@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primaryColor: rgb(119, 64, 106);
+  --secondColor: #aaabac;
+  --thirdColor: #20b2aa;
+  --fourthColor: #000000;
+  --fifthColor: #fff;
+  --sixthColor: #8c8b8b;
+
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 0%;
+
+  --primary: 320 30% 36%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 0 0% 68%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 210 20% 96%;
+  --muted-foreground: 0 0% 55%;
+
+  --accent: 174 70% 41%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 0 0% 68%;
+  --input: 0 0% 68%;
+  --ring: 320 30% 36%;
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+
+  --card: 0 0% 12%;
+  --card-foreground: 0 0% 100%;
+
+  --popover: 0 0% 12%;
+  --popover-foreground: 0 0% 100%;
+
+  --primary: 320 30% 36%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 0 0% 17%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 0 0% 17%;
+  --muted-foreground: 0 0% 67%;
+
+  --accent: 174 70% 41%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 320 30% 36%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Clases de utilidad personalizadas para los colores específicos */
+@layer utilities {
+  .bg-primary-custom {
+    background-color: rgb(119, 64, 106);
+  }
+
+  .text-primary-custom {
+    color: rgb(119, 64, 106);
+  }
+
+  .bg-accent-custom {
+    background-color: #20b2aa;
+  }
+
+  .text-accent-custom {
+    color: #20b2aa;
+  }
+
+  .border-primary-custom {
+    border-color: rgb(119, 64, 106);
+  }
+
+  .border-accent-custom {
+    border-color: #20b2aa;
+  }
+}
+
+/* Estilos personalizados para componentes específicos */
+@layer components {
+
+  /* Estilos para las pestañas */
+  .tabs-list {
+    @apply flex p-1 bg-secondary rounded-md;
+  }
+
+  .tab-trigger {
+    @apply flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all;
+  }
+
+  .tab-trigger[data-state="active"] {
+    @apply bg-primary-custom text-white;
+  }
+
+  .tab-trigger[data-state="inactive"] {
+    @apply text-foreground hover:bg-muted;
+  }
+
+  /* Estilos para modales */
+  .dialog-overlay {
+    @apply bg-black/50 backdrop-blur-sm;
+  }
+
+  .dialog-content {
+    @apply bg-background border border-border shadow-lg;
+  }
+}
