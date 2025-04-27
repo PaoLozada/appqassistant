@@ -9,8 +9,7 @@ export async function analyzeUrlWithAI(url: string): Promise<string> {
   try {
     // Inicializar el cliente de OpenAI con la API key fija y permitir uso en navegador
     const openai = new OpenAI({
-      apiKey: OPENAI_API_KEY,
-      dangerouslyAllowBrowser: true,
+      apiKey: OPENAI_API_KEY
     })
 
     console.log("Analizando URL con IA:", url)

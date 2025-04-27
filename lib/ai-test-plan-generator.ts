@@ -159,8 +159,7 @@ export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan
   try {
     // Inicializar el cliente de OpenAI con la API key fija y permitir uso en navegador
     const openai = new OpenAI({
-      apiKey: OPENAI_API_KEY,
-      dangerouslyAllowBrowser: true,
+      apiKey: OPENAI_API_KEY
     })
 
     console.log("API Key disponible:", process.env.OPENAI_API_KEY ? "Sí" : "No")
