@@ -3,7 +3,7 @@ import type { TestPlan, TestPlanInput } from "./types"
 import { generateTestPlan } from "./test-plan-generator"
 
 // API Key fija de OpenAI (reemplaza esto con tu API key real)
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY
 // Modelo a utilizar - Cambiado a GPT-3.5-turbo-16k para manejar respuestas largas
 const DEFAULT_MODEL = "gpt-4o-mini" // Cambiado a modelo más estable
 

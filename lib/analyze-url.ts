@@ -1,7 +1,7 @@
 import { OpenAI } from "openai"
 
 // API Key fija de OpenAI (reemplaza esto con tu API key real)
-const OPENAI_API_KEY = "tu-api-key-aquí"
+const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY
 // Modelo a utilizar - Cambiado a GPT-4 para obtener respuestas de mayor calidad
 const DEFAULT_MODEL = "gpt-4" // Alternativas: "gpt-4o", "gpt-4-turbo"
 
