@@ -18,12 +18,12 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
   try {
     // Configurar el transporte de correo con las variables de entorno
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "",
+      host: process.env.SMTP_HOST as string || "",
       port: 465,
       secure: true,
       auth: {
-        user: process.env.SMTP_USER || "",
-        pass: process.env.SMTP_PASSWORD || "",
+        user: process.env.SMTP_USER as string || "",
+        pass: process.env.SMTP_PASSWORD as string || "",
       },
     })
 

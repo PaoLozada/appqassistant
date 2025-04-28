@@ -1,4 +1,4 @@
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app)
+[![Deploy on Railway](https://railway.app/button.svg)](https://appqassistant-production.up.railway.app/)
 
 # QAssistant – Generador de Planes de Prueba 🧪🧠
 
