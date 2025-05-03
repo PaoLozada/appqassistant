@@ -2,10 +2,9 @@ import { OpenAI } from "openai"
 import type { TestPlan, TestPlanInput } from "./types"
 import { generateTestPlan } from "./test-plan-generator"
 
-// API Key fija de OpenAI (reemplaza esto con tu API key real)
-const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
-// Modelo a utilizar - Cambiado a GPT-3.5-turbo-16k para manejar respuestas largas
-const DEFAULT_MODEL = "gpt-4o-mini" // Cambiado a modelo más estable
+
+
+const DEFAULT_MODEL = "gpt-4o-mini" 
 
 // Actualizar la función createPrompt para incluir información del tipo de aplicación
 function createPrompt(input: TestPlanInput): string {
@@ -154,12 +153,11 @@ IMPORTANTE: Asegúrate de que tu respuesta sea un JSON válido. No incluyas comi
 }
 
 export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan> {
-  console.log("sssssssssssssssssssssssssss", process.env.OPENAI_API_KEY)
-  console.log("mi Key:", OPENAI_API_KEY)
+
   try {
-    // Inicializar el cliente de OpenAI con la API key fija y permitir uso en navegador
+    
     const openai = new OpenAI({
-      apiKey: OPENAI_API_KEY
+      apiKey: process.env.OPENAI_API_KEY!,
     })
 
     console.log("API Key disponible:", process.env.OPENAI_API_KEY ? "Sí" : "No")
@@ -179,8 +177,8 @@ export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan
         },
         { role: "user", content: prompt },
       ],
-      temperature: 0.3, // Reducido para respuestas más consistentes y predecibles
-      max_tokens: 10000, // Reducido para evitar respuestas demasiado largas
+      temperature: 0.3, 
+      max_tokens: 10000, 
     })
 
     const aiResponse = response.choices[0].message.content
@@ -252,5 +250,18 @@ export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan
       description: input.description,
     }
   }
-}
+} 
 
+  /* export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan> {
+    console.log("Generando plan con IA en el servidor...");
+  
+    const prompt = `Genera un plan de pruebas para un sistema con los siguientes datos: ${JSON.stringify(input)}`;
+    const response = await openai.chat.completions.create({
+      model: "gpt-4", // o el que estés usando
+      messages: [{ role: "user", content: prompt }],
+    });
+  
+    const content = response.choices[0].message.content;
+    const result: TestPlan = JSON.parse(content || "{}");
+    return result;
+  } */

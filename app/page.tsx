@@ -136,7 +136,6 @@ export default function Home() {
   const [emailSent, setEmailSent] = useState(false)
 
   // Primero, agreguemos un nuevo estado para el formato de envío
-  // Añade esto junto a los otros estados al inicio del componente (cerca de la línea 70-80)
   const [emailFormat, setEmailFormat] = useState<"html" | "pdf">("html")
 
   // Estado para el caso de prueba activo en la vista de tabla
@@ -189,12 +188,12 @@ export default function Home() {
   // Función para generar el plan de pruebas
   const handleGenerateTestPlan = async () => {
     if (!description) {
-      alert("Por favor, proporciona una descripción del sistema a probar.")
-      return
+      alert("Por favor, proporciona una descripción del sistema a probar.");
+      return;
     }
-
-    setIsGenerating(true)
-
+  
+    setIsGenerating(true);
+  
     try {
       const input: TestPlanInput = {
         description,
@@ -205,34 +204,43 @@ export default function Home() {
         applicationType,
         applicationSubtype,
         applicationFeatures: selectedFeatures,
-      }
-
-      console.log("Generando plan con input:", input)
-
-      // Intentar generar con IA primero
+      };
+  
+      console.log("Generando plan con input:", input);
+  
       try {
-        console.log("Intentando generar plan con OpenAI...")
-        const aiPlan = await generateAITestPlan(input)
-        console.log("Plan generado con OpenAI exitosamente")
-        setTestPlan(aiPlan)
+        console.log("Intentando generar plan con OpenAI desde la API interna...");
+        const response = await fetch("/api/generate-ai-plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(input),
+        });
+  
+        if (!response.ok) {
+          throw new Error("Error desde la API interna");
+        }
+  
+        const data = await response.json();
+        console.log("Plan generado:", data);
+        setTestPlan(data);
       } catch (error) {
-        console.error("Error al generar plan con IA:", error)
-        // Si falla, usar el generador predeterminado
-        console.log("Usando generador predeterminado como fallback")
-        const fallbackPlan = generateTestPlan(input)
-        fallbackPlan.source = "Generador predeterminado (fallback por error en OpenAI)"
-        setTestPlan(fallbackPlan)
+        console.error("❌ Error al generar plan con IA:", error);
+        console.log("⚠️ Usando generador predeterminado como fallback...");
+        const fallbackPlan = generateTestPlan(input);
+        fallbackPlan.source = "Generador predeterminado (fallback por error en OpenAI)";
+        setTestPlan(fallbackPlan);
       }
-
-      // Establecer el asunto del correo predeterminado
-      setEmailSubject(`Plan de Pruebas: ${description.substring(0, 50)}${description.length > 50 ? "..." : ""}`)
+  
+      // Asunto predeterminado para el email
+      setEmailSubject(`Plan de Pruebas: ${description.substring(0, 50)}${description.length > 50 ? "..." : ""}`);
     } catch (error) {
-      console.error("Error al generar el plan de pruebas:", error)
-      alert("Ocurrió un error al generar el plan de pruebas. Por favor, intenta de nuevo.")
+      console.error("⚠️ Error general en la generación:", error);
+      alert("Ocurrió un error inesperado. Por favor, intenta de nuevo.");
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
+  
 
   // Funciones para editar objetivos
   const handleEditObjective = (index: number, value: string) => {
