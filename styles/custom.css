@@ -50,7 +50,8 @@
 
 .footer-distributed h3 {
   color: var(--secondColor);
-  font: normal 36px 'Shadow', cursive;
+  font: normal 36px 'Shadow';
+  font-family: "Comic Sans MS", "Comic Sans", sans-serif;
   margin: 0;
 }
 
