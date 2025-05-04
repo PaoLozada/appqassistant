@@ -2,13 +2,17 @@
 
 /* src/App.css */
 ::selection {
-  background-color: var(--primaryColor); /* Un azul con transparencia */
-  color: var(--fifthColor); /* Texto blanco al seleccionar */
+  background-color: var(--primaryColor);
+  /* Un azul con transparencia */
+  color: var(--fifthColor);
+  /* Texto blanco al seleccionar */
 }
 
 ::-moz-selection {
-  background-color:var(--primaryColor); /* Un azul con transparencia */
-  color: var(--fifthColor); /* Texto blanco al seleccionar */
+  background-color: var(--primaryColor);
+  /* Un azul con transparencia */
+  color: var(--fifthColor);
+  /* Texto blanco al seleccionar */
 }
 
 .logo_tittle {
@@ -152,12 +156,14 @@
   margin-bottom: 5px;
 }
 
-.footer-distributed h3:hover{
+.footer-distributed h3:hover {
   color: var(--thirdColor);
 }
-.footer-distributed h3 span:hover{
+
+.footer-distributed h3 span:hover {
   color: var(--secondColor);
 }
+
 .footer-distributed .footer-links:hover {
   color: var(--thirdColor);
 
@@ -165,4 +171,39 @@
 
 .footer-distributed a:hover {
   color: var(--thirdColor);
+}
+
+
+
+@media (max-width: 880px) {
+  .footer-distributed {
+    font: bold 14px sans-serif;
+  }
+
+  .footer-distributed .footer-left,
+  .footer-distributed .footer-center,
+  .footer-distributed .footer-right {
+    display: block;
+    width: 100%;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .footer-distributed .footer-center i {
+    margin-left: 0;
+  }
+
+}
+
+
+@media screen and (max-width:265px) {
+
+  .footer-distributed {
+    padding: 5vw;
+  }
+
+  .footer-distributed h3 {
+    font: normal 11vw 'Open Sans', cursive;
+  }
+
 }
