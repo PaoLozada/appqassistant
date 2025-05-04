@@ -4,8 +4,8 @@ import '../styles/custom.css';
 
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'appqa.paolozada',
+  description: 'Created by paolozada.com whit help to IA V0',
   generator: 'v0.dev',
 }
 

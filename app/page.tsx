@@ -6,6 +6,7 @@ import type { TestPlan, TestPlanInput } from "@/lib/types"
 import { sendEmail } from "@/lib/send-email"
 import type { Risk, TestCase } from "@/lib/types"
 import { generateAITestPlan } from "@/lib/ai-test-plan-generator"
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 // Definición de tipos de aplicación y subtipos
 const applicationTypes = ["Web", "API", "Escritorio", "Móvil"]
@@ -191,9 +192,9 @@ export default function Home() {
       alert("Por favor, proporciona una descripción del sistema a probar.");
       return;
     }
-  
+
     setIsGenerating(true);
-  
+
     try {
       const input: TestPlanInput = {
         description,
@@ -205,9 +206,9 @@ export default function Home() {
         applicationSubtype,
         applicationFeatures: selectedFeatures,
       };
-  
+
       console.log("Generando plan con input:", input);
-  
+
       try {
         console.log("Intentando generar plan con OpenAI desde la API interna...");
         const response = await fetch("/api/generate-ai-plan", {
@@ -215,11 +216,11 @@ export default function Home() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(input),
         });
-  
+
         if (!response.ok) {
           throw new Error("Error desde la API interna");
         }
-  
+
         const data = await response.json();
         console.log("Plan generado:", data);
         setTestPlan(data);
@@ -230,7 +231,7 @@ export default function Home() {
         fallbackPlan.source = "Generador predeterminado (fallback por error en OpenAI)";
         setTestPlan(fallbackPlan);
       }
-  
+
       // Asunto predeterminado para el email
       setEmailSubject(`Plan de Pruebas: ${description.substring(0, 50)}${description.length > 50 ? "..." : ""}`);
     } catch (error) {
@@ -240,7 +241,7 @@ export default function Home() {
       setIsGenerating(false);
     }
   };
-  
+
 
   // Funciones para editar objetivos
   const handleEditObjective = (index: number, value: string) => {
@@ -2221,23 +2222,74 @@ export default function Home() {
 
               {/* Mensaje de éxito */}
               {emailSent && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                <div className="bg-green-100 text-green-900 rounded-xl shadow-xl p-6 max-w-md w-[90%] text-center">
-                  <div className="text-xl font-bold mb-2">📬 ¡Correo enviado!</div>
-                  <p className="text-green-800">✅ Tu plan fue enviado correctamente.<br /> ¡Que la calidad te acompañe!</p>
-                  <button 
-                    onClick={() => setEmailSent(false)}
-                    className="mt-4 bg-green-700 text-white py-2 px-6 rounded-md hover:bg-green-800 transition">
-                    Cerrar
-                  </button>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                  <div className="bg-green-100 text-green-900 rounded-xl shadow-xl p-6 max-w-md w-[90%] text-center">
+                    <div className="text-xl font-bold mb-2">📬 ¡Correo enviado!</div>
+                    <p className="text-green-800">✅ Tu plan fue enviado correctamente.<br /> ¡Que la calidad te acompañe!</p>
+                    <button
+                      onClick={() => setEmailSent(false)}
+                      className="mt-4 bg-green-700 text-white py-2 px-6 rounded-md hover:bg-green-800 transition">
+                      Cerrar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             </div>
           </div>
         </div>
       )}
+      <footer className="footer-distributed">
+
+        <div className="footer-left">
+          <a href="https://paolozada.com" target="_blank"><h3>Paola<span>Lozada</span></h3></a>
+         
+
+          <p className="footer-links">
+            <a href="https://paolozada.com#about" target="_blank" className="link-1">About me</a>
+
+            <a href="https://paolozada.com/info/contact" target="_blank">Contact</a>
+          </p>
+
+
+        </div>
+
+        <div className="footer-center">
+
+          <div>
+            <i className="bi bi-geo-alt-fill"></i>
+            <p> Cundinamarca, Colombia</p>
+          </div>
+
+          <div>
+            <i className="bi bi-telephone-fill"></i>
+            <p>+571 3118534588</p>
+          </div>
+
+          <div>
+            <i className="bi bi-envelope-fill"></i>
+            <p className="mail "><a href="mailto:dev@paolozada.com">dev@paolozada.com</a></p>
+          </div>
+
+        </div>
+
+        <div className="footer-right">
+
+          <p className="footer-company-about">
+            <span>About</span>On this website, you will find a person passionate about challenges and always in search of new opportunities to learn and grow.
+          </p>
+
+          <div className="footer-icons">
+
+            <a href="https://www.linkedin.com/in/paola-a-lozada-g/" target="_blank"><i className="bi bi-linkedin"></i></a>
+            <a href="https://github.com/PaoLozada" target="_blank"><i className="bi bi-github"></i></a>
+            <a href="https://twitter.com/PaolaALoG" target="_blank"><i className="bi bi-twitter"></i></a>
+
+          </div>
+
+        </div>
+
+      </footer>
     </div>
   )
 }

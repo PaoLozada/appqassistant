@@ -1,10 +1,168 @@
 /* styles/custom.css */
 
+/* src/App.css */
+::selection {
+  background-color: var(--primaryColor); /* Un azul con transparencia */
+  color: var(--fifthColor); /* Texto blanco al seleccionar */
+}
+
+::-moz-selection {
+  background-color:var(--primaryColor); /* Un azul con transparencia */
+  color: var(--fifthColor); /* Texto blanco al seleccionar */
+}
+
 .logo_tittle {
-    display: flex;
-  }
-  
-  .logo_pl {
-    width: 30%;
-  }
-  
+  display: flex;
+}
+
+.logo_pl {
+  width: 30%;
+}
+
+.footer-distributed {
+  background-color: var(--fourthColor);
+  margin-top: 50px;
+  box-sizing: border-box;
+  width: 100%;
+  text-align: left;
+  font: bold 16px sans-serif;
+  padding: 55px 50px;
+}
+
+.footer-distributed .footer-left,
+.footer-distributed .footer-center,
+.footer-distributed .footer-right {
+  display: inline-block;
+  vertical-align: top;
+}
+
+/* Footer left */
+
+.footer-distributed .footer-left {
+  width: 40%;
+}
+
+/* The company logo */
+
+.footer-distributed h3 {
+  color: var(--secondColor);
+  font: normal 36px 'Shadow', cursive;
+  margin: 0;
+}
+
+.footer-distributed h3 span {
+  color: var(--thirdColor);
+}
+
+/* Footer links */
+
+.footer-distributed .footer-links {
+  color: var(--fifthColor);
+  margin: 20px 0 12px;
+  padding: 0;
+}
+
+.footer-distributed .footer-links a {
+  display: inline-block;
+  line-height: 1.8;
+  font-weight: 400;
+  text-decoration: underline;
+  color: inherit;
+}
+
+/* Footer Center */
+
+.footer-distributed .footer-center {
+  width: 35%;
+}
+
+.footer-distributed .footer-center i {
+  background-color: transparents;
+  color: var(--thirdColor);
+  font-size: 25px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 42px;
+  margin: 10px 15px;
+  vertical-align: middle;
+}
+
+.footer-distributed .footer-center p {
+  display: inline-block;
+  color: var(--fifthColor);
+  font-weight: 400;
+  vertical-align: middle;
+  margin: 0;
+}
+
+.footer-distributed .footer-links a:before {
+  content: "|";
+  font-weight: 300;
+  font-size: 20px;
+  left: 0;
+  color: var(--fifthColor);
+  display: inline-block;
+  padding: 5px;
+}
+
+.footer-distributed .footer-links .link-1:before {
+  content: none;
+}
+
+/* Footer Right */
+
+.footer-distributed .footer-right {
+  width: 20%;
+}
+
+.footer-distributed .footer-company-about {
+  line-height: 20px;
+  color: var(--fifthColor);
+  font-size: 13px;
+  font-weight: normal;
+  margin: 0;
+}
+
+.footer-distributed .footer-company-about span {
+  display: block;
+  color: var(--thirdColor);
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.footer-distributed .footer-icons {
+  margin-top: 25px;
+}
+
+.footer-distributed .footer-icons a {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+  background-color: transparent;
+  border-radius: 2px;
+  font-size: 20px;
+  color: var(--secondColor);
+  text-align: center;
+  line-height: 35px;
+  margin-right: 3px;
+  margin-bottom: 5px;
+}
+
+.footer-distributed h3:hover{
+  color: var(--thirdColor);
+}
+.footer-distributed h3 span:hover{
+  color: var(--secondColor);
+}
+.footer-distributed .footer-links:hover {
+  color: var(--thirdColor);
+
+}
+
+.footer-distributed a:hover {
+  color: var(--thirdColor);
+}
