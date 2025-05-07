@@ -622,8 +622,8 @@ function generateTimeEstimation(input: TestPlanInput): {
     },
   ]
 
-  // Calcular el total de días
-  const totalDays = phases.reduce((sum, phase) => sum + phase.duration, 0)
+ // Calcular el total de días sumando la duración de cada fase
+ const totalDays = phases.reduce((sum, phase) => sum + phase.duration, 0)
 
   const factors = [
     "Complejidad del sistema",
@@ -635,6 +635,7 @@ function generateTimeEstimation(input: TestPlanInput): {
     "Nivel de automatización de pruebas",
     "Dependencias externas",
   ]
+
 
   return {
     phases,

@@ -18,12 +18,12 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
   try {
     // Configurar el transporte de correo con las variables de entorno
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST as string || "",
+      host: (process.env.SMTP_HOST as string) || "",
       port: 465,
       secure: true,
       auth: {
-        user: process.env.SMTP_USER as string || "",
-        pass: process.env.SMTP_PASSWORD as string || "",
+        user: (process.env.SMTP_USER as string) || "",
+        pass: (process.env.SMTP_PASSWORD as string) || "",
       },
     })
 
@@ -101,6 +101,57 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
 
   `
 
+    // Crear el cuerpo del correo de confirmación para el remitente
+    const confirmationEmailBody = `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; color: #333;">
+  <!-- Encabezado -->
+  <div style="background-color: rgb(119, 64, 106); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
+    <a href="https://paolozada.com" target="_blank">
+      <img src="https://paolozada.com/info/wp-content/uploads/2025/04/iconPL-1.png" alt="Icono de la app" width="60" height="60" style="vertical-align: middle; margin-right: 10px;">
+    </a>
+    <h1 style="display: inline-block; margin: 0; vertical-align: middle;">Confirmación de Envío</h1>
+  </div>
+
+  <!-- Cuerpo -->
+  <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
+    <p style="font-size: 16px;">¡Hola!</p>
+
+    <p style="font-size: 16px;">
+      Se ha enviado correctamente un plan de pruebas generado con <strong>QAssistant</strong>.
+    </p>
+
+    <div style="background-color: #e9e9e9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+      <p style="font-size: 16px; margin: 5px 0;"><strong>Detalles del envío:</strong></p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>Destinatario:</strong> ${params.to}</p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>Asunto:</strong> ${params.subject}</p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>Nombre del plan:</strong> ${params.planName}</p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>Formato:</strong> ${params.format || "HTML"}</p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>Fecha y hora:</strong> ${new Date().toLocaleString()}</p>
+    </div>
+
+    <p style="font-size: 16px;">
+      Se ha adjuntado una copia del plan de pruebas enviado para tu referencia.
+    </p>
+
+    <p style="font-size: 16px; margin-top: 30px;">
+      ¡Gracias por usar QAssistant!
+    </p>
+
+    <!-- Despedida -->
+    <p style="margin-top: 20px; font-size: 16px;">
+      <em style="color: #20b2aa;">⚔️🤖🔦Que la calidad te acompañe,</em><br>
+      <strong>Paola</strong><br>
+      <a href="https://paolozada.com" style="color: #77406A;">paolozada.com</a>
+    </p>
+
+    <!-- Pie de página -->
+    <p style="font-size: 10px; color: #999; text-align: center; margin-top: 40px;">
+      Este es un correo automático de confirmación. Por favor, no respondas a este mensaje.
+    </p>
+  </div>
+</div>
+  `
+
 
     const attachments = [
       {
@@ -110,7 +161,7 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
       },
     ]
 
-    // Enviar el correo con el adjunto correspondiente
+    // 1. Enviar el correo al destinatario con el adjunto
     const info = await transporter.sendMail({
       from: params.from,
       to: params.to,
@@ -119,6 +170,15 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
       attachments: attachments,
     })
 
+        // 2. Enviar correo de confirmación al remitente predeterminado
+        const remitentePredeterminado = "letmehelpyou@paolozada.com"
+        await transporter.sendMail({
+          from: remitentePredeterminado,
+          to: remitentePredeterminado,
+          subject: `Confirmación: Plan de Pruebas enviado a ${params.to}`,
+          html: confirmationEmailBody,
+          attachments: attachments, // Adjuntar también el plan de pruebas
+        })
     console.log("Correo enviado:", info.messageId)
     return { success: true, message: "Correo enviado correctamente" }
   } catch (error) {

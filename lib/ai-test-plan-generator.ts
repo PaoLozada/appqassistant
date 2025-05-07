@@ -154,6 +154,7 @@ IMPORTANTE: Asegúrate de que tu respuesta sea un JSON válido. No incluyas comi
 
 export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan> {
 
+
   try {
     
     const openai = new OpenAI({
@@ -177,8 +178,8 @@ export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan
         },
         { role: "user", content: prompt },
       ],
-      temperature: 0.3, 
-      max_tokens: 10000, 
+      temperature: 0.3, // Reducido para respuestas más consistentes y predecibles
+      max_tokens: 10000, // Reducido para evitar respuestas demasiado largas
     })
 
     const aiResponse = response.choices[0].message.content

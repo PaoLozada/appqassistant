@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --primaryColor: rgb(119, 64, 106);
+  --primaryColor: #5A1A2D;
   --secondColor: #aaabac;
   --thirdColor: #20b2aa;
   --fourthColor: #000000;
@@ -84,27 +84,27 @@
 /* Clases de utilidad personalizadas para los colores específicos */
 @layer utilities {
   .bg-primary-custom {
-    background-color: rgb(119, 64, 106);
+    background-color:var(--primaryColor);
   }
 
   .text-primary-custom {
-    color: rgb(119, 64, 106);
+    color: var(--primaryColor);
   }
 
   .bg-accent-custom {
-    background-color: #20b2aa;
+    background-color: var(--thirdColor);
   }
 
   .text-accent-custom {
-    color: #20b2aa;
+    color: var(--thirdColor);
   }
 
   .border-primary-custom {
-    border-color: rgb(119, 64, 106);
+    border-color: var(--primaryColor);
   }
 
   .border-accent-custom {
-    border-color: #20b2aa;
+    border-color:var(--thirdColor);
   }
 }
 

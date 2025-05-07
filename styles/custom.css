@@ -10,14 +10,14 @@
 
 ::-moz-selection {
   background-color: var(--primaryColor);
-  /* Un azul con transparencia */
-  color: var(--fifthColor);
-  /* Texto blanco al seleccionar */
+   color: var(--fifthColor);
 }
-
+.tittle_app{
+  width: 70%;
+}
 .logo_tittle {
   display: flex;
-}
+}h
 
 .logo_pl {
   width: 30%;

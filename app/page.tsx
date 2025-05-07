@@ -5,8 +5,8 @@ import { generateTestPlan } from "@/lib/test-plan-generator"
 import type { TestPlan, TestPlanInput } from "@/lib/types"
 import { sendEmail } from "@/lib/send-email"
 import type { Risk, TestCase } from "@/lib/types"
-import { generateAITestPlan } from "@/lib/ai-test-plan-generator"
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import "bootstrap-icons/font/bootstrap-icons.css"
+import LoadingGame from "@/components/loading-game"
 
 // Definición de tipos de aplicación y subtipos
 const applicationTypes = ["Web", "API", "Escritorio", "Móvil"]
@@ -141,7 +141,7 @@ export default function Home() {
 
   // Estado para el caso de prueba activo en la vista de tabla
   //const [activeTestCaseDetails, setActiveTestCaseDetails, setActiveTestCaseDetails] = useState<number | null>(null)
-
+  const [showLoadingGame, setShowLoadingGame] = useState(false)
   // Efecto para actualizar subtipos disponibles cuando cambia el tipo de aplicación
   useEffect(() => {
     if (applicationType) {
@@ -189,12 +189,12 @@ export default function Home() {
   // Función para generar el plan de pruebas
   const handleGenerateTestPlan = async () => {
     if (!description) {
-      alert("Por favor, proporciona una descripción del sistema a probar.");
-      return;
+      alert("Por favor, proporciona una descripción del sistema a probar.")
+      return
     }
 
-    setIsGenerating(true);
-
+    setIsGenerating(true)
+    setShowLoadingGame(true) // Mostrar el juego de carga
     try {
       const input: TestPlanInput = {
         description,
@@ -205,45 +205,64 @@ export default function Home() {
         applicationType,
         applicationSubtype,
         applicationFeatures: selectedFeatures,
-      };
+      }
 
-      console.log("Generando plan con input:", input);
+      console.log("Generando plan con input:", input)
 
       try {
-        console.log("Intentando generar plan con OpenAI desde la API interna...");
+        console.log("Intentando generar plan con OpenAI desde la API interna...")
         const response = await fetch("/api/generate-ai-plan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(input),
-        });
+        })
 
         if (!response.ok) {
-          throw new Error("Error desde la API interna");
+          throw new Error("Error desde la API interna")
         }
 
-        const data = await response.json();
-        console.log("Plan generado:", data);
-        setTestPlan(data);
+        const data = await response.json()
+        console.log("Plan generado:", data)
+        setTestPlan(data)
       } catch (error) {
-        console.error("❌ Error al generar plan con IA:", error);
-        console.log("⚠️ Usando generador predeterminado como fallback...");
-        const fallbackPlan = generateTestPlan(input);
-        fallbackPlan.source = "Generador predeterminado (fallback por error en OpenAI)";
-        setTestPlan(fallbackPlan);
+        console.error("❌ Error al generar plan con IA:", error)
+        console.log("⚠️ Usando generador predeterminado como fallback...")
+        const fallbackPlan = generateTestPlan(input)
+        fallbackPlan.source = "Generador predeterminado (fallback por error en OpenAI)"
+        setTestPlan(fallbackPlan)
       }
 
       // Asunto predeterminado para el email
-      setEmailSubject(`Plan de Pruebas: ${description.substring(0, 50)}${description.length > 50 ? "..." : ""}`);
+      setEmailSubject(`Plan de Pruebas: ${description.substring(0, 50)}${description.length > 50 ? "..." : ""}`)
     } catch (error) {
-      console.error("⚠️ Error general en la generación:", error);
-      alert("Ocurrió un error inesperado. Por favor, intenta de nuevo.");
+      console.error("⚠️ Error general en la generación:", error)
+      alert("Ocurrió un error inesperado. Por favor, intenta de nuevo.")
     } finally {
-      setIsGenerating(false);
+      setIsGenerating(false)
+      setShowLoadingGame(false) // Ocultar el juego de carga
     }
-  };
+  }
 
+  // Funciones para añadir y editar objetivos
+  const handleAddObjective = () => {
+    if (!testPlan) return
+    const newObjective = "Nuevo objetivo"
+    setTestPlan({
+      ...testPlan,
+      objectives: [newObjective, ...testPlan.objectives],
+    })
+  }
 
-  // Funciones para editar objetivos
+  const handleDeleteObjective = (index: number) => {
+    if (!testPlan) return
+    const updatedObjectives = [...testPlan.objectives]
+    updatedObjectives.splice(index, 1)
+    setTestPlan({
+      ...testPlan,
+      objectives: updatedObjectives,
+    })
+  }
+
   const handleEditObjective = (index: number, value: string) => {
     if (!testPlan) return
     const updatedObjectives = [...testPlan.objectives]
@@ -254,7 +273,32 @@ export default function Home() {
     })
   }
 
-  // Funciones para editar alcance
+  // Funciones para añadir y editar alcance
+  const handleAddIncludedScope = () => {
+    if (!testPlan) return
+    const newItem = "Nuevo elemento incluido"
+    setTestPlan({
+      ...testPlan,
+      scope: {
+        ...testPlan.scope,
+        included: [newItem, ...testPlan.scope.included],
+      },
+    })
+  }
+
+  const handleDeleteIncludedScope = (index: number) => {
+    if (!testPlan) return
+    const updatedIncluded = [...testPlan.scope.included]
+    updatedIncluded.splice(index, 1)
+    setTestPlan({
+      ...testPlan,
+      scope: {
+        ...testPlan.scope,
+        included: updatedIncluded,
+      },
+    })
+  }
+
   const handleEditIncludedScope = (index: number, value: string) => {
     if (!testPlan) return
     const updatedIncluded = [...testPlan.scope.included]
@@ -264,6 +308,31 @@ export default function Home() {
       scope: {
         ...testPlan.scope,
         included: updatedIncluded,
+      },
+    })
+  }
+
+  const handleAddExcludedScope = () => {
+    if (!testPlan) return
+    const newItem = "Nuevo elemento excluido"
+    setTestPlan({
+      ...testPlan,
+      scope: {
+        ...testPlan.scope,
+        excluded: [newItem, ...testPlan.scope.excluded],
+      },
+    })
+  }
+
+  const handleDeleteExcludedScope = (index: number) => {
+    if (!testPlan) return
+    const updatedExcluded = [...testPlan.scope.excluded]
+    updatedExcluded.splice(index, 1)
+    setTestPlan({
+      ...testPlan,
+      scope: {
+        ...testPlan.scope,
+        excluded: updatedExcluded,
       },
     })
   }
@@ -281,7 +350,31 @@ export default function Home() {
     })
   }
 
-  // Funciones para editar riesgos
+  // Funciones para añadir y editar riesgos
+  const handleAddRisk = () => {
+    if (!testPlan) return
+    const newRisk: Risk = {
+      description: "Nueva descripción de riesgo",
+      impact: "Medio",
+      probability: "Media",
+      mitigation: "Nueva estrategia de mitigación",
+    }
+    setTestPlan({
+      ...testPlan,
+      risks: [newRisk, ...testPlan.risks],
+    })
+  }
+
+  const handleDeleteRisk = (index: number) => {
+    if (!testPlan) return
+    const updatedRisks = [...testPlan.risks]
+    updatedRisks.splice(index, 1)
+    setTestPlan({
+      ...testPlan,
+      risks: updatedRisks,
+    })
+  }
+
   const handleEditRisk = (index: number, field: keyof Risk, value: string) => {
     if (!testPlan) return
     const updatedRisks = [...testPlan.risks]
@@ -295,7 +388,34 @@ export default function Home() {
     })
   }
 
-  // Funciones para editar casos de prueba
+  // Funciones para añadir y editar casos de prueba
+  const handleAddTestCase = () => {
+    if (!testPlan) return
+    const newTestCase: TestCase = {
+      title: "Nuevo caso de prueba",
+      priority: "Media",
+      preconditions: ["Precondición 1"],
+      steps: ["Paso 1"],
+      expectedResult: "Resultado esperado",
+      type: "Funcional",
+      automatable: true,
+    }
+    setTestPlan({
+      ...testPlan,
+      testCases: [newTestCase, ...testPlan.testCases],
+    })
+  }
+
+  const handleDeleteTestCase = (index: number) => {
+    if (!testPlan) return
+    const updatedTestCases = [...testPlan.testCases]
+    updatedTestCases.splice(index, 1)
+    setTestPlan({
+      ...testPlan,
+      testCases: updatedTestCases,
+    })
+  }
+
   const handleEditTestCase = (index: number, field: keyof TestCase, value: string | string[] | boolean) => {
     if (!testPlan) return
     const updatedTestCases = [...testPlan.testCases]
@@ -316,7 +436,48 @@ export default function Home() {
     })
   }
 
-  // Funciones para editar estimación de tiempos
+  // Funciones para añadir y editar estimación de tiempos
+  const handleAddTimeEstimationPhase = () => {
+    if (!testPlan) return
+    const newPhase = {
+      name: "Nueva fase",
+      duration: 1,
+      resources: "Recursos necesarios",
+      justification: "Justificación de la duración",
+    }
+    const updatedPhases = [newPhase, ...testPlan.timeEstimation.phases]
+
+    // Recalcular el tiempo total
+    const totalDays = updatedPhases.reduce((sum, phase) => sum + phase.duration, 0)
+
+    setTestPlan({
+      ...testPlan,
+      timeEstimation: {
+        ...testPlan.timeEstimation,
+        phases: updatedPhases,
+        totalDays: totalDays,
+      },
+    })
+  }
+
+  const handleDeleteTimeEstimationPhase = (index: number) => {
+    if (!testPlan) return
+    const updatedPhases = [...testPlan.timeEstimation.phases]
+    updatedPhases.splice(index, 1)
+
+    // Recalcular el tiempo total
+    const totalDays = updatedPhases.reduce((sum, phase) => sum + phase.duration, 0)
+
+    setTestPlan({
+      ...testPlan,
+      timeEstimation: {
+        ...testPlan.timeEstimation,
+        phases: updatedPhases,
+        totalDays: totalDays,
+      },
+    })
+  }
+
   const handleEditTimeEstimation = (index: number, field: string, value: string | number) => {
     if (!testPlan) return
     const updatedPhases = [...testPlan.timeEstimation.phases]
@@ -324,11 +485,41 @@ export default function Home() {
       ...updatedPhases[index],
       [field]: field === "duration" ? Number(value) : value,
     }
+
+    // Recalcular el tiempo total
+    const totalDays = updatedPhases.reduce((sum, phase) => sum + phase.duration, 0)
+
     setTestPlan({
       ...testPlan,
       timeEstimation: {
         ...testPlan.timeEstimation,
         phases: updatedPhases,
+        totalDays: totalDays, // Actualizar el tiempo total
+      },
+    })
+  }
+
+  const handleAddTimeEstimationFactor = () => {
+    if (!testPlan) return
+    const newFactor = "Nuevo factor considerado"
+    setTestPlan({
+      ...testPlan,
+      timeEstimation: {
+        ...testPlan.timeEstimation,
+        factors: [newFactor, ...testPlan.timeEstimation.factors],
+      },
+    })
+  }
+
+  const handleDeleteTimeEstimationFactor = (index: number) => {
+    if (!testPlan) return
+    const updatedFactors = [...testPlan.timeEstimation.factors]
+    updatedFactors.splice(index, 1)
+    setTestPlan({
+      ...testPlan,
+      timeEstimation: {
+        ...testPlan.timeEstimation,
+        factors: updatedFactors,
       },
     })
   }
@@ -372,6 +563,7 @@ export default function Home() {
         techniques: updatedTechniques,
       },
     })
+    setEditingStrategyTechnique(null) // Asegurarse de que se cierre el modo de edición
   }
 
   const handleEditEntryCriteria = (index: number, value: string) => {
@@ -400,14 +592,103 @@ export default function Home() {
     })
   }
 
-  // Funciones para editar entorno
-  const handleEditEnvironment = (index: number, field: string, value: string) => {
+  // Funciones para añadir elementos a las listas de estrategia
+  const handleAddStrategyTechnique = () => {
+    if (!testPlan) return
+    const newTechnique = { name: "Nueva Técnica", description: "Descripción de la nueva técnica" }
+    setTestPlan({
+      ...testPlan,
+      strategy: {
+        ...testPlan.strategy,
+        techniques: [newTechnique, ...testPlan.strategy.techniques],
+      },
+    })
+  }
+
+  const handleAddEntryCriteria = () => {
+    if (!testPlan) return
+    const newCriteria = "Nuevo criterio de entrada"
+    setTestPlan({
+      ...testPlan,
+      strategy: {
+        ...testPlan.strategy,
+        entryCriteria: [newCriteria, ...testPlan.strategy.entryCriteria],
+      },
+    })
+  }
+
+  const handleAddExitCriteria = () => {
+    if (!testPlan) return
+    const newCriteria = "Nuevo criterio de salida"
+    setTestPlan({
+      ...testPlan,
+      strategy: {
+        ...testPlan.strategy,
+        exitCriteria: [newCriteria, ...testPlan.strategy.exitCriteria],
+      },
+    })
+  }
+
+  // Funciones para eliminar elementos de las listas de estrategia
+  const handleDeleteStrategyTechnique = (index: number) => {
+    if (!testPlan) return
+    const updatedTechniques = [...testPlan.strategy.techniques]
+    updatedTechniques.splice(index, 1)
+    setTestPlan({
+      ...testPlan,
+      strategy: {
+        ...testPlan.strategy,
+        techniques: updatedTechniques,
+      },
+    })
+  }
+
+  const handleDeleteEntryCriteria = (index: number) => {
+    if (!testPlan) return
+    const updatedCriteria = [...testPlan.strategy.entryCriteria]
+    updatedCriteria.splice(index, 1)
+    setTestPlan({
+      ...testPlan,
+      strategy: {
+        ...testPlan.strategy,
+        entryCriteria: updatedCriteria,
+      },
+    })
+  }
+
+  const handleDeleteExitCriteria = (index: number) => {
+    if (!testPlan) return
+    const updatedCriteria = [...testPlan.strategy.exitCriteria]
+    updatedCriteria.splice(index, 1)
+    setTestPlan({
+      ...testPlan,
+      strategy: {
+        ...testPlan.strategy,
+        exitCriteria: updatedCriteria,
+      },
+    })
+  }
+
+  const handleAddEnvironment = () => {
+    if (!testPlan) return
+    const newEnvironment = {
+      name: "Nuevo Entorno",
+      purpose: "Propósito del nuevo entorno",
+      configuration: "Configuración",
+    }
+    setTestPlan({
+      ...testPlan,
+      environment: {
+        ...testPlan.environment,
+        environments: [newEnvironment, ...testPlan.environment.environments],
+      },
+    })
+  }
+
+  const handleDeleteEnvironment = (index: number) => {
     if (!testPlan) return
     const updatedEnvironments = [...testPlan.environment.environments]
-    updatedEnvironments[index] = {
-      ...updatedEnvironments[index],
-      [field]: value,
-    }
+    updatedEnvironments.splice(index, 1)
     setTestPlan({
       ...testPlan,
       environment: {
@@ -417,10 +698,22 @@ export default function Home() {
     })
   }
 
-  const handleEditTestData = (index: number, value: string) => {
+  const handleAddTestData = () => {
+    if (!testPlan) return
+    const newTestData = "Nuevo dato de prueba"
+    setTestPlan({
+      ...testPlan,
+      environment: {
+        ...testPlan.environment,
+        testData: [newTestData, ...testPlan.environment.testData],
+      },
+    })
+  }
+
+  const handleDeleteTestData = (index: number) => {
     if (!testPlan) return
     const updatedTestData = [...testPlan.environment.testData]
-    updatedTestData[index] = value
+    updatedTestData.splice(index, 1)
     setTestPlan({
       ...testPlan,
       environment: {
@@ -430,13 +723,22 @@ export default function Home() {
     })
   }
 
-  const handleEditTool = (index: number, field: string, value: string) => {
+  const handleAddTool = () => {
+    if (!testPlan) return
+    const newTool = { name: "Nueva Herramienta", purpose: "Propósito de la nueva herramienta" }
+    setTestPlan({
+      ...testPlan,
+      environment: {
+        ...testPlan.environment,
+        tools: [newTool, ...testPlan.environment.tools],
+      },
+    })
+  }
+
+  const handleDeleteTool = (index: number) => {
     if (!testPlan) return
     const updatedTools = [...testPlan.environment.tools]
-    updatedTools[index] = {
-      ...updatedTools[index],
-      [field]: value,
-    }
+    updatedTools.splice(index, 1)
     setTestPlan({
       ...testPlan,
       environment: {
@@ -445,7 +747,6 @@ export default function Home() {
       },
     })
   }
-
 
   const handleSendEmail = async () => {
     if (!testPlan || !emailTo) return
@@ -479,9 +780,61 @@ export default function Home() {
     }
   }
 
+  // Corregir la función handleEditEnvironment
+  const handleEditEnvironment = (index: number, field: string, value: string) => {
+    if (!testPlan) return
+    const updatedEnvironments = [...testPlan.environment.environments]
+    updatedEnvironments[index] = {
+      ...updatedEnvironments[index],
+      [field]: value,
+    }
+    setTestPlan({
+      ...testPlan,
+      environment: {
+        ...testPlan.environment,
+        environments: updatedEnvironments,
+      },
+    })
+    setEditingEnvironment(null) // Cerrar el modo de edición
+  }
+
+  // Corregir la función handleEditTestData
+  const handleEditTestData = (index: number, value: string) => {
+    if (!testPlan) return
+    const updatedTestData = [...testPlan.environment.testData]
+    updatedTestData[index] = value
+    setTestPlan({
+      ...testPlan,
+      environment: {
+        ...testPlan.environment,
+        testData: updatedTestData,
+      },
+    })
+    setEditingTestData(null) // Cerrar el modo de edición
+  }
+
+  // Corregir la función handleEditTool
+  const handleEditTool = (index: number, field: string, value: string) => {
+    if (!testPlan) return
+    const updatedTools = [...testPlan.environment.tools]
+    updatedTools[index] = {
+      ...updatedTools[index],
+      [field]: value,
+    }
+    setTestPlan({
+      ...testPlan,
+      environment: {
+        ...testPlan.environment,
+        tools: updatedTools,
+      },
+    })
+    setEditingTool(null) // Cerrar el modo de edición
+  }
+
   // Renderizar la interfaz de usuario
   return (
     <div className="container mx-auto py-8 px-4">
+            {showLoadingGame && <LoadingGame onClose={() => setShowLoadingGame(false)} />}
       <div className="bg-white text-[rgb(119,64,106)] p-6 rounded-lg shadow-xl mb-8 border border-gray-100">
         <div className="logo_tittle">
           <div className="logo_pl">
@@ -670,10 +1023,11 @@ export default function Home() {
             {/* Botón para generar */}
             <div className="mt-8">
               <button
-                className={`w-full py-2 px-4 rounded-md transition-colors ${isGenerating || !description
-                  ? "bg-gray-400 cursor-not-allowed text-gray-200"
-                  : "bg-primary-custom text-white hover:bg-opacity-90"
-                  }`}
+                className={`w-full py-2 px-4 rounded-md transition-colors ${
+                  isGenerating || !description
+                    ? "bg-gray-400 cursor-not-allowed text-gray-200"
+                    : "bg-primary-custom text-white hover:bg-opacity-90"
+                }`}
                 onClick={handleGenerateTestPlan}
                 disabled={isGenerating || !description}
               >
@@ -690,10 +1044,11 @@ export default function Home() {
               {["objectives", "scope", "risks", "testCases", "time", "strategy", "environment"].map((tab) => (
                 <button
                   key={tab}
-                  className={`px-4 py-2 font-medium ${activeTab === tab
-                    ? "border-b-2 border-primary-custom text-primary-custom"
-                    : "text-gray-500 hover:text-primary-custom"
-                    }`}
+                  className={`px-4 py-2 font-medium ${
+                    activeTab === tab
+                      ? "border-b-2 border-primary-custom text-primary-custom"
+                      : "text-gray-500 hover:text-primary-custom"
+                  }`}
                   onClick={() => setActiveTab(tab)}
                 >
                   {tab === "objectives" && "Objetivos"}
@@ -713,7 +1068,15 @@ export default function Home() {
             {/* Pestaña de Objetivos */}
             {activeTab === "objectives" && (
               <div>
-                <h2 className="text-2xl font-bold mb-4 text-primary-custom">Objetivos</h2>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-primary-custom">Objetivos</h2>
+                  <button
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleAddObjective}
+                  >
+                    Añadir Objetivo
+                  </button>
+                </div>
                 <ul className="space-y-2">
                   {testPlan.objectives.map((objective, index) => (
                     <li key={index} className="flex items-start">
@@ -746,12 +1109,20 @@ export default function Home() {
                       ) : (
                         <div className="flex-1 flex justify-between items-start">
                           <span>{objective}</span>
-                          <button
-                            className="ml-2 text-primary-custom hover:text-opacity-80"
-                            onClick={() => setEditingObjective({ index, value: objective })}
-                          >
-                            Editar
-                          </button>
+                          <div className="flex space-x-2">
+                            <button
+                              className="ml-2 text-primary-custom hover:text-opacity-80"
+                              onClick={() => setEditingObjective({ index, value: objective })}
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="text-red-500 hover:text-opacity-80"
+                              onClick={() => handleDeleteObjective(index)}
+                            >
+                              Eliminar
+                            </button>
+                          </div>
                         </div>
                       )}
                     </li>
@@ -765,7 +1136,15 @@ export default function Home() {
                 <h2 className="text-2xl font-bold mb-4 text-primary-custom">Alcance</h2>
 
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold mb-2">Áreas Incluidas</h3>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xl font-semibold">Áreas Incluidas</h3>
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={handleAddIncludedScope}
+                    >
+                      Añadir Área Incluida
+                    </button>
+                  </div>
                   <ul className="space-y-2">
                     {testPlan.scope.included.map((item, index) => (
                       <li key={index} className="flex items-start">
@@ -798,12 +1177,20 @@ export default function Home() {
                         ) : (
                           <div className="flex-1 flex justify-between items-start">
                             <span>{item}</span>
-                            <button
-                              className="ml-2 text-primary-custom hover:text-opacity-80"
-                              onClick={() => setEditingIncludedScope({ index, value: item })}
-                            >
-                              Editar
-                            </button>
+                            <div className="flex space-x-2">
+                              <button
+                                className="ml-2 text-primary-custom hover:text-opacity-80"
+                                onClick={() => setEditingIncludedScope({ index, value: item })}
+                              >
+                                Editar
+                              </button>
+                              <button
+                                className="text-red-500 hover:text-opacity-80"
+                                onClick={() => handleDeleteIncludedScope(index)}
+                              >
+                                Eliminar
+                              </button>
+                            </div>
                           </div>
                         )}
                       </li>
@@ -812,7 +1199,15 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Áreas Excluidas</h3>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xl font-semibold">Áreas Excluidas</h3>
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={handleAddExcludedScope}
+                    >
+                      Añadir Área Excluida
+                    </button>
+                  </div>
                   <ul className="space-y-2">
                     {testPlan.scope.excluded.map((item, index) => (
                       <li key={index} className="flex items-start">
@@ -845,12 +1240,20 @@ export default function Home() {
                         ) : (
                           <div className="flex-1 flex justify-between items-start">
                             <span>{item}</span>
-                            <button
-                              className="ml-2 text-primary-custom hover:text-opacity-80"
-                              onClick={() => setEditingExcludedScope({ index, value: item })}
-                            >
-                              Editar
-                            </button>
+                            <div className="flex space-x-2">
+                              <button
+                                className="ml-2 text-primary-custom hover:text-opacity-80"
+                                onClick={() => setEditingExcludedScope({ index, value: item })}
+                              >
+                                Editar
+                              </button>
+                              <button
+                                className="text-red-500 hover:text-opacity-80"
+                                onClick={() => handleDeleteExcludedScope(index)}
+                              >
+                                Eliminar
+                              </button>
+                            </div>
                           </div>
                         )}
                       </li>
@@ -862,7 +1265,15 @@ export default function Home() {
             {/* Pestaña de Riesgos */}
             {activeTab === "risks" && (
               <div>
-                <h2 className="text-2xl font-bold mb-4 text-primary-custom">Riesgos</h2>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-primary-custom">Riesgos</h2>
+                  <button
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleAddRisk}
+                  >
+                    Añadir Riesgo
+                  </button>
+                </div>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
@@ -903,12 +1314,13 @@ export default function Home() {
                               </select>
                             ) : (
                               <span
-                                className={`px-2 py-1 rounded text-xs ${risk.impact === "Alto"
-                                  ? "bg-red-100 text-red-800"
-                                  : risk.impact === "Medio"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-green-100 text-green-800"
-                                  }`}
+                                className={`px-2 py-1 rounded text-xs ${
+                                  risk.impact === "Alto"
+                                    ? "bg-red-100 text-red-800"
+                                    : risk.impact === "Medio"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-green-100 text-green-800"
+                                }`}
                               >
                                 {risk.impact}
                               </span>
@@ -927,12 +1339,13 @@ export default function Home() {
                               </select>
                             ) : (
                               <span
-                                className={`px-2 py-1 rounded text-xs ${risk.probability === "Alta"
-                                  ? "bg-red-100 text-red-800"
-                                  : risk.probability === "Media"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-green-100 text-green-800"
-                                  }`}
+                                className={`px-2 py-1 rounded text-xs ${
+                                  risk.probability === "Alta"
+                                    ? "bg-red-100 text-red-800"
+                                    : risk.probability === "Media"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-green-100 text-green-800"
+                                }`}
                               >
                                 {risk.probability}
                               </span>
@@ -998,6 +1411,12 @@ export default function Home() {
                                 >
                                   Editar Mit.
                                 </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80 text-xs"
+                                  onClick={() => handleDeleteRisk(index)}
+                                >
+                                  Eliminar
+                                </button>
                               </div>
                             )}
                           </td>
@@ -1011,22 +1430,30 @@ export default function Home() {
             {/* Pestaña de Casos de Prueba */}
             {activeTab === "testCases" && (
               <div>
-                <h2 className="text-2xl font-bold mb-4 text-primary-custom">Casos de Prueba</h2>
-
-                {/* Botones para cambiar la vista */}
-                <div className="flex justify-end mb-4">
-                  <button
-                    className={`px-3 py-1 rounded-l ${viewMode === "cards" ? "bg-primary-custom text-white" : "bg-gray-200"}`}
-                    onClick={() => setViewMode("cards")}
-                  >
-                    Tarjetas
-                  </button>
-                  <button
-                    className={`px-3 py-1 rounded-r ${viewMode === "table" ? "bg-primary-custom text-white" : "bg-gray-200"}`}
-                    onClick={() => setViewMode("table")}
-                  >
-                    Tabla
-                  </button>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-primary-custom">Casos de Prueba</h2>
+                  <div className="flex space-x-2">
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={handleAddTestCase}
+                    >
+                      Añadir Caso de Prueba
+                    </button>
+                    <div className="flex">
+                      <button
+                        className={`px-3 py-1 rounded-l ${viewMode === "cards" ? "bg-primary-custom text-white" : "bg-gray-200"}`}
+                        onClick={() => setViewMode("cards")}
+                      >
+                        Tarjetas
+                      </button>
+                      <button
+                        className={`px-3 py-1 rounded-r ${viewMode === "table" ? "bg-primary-custom text-white" : "bg-gray-200"}`}
+                        onClick={() => setViewMode("table")}
+                      >
+                        Tabla
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Vista de Tarjetas */}
@@ -1042,14 +1469,13 @@ export default function Home() {
                             TC-{index + 1}: {testCase.title}
                           </h3>
                           <span
-                            className={`px-2 py-1 rounded text-xs ${testCase.priority === "Alta"
-                              ? "bg-red-100 text-red-800"
-                              : testCase.priority === "Media"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : testCase.priority === "Baja"
-                                  ? "bg-green-100 text-green-800"
-                                  : ""
-                              }`}
+                            className={`px-2 py-1 rounded text-xs ${
+                              testCase.priority === "Alta"
+                                ? "bg-red-100 text-red-800"
+                                : testCase.priority === "Media"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-green-100 text-green-800"
+                            }`}
                           >
                             {testCase.priority}
                           </span>
@@ -1144,6 +1570,12 @@ export default function Home() {
                           >
                             Editar Resultado
                           </button>
+                          <button
+                            className="text-red-500 hover:text-opacity-80 text-xs border border-red-500 px-2 py-1 rounded"
+                            onClick={() => handleDeleteTestCase(index)}
+                          >
+                            Eliminar
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -1173,12 +1605,13 @@ export default function Home() {
                             </td>
                             <td className="border p-2">
                               <span
-                                className={`px-2 py-1 rounded text-xs ${testCase.priority === "Alta"
-                                  ? "bg-red-100 text-red-800"
-                                  : testCase.priority === "Media"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-green-100 text-green-800"
-                                  }`}
+                                className={`px-2 py-1 rounded text-xs ${
+                                  testCase.priority === "Alta"
+                                    ? "bg-red-100 text-red-800"
+                                    : testCase.priority === "Media"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-green-100 text-green-800"
+                                }`}
                               >
                                 {testCase.priority}
                               </span>
@@ -1239,6 +1672,26 @@ export default function Home() {
                                   </svg>
                                   Editar
                                 </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80 text-sm flex items-center"
+                                  onClick={() => handleDeleteTestCase(index)}
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 mr-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                  Eliminar
+                                </button>
                               </div>
                             </td>
                           </tr>
@@ -1281,12 +1734,13 @@ export default function Home() {
                         <div>
                           <h4 className="font-semibold mb-2">Prioridad</h4>
                           <span
-                            className={`px-2 py-1 rounded text-xs ${testPlan.testCases[activeTestCaseDetails].priority === "Alta"
-                              ? "bg-red-100 text-red-800"
-                              : testPlan.testCases[activeTestCaseDetails].priority === "Media"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-green-100 text-green-800"
-                              }`}
+                            className={`px-2 py-1 rounded text-xs ${
+                              testPlan.testCases[activeTestCaseDetails].priority === "Alta"
+                                ? "bg-red-100 text-red-800"
+                                : testPlan.testCases[activeTestCaseDetails].priority === "Media"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-green-100 text-green-800"
+                            }`}
                           >
                             {testPlan.testCases[activeTestCaseDetails].priority}
                           </span>
@@ -1485,7 +1939,15 @@ export default function Home() {
             {/* Pestaña de Estimación de Tiempos */}
             {activeTab === "time" && (
               <div>
-                <h2 className="text-2xl font-bold mb-4 text-primary-custom">Estimación de Tiempos</h2>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-primary-custom">Estimación de Tiempos</h2>
+                  <button
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleAddTimeEstimationPhase}
+                  >
+                    Añadir Fase
+                  </button>
+                </div>
 
                 <div className="overflow-x-auto mb-6">
                   <table className="w-full border-collapse">
@@ -1505,8 +1967,8 @@ export default function Home() {
                           <td className="border p-2">{index + 1}</td>
                           <td className="border p-2">
                             {editingTimeEstimation &&
-                              editingTimeEstimation.index === index &&
-                              editingTimeEstimation.field === "name" ? (
+                            editingTimeEstimation.index === index &&
+                            editingTimeEstimation.field === "name" ? (
                               <input
                                 type="text"
                                 className="w-full p-1 border rounded"
@@ -1521,8 +1983,8 @@ export default function Home() {
                           </td>
                           <td className="border p-2">
                             {editingTimeEstimation &&
-                              editingTimeEstimation.index === index &&
-                              editingTimeEstimation.field === "duration" ? (
+                            editingTimeEstimation.index === index &&
+                            editingTimeEstimation.field === "duration" ? (
                               <input
                                 type="number"
                                 className="w-full p-1 border rounded"
@@ -1538,8 +2000,8 @@ export default function Home() {
                           </td>
                           <td className="border p-2">
                             {editingTimeEstimation &&
-                              editingTimeEstimation.index === index &&
-                              editingTimeEstimation.field === "resources" ? (
+                            editingTimeEstimation.index === index &&
+                            editingTimeEstimation.field === "resources" ? (
                               <input
                                 type="text"
                                 className="w-full p-1 border rounded"
@@ -1554,8 +2016,8 @@ export default function Home() {
                           </td>
                           <td className="border p-2">
                             {editingTimeEstimation &&
-                              editingTimeEstimation.index === index &&
-                              editingTimeEstimation.field === "justification" ? (
+                            editingTimeEstimation.index === index &&
+                            editingTimeEstimation.field === "justification" ? (
                               <textarea
                                 className="w-full p-1 border rounded"
                                 value={editingTimeEstimation.value as string}
@@ -1626,6 +2088,12 @@ export default function Home() {
                                 >
                                   Editar Just.
                                 </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80 text-xs"
+                                  onClick={() => handleDeleteTimeEstimationPhase(index)}
+                                >
+                                  Eliminar
+                                </button>
                               </div>
                             )}
                           </td>
@@ -1646,7 +2114,15 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Factores Considerados</h3>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xl font-semibold">Factores Considerados</h3>
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={handleAddTimeEstimationFactor}
+                    >
+                      Añadir Factor
+                    </button>
+                  </div>
                   <ul className="space-y-2">
                     {testPlan.timeEstimation.factors.map((factor, index) => (
                       <li key={index} className="flex items-start">
@@ -1679,12 +2155,20 @@ export default function Home() {
                         ) : (
                           <div className="flex-1 flex justify-between items-start">
                             <span>{factor}</span>
-                            <button
-                              className="ml-2 text-primary-custom hover:text-opacity-80"
-                              onClick={() => setEditingTimeEstimationFactor({ index, value: factor })}
-                            >
-                              Editar
-                            </button>
+                            <div className="flex space-x-2">
+                              <button
+                                className="ml-2 text-primary-custom hover:text-opacity-80"
+                                onClick={() => setEditingTimeEstimationFactor({ index, value: factor })}
+                              >
+                                Editar
+                              </button>
+                              <button
+                                className="text-red-500 hover:text-opacity-80"
+                                onClick={() => handleDeleteTimeEstimationFactor(index)}
+                              >
+                                Eliminar
+                              </button>
+                            </div>
                           </div>
                         )}
                       </li>
@@ -1739,49 +2223,86 @@ export default function Home() {
                 </div>
 
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold mb-2">Técnicas de Prueba</h3>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xl font-semibold mb-2">Técnicas de Prueba</h3>
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={handleAddStrategyTechnique}
+                    >
+                      Añadir Técnica
+                    </button>
+                  </div>
                   <div className="space-y-4">
                     {testPlan.strategy.techniques.map((technique, index) => (
                       <div key={index} className="border rounded-lg p-4 bg-white shadow-sm">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-bold">
-                            {editingStrategyTechnique &&
-                              editingStrategyTechnique.index === index &&
-                              editingStrategyTechnique.field === "name" ? (
+                        {/* Nombre de la técnica */}
+                        <div className="mb-3">
+                          {editingStrategyTechnique &&
+                          editingStrategyTechnique.index === index &&
+                          editingStrategyTechnique.field === "name" ? (
+                            <div>
+                              <label className="block text-sm font-medium mb-1">Nombre de la técnica</label>
                               <input
                                 type="text"
-                                className="w-full p-1 border rounded"
+                                className="w-full p-2 border rounded-md"
                                 value={editingStrategyTechnique.value}
                                 onChange={(e) =>
                                   setEditingStrategyTechnique({ ...editingStrategyTechnique, value: e.target.value })
                                 }
                               />
-                            ) : (
-                              technique.name
-                            )}
-                          </h4>
-                          {!(
-                            editingStrategyTechnique &&
-                            editingStrategyTechnique.index === index &&
-                            editingStrategyTechnique.field === "name"
-                          ) && (
-                              <button
-                                className="text-primary-custom hover:text-opacity-80 text-xs"
-                                onClick={() =>
-                                  setEditingStrategyTechnique({ index, field: "name", value: technique.name })
-                                }
-                              >
-                                Editar Nombre
-                              </button>
-                            )}
+                              <div className="flex mt-2 space-x-2">
+                                <button
+                                  className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
+                                  onClick={() => {
+                                    handleEditStrategyTechnique(
+                                      index,
+                                      editingStrategyTechnique.field,
+                                      editingStrategyTechnique.value,
+                                    )
+                                  }}
+                                >
+                                  Guardar
+                                </button>
+                                <button
+                                  className="bg-gray-300 px-3 py-1 rounded-md text-sm"
+                                  onClick={() => setEditingStrategyTechnique(null)}
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex justify-between items-center">
+                              <h4 className="font-bold">{technique.name}</h4>
+                              <div className="flex space-x-2">
+                                <button
+                                  className="text-primary-custom hover:text-opacity-80 text-xs"
+                                  onClick={() =>
+                                    setEditingStrategyTechnique({ index, field: "name", value: technique.name })
+                                  }
+                                >
+                                  Editar Nombre
+                                </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80 text-xs"
+                                  onClick={() => handleDeleteStrategyTechnique(index)}
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
+
+                        {/* Descripción de la técnica */}
                         <div>
                           {editingStrategyTechnique &&
-                            editingStrategyTechnique.index === index &&
-                            editingStrategyTechnique.field === "description" ? (
+                          editingStrategyTechnique.index === index &&
+                          editingStrategyTechnique.field === "description" ? (
                             <div>
+                              <label className="block text-sm font-medium mb-1">Descripción</label>
                               <textarea
-                                className="w-full p-1 border rounded"
+                                className="w-full p-2 border rounded-md"
                                 value={editingStrategyTechnique.value}
                                 onChange={(e) =>
                                   setEditingStrategyTechnique({ ...editingStrategyTechnique, value: e.target.value })
@@ -1790,7 +2311,7 @@ export default function Home() {
                               />
                               <div className="flex mt-2 space-x-2">
                                 <button
-                                  className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                  className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
                                   onClick={() => {
                                     handleEditStrategyTechnique(
                                       index,
@@ -1803,7 +2324,7 @@ export default function Home() {
                                   Guardar
                                 </button>
                                 <button
-                                  className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                  className="bg-gray-300 px-3 py-1 rounded-md text-sm"
                                   onClick={() => setEditingStrategyTechnique(null)}
                                 >
                                   Cancelar
@@ -1835,7 +2356,15 @@ export default function Home() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Criterios de Entrada</h3>
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-xl font-semibold mb-2">Criterios de Entrada</h3>
+                      <button
+                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={handleAddEntryCriteria}
+                      >
+                        Añadir Criterio
+                      </button>
+                    </div>
                     <ul className="space-y-2">
                       {testPlan.strategy.entryCriteria.map((criteria, index) => (
                         <li key={index} className="flex items-start">
@@ -1868,12 +2397,20 @@ export default function Home() {
                           ) : (
                             <div className="flex-1 flex justify-between items-start">
                               <span>{criteria}</span>
-                              <button
-                                className="ml-2 text-primary-custom hover:text-opacity-80"
-                                onClick={() => setEditingEntryCriteria({ index, value: criteria })}
-                              >
-                                Editar
-                              </button>
+                              <div className="flex space-x-2">
+                                <button
+                                  className="ml-2 text-primary-custom hover:text-opacity-80"
+                                  onClick={() => setEditingEntryCriteria({ index, value: criteria })}
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80"
+                                  onClick={() => handleDeleteEntryCriteria(index)}
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
                             </div>
                           )}
                         </li>
@@ -1882,7 +2419,15 @@ export default function Home() {
                   </div>
 
                   <div>
-                    <h3 className="text-xl font-semibold mb-2">Criterios de Salida</h3>
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-xl font-semibold mb-2">Criterios de Salida</h3>
+                      <button
+                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={handleAddExitCriteria}
+                      >
+                        Añadir Criterio
+                      </button>
+                    </div>
                     <ul className="space-y-2">
                       {testPlan.strategy.exitCriteria.map((criteria, index) => (
                         <li key={index} className="flex items-start">
@@ -1915,12 +2460,20 @@ export default function Home() {
                           ) : (
                             <div className="flex-1 flex justify-between items-start">
                               <span>{criteria}</span>
-                              <button
-                                className="ml-2 text-primary-custom hover:text-opacity-80"
-                                onClick={() => setEditingExitCriteria({ index, value: criteria })}
-                              >
-                                Editar
-                              </button>
+                              <div className="flex space-x-2">
+                                <button
+                                  className="ml-2 text-primary-custom hover:text-opacity-80"
+                                  onClick={() => setEditingExitCriteria({ index, value: criteria })}
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80"
+                                  onClick={() => handleDeleteExitCriteria(index)}
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
                             </div>
                           )}
                         </li>
@@ -1936,7 +2489,15 @@ export default function Home() {
                 <h2 className="text-2xl font-bold mb-4 text-primary-custom">Entorno y Datos de Prueba</h2>
 
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold mb-2">Entornos Requeridos</h3>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xl font-semibold mb-2">Entornos Requeridos</h3>
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={handleAddEnvironment}
+                    >
+                      Añadir Entorno
+                    </button>
+                  </div>
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
                       <thead>
@@ -1952,70 +2513,109 @@ export default function Home() {
                           <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                             <td className="border p-2">
                               {editingEnvironment &&
-                                editingEnvironment.index === index &&
-                                editingEnvironment.field === "name" ? (
-                                <input
-                                  type="text"
-                                  className="w-full p-1 border rounded"
-                                  value={editingEnvironment.value}
-                                  onChange={(e) =>
-                                    setEditingEnvironment({ ...editingEnvironment, value: e.target.value })
-                                  }
-                                />
+                              editingEnvironment.index === index &&
+                              editingEnvironment.field === "name" ? (
+                                <div>
+                                  <input
+                                    type="text"
+                                    className="w-full p-1 border rounded"
+                                    value={editingEnvironment.value}
+                                    onChange={(e) =>
+                                      setEditingEnvironment({ ...editingEnvironment, value: e.target.value })
+                                    }
+                                  />
+                                  <div className="flex mt-2 space-x-2">
+                                    <button
+                                      className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                      onClick={() => {
+                                        handleEditEnvironment(index, editingEnvironment.field, editingEnvironment.value)
+                                        setEditingEnvironment(null)
+                                      }}
+                                    >
+                                      Guardar
+                                    </button>
+                                    <button
+                                      className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                      onClick={() => setEditingEnvironment(null)}
+                                    >
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                </div>
                               ) : (
                                 env.name
                               )}
                             </td>
                             <td className="border p-2">
                               {editingEnvironment &&
-                                editingEnvironment.index === index &&
-                                editingEnvironment.field === "purpose" ? (
-                                <textarea
-                                  className="w-full p-1 border rounded"
-                                  value={editingEnvironment.value}
-                                  onChange={(e) =>
-                                    setEditingEnvironment({ ...editingEnvironment, value: e.target.value })
-                                  }
-                                />
+                              editingEnvironment.index === index &&
+                              editingEnvironment.field === "purpose" ? (
+                                <div>
+                                  <textarea
+                                    className="w-full p-1 border rounded"
+                                    value={editingEnvironment.value}
+                                    onChange={(e) =>
+                                      setEditingEnvironment({ ...editingEnvironment, value: e.target.value })
+                                    }
+                                  />
+                                  <div className="flex mt-2 space-x-2">
+                                    <button
+                                      className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                      onClick={() => {
+                                        handleEditEnvironment(index, editingEnvironment.field, editingEnvironment.value)
+                                        setEditingEnvironment(null)
+                                      }}
+                                    >
+                                      Guardar
+                                    </button>
+                                    <button
+                                      className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                      onClick={() => setEditingEnvironment(null)}
+                                    >
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                </div>
                               ) : (
                                 env.purpose
                               )}
                             </td>
                             <td className="border p-2">
                               {editingEnvironment &&
-                                editingEnvironment.index === index &&
-                                editingEnvironment.field === "configuration" ? (
-                                <textarea
-                                  className="w-full p-1 border rounded"
-                                  value={editingEnvironment.value}
-                                  onChange={(e) =>
-                                    setEditingEnvironment({ ...editingEnvironment, value: e.target.value })
-                                  }
-                                />
+                              editingEnvironment.index === index &&
+                              editingEnvironment.field === "configuration" ? (
+                                <div>
+                                  <textarea
+                                    className="w-full p-1 border rounded"
+                                    value={editingEnvironment.value}
+                                    onChange={(e) =>
+                                      setEditingEnvironment({ ...editingEnvironment, value: e.target.value })
+                                    }
+                                  />
+                                  <div className="flex mt-2 space-x-2">
+                                    <button
+                                      className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                      onClick={() => {
+                                        handleEditEnvironment(index, editingEnvironment.field, editingEnvironment.value)
+                                        setEditingEnvironment(null)
+                                      }}
+                                    >
+                                      Guardar
+                                    </button>
+                                    <button
+                                      className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                      onClick={() => setEditingEnvironment(null)}
+                                    >
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                </div>
                               ) : (
                                 env.configuration
                               )}
                             </td>
                             <td className="border p-2">
-                              {editingEnvironment && editingEnvironment.index === index ? (
-                                <div className="flex space-x-1">
-                                  <button
-                                    className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
-                                    onClick={() => {
-                                      handleEditEnvironment(index, editingEnvironment.field, editingEnvironment.value)
-                                      setEditingEnvironment(null)
-                                    }}
-                                  >
-                                    Guardar
-                                  </button>
-                                  <button
-                                    className="bg-gray-300 px-2 py-1 rounded text-xs"
-                                    onClick={() => setEditingEnvironment(null)}
-                                  >
-                                    Cancelar
-                                  </button>
-                                </div>
-                              ) : (
+                              {!(editingEnvironment && editingEnvironment.index === index) && (
                                 <div className="flex flex-col space-y-1">
                                   <button
                                     className="text-primary-custom hover:text-opacity-80 text-xs"
@@ -2039,6 +2639,12 @@ export default function Home() {
                                   >
                                     Editar Config.
                                   </button>
+                                  <button
+                                    className="text-red-500 hover:text-opacity-80 text-xs"
+                                    onClick={() => handleDeleteEnvironment(index)}
+                                  >
+                                    Eliminar
+                                  </button>
                                 </div>
                               )}
                             </td>
@@ -2050,7 +2656,15 @@ export default function Home() {
                 </div>
 
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold mb-2">Datos de Prueba</h3>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xl font-semibold mb-2">Datos de Prueba</h3>
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={handleAddTestData}
+                    >
+                      Añadir Dato
+                    </button>
+                  </div>
                   <ul className="space-y-2">
                     {testPlan.environment.testData.map((data, index) => (
                       <li key={index} className="flex items-start">
@@ -2083,12 +2697,20 @@ export default function Home() {
                         ) : (
                           <div className="flex-1 flex justify-between items-start">
                             <span>{data}</span>
-                            <button
-                              className="ml-2 text-primary-custom hover:text-opacity-80"
-                              onClick={() => setEditingTestData({ index, value: data })}
-                            >
-                              Editar
-                            </button>
+                            <div className="flex space-x-2">
+                              <button
+                                className="ml-2 text-primary-custom hover:text-opacity-80"
+                                onClick={() => setEditingTestData({ index, value: data })}
+                              >
+                                Editar
+                              </button>
+                              <button
+                                className="text-red-500 hover:text-opacity-80"
+                                onClick={() => handleDeleteTestData(index)}
+                              >
+                                Eliminar
+                              </button>
+                            </div>
                           </div>
                         )}
                       </li>
@@ -2097,44 +2719,32 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Herramientas</h3>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xl font-semibold mb-2">Herramientas</h3>
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={handleAddTool}
+                    >
+                      Añadir Herramienta
+                    </button>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {testPlan.environment.tools.map((tool, index) => (
                       <div key={index} className="border rounded-lg p-4 bg-white shadow-sm">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-bold">
-                            {editingTool && editingTool.index === index && editingTool.field === "name" ? (
+                        {/* Nombre de la herramienta */}
+                        <div className="mb-3">
+                          {editingTool && editingTool.index === index && editingTool.field === "name" ? (
+                            <div>
+                              <label className="block text-sm font-medium mb-1">Nombre de la herramienta</label>
                               <input
                                 type="text"
-                                className="w-full p-1 border rounded"
+                                className="w-full p-2 border rounded-md"
                                 value={editingTool.value}
                                 onChange={(e) => setEditingTool({ ...editingTool, value: e.target.value })}
-                              />
-                            ) : (
-                              tool.name
-                            )}
-                          </h4>
-                          {!(editingTool && editingTool.index === index && editingTool.field === "name") && (
-                            <button
-                              className="text-primary-custom hover:text-opacity-80 text-xs"
-                              onClick={() => setEditingTool({ index, field: "name", value: tool.name })}
-                            >
-                              Editar
-                            </button>
-                          )}
-                        </div>
-                        <div>
-                          {editingTool && editingTool.index === index && editingTool.field === "purpose" ? (
-                            <div>
-                              <textarea
-                                className="w-full p-1 border rounded"
-                                value={editingTool.value}
-                                onChange={(e) => setEditingTool({ ...editingTool, value: e.target.value })}
-                                rows={3}
                               />
                               <div className="flex mt-2 space-x-2">
                                 <button
-                                  className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                  className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
                                   onClick={() => {
                                     handleEditTool(index, editingTool.field, editingTool.value)
                                     setEditingTool(null)
@@ -2143,7 +2753,57 @@ export default function Home() {
                                   Guardar
                                 </button>
                                 <button
-                                  className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                  className="bg-gray-300 px-3 py-1 rounded-md text-sm"
+                                  onClick={() => setEditingTool(null)}
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex justify-between items-center">
+                              <h4 className="font-bold">{tool.name}</h4>
+                              <div className="flex space-x-2">
+                                <button
+                                  className="text-primary-custom hover:text-opacity-80 text-xs"
+                                  onClick={() => setEditingTool({ index, field: "name", value: tool.name })}
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  className="text-red-500 hover:text-opacity-80 text-xs"
+                                  onClick={() => handleDeleteTool(index)}
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Propósito de la herramienta */}
+                        <div>
+                          {editingTool && editingTool.index === index && editingTool.field === "purpose" ? (
+                            <div>
+                              <label className="block text-sm font-medium mb-1">Propósito</label>
+                              <textarea
+                                className="w-full p-2 border rounded-md"
+                                value={editingTool.value}
+                                onChange={(e) => setEditingTool({ ...editingTool, value: e.target.value })}
+                                rows={3}
+                              />
+                              <div className="flex mt-2 space-x-2">
+                                <button
+                                  className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
+                                  onClick={() => {
+                                    handleEditTool(index, editingTool.field, editingTool.value)
+                                    setEditingTool(null)
+                                  }}
+                                >
+                                  Guardar
+                                </button>
+                                <button
+                                  className="bg-gray-300 px-3 py-1 rounded-md text-sm"
                                   onClick={() => setEditingTool(null)}
                                 >
                                   Cancelar
@@ -2153,14 +2813,12 @@ export default function Home() {
                           ) : (
                             <div className="flex justify-between items-start">
                               <p className="text-gray-700">{tool.purpose}</p>
-                              {!(editingTool && editingTool.index === index) && (
-                                <button
-                                  className="ml-2 text-primary-custom hover:text-opacity-80 text-xs"
-                                  onClick={() => setEditingTool({ index, field: "purpose", value: tool.purpose })}
-                                >
-                                  Editar
-                                </button>
-                              )}
+                              <button
+                                className="ml-2 text-primary-custom hover:text-opacity-80 text-xs"
+                                onClick={() => setEditingTool({ index, field: "purpose", value: tool.purpose })}
+                              >
+                                Editar
+                              </button>
                             </div>
                           )}
                         </div>
@@ -2208,10 +2866,9 @@ export default function Home() {
                         onChange={(e) => setEmailSubject(e.target.value)}
                       />
                     </div>
-
                   </div>
                   <button
-                    className="bg-[rgb(119,64,106)] text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors w-full"
+                    className="bg-[var(--primaryColor)] text-white py-2 px-4 rounded-md hover:bg-opacity-90 transition-colors w-full"
                     onClick={handleSendEmail}
                     disabled={isSending || !emailTo}
                   >
@@ -2225,37 +2882,43 @@ export default function Home() {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                   <div className="bg-green-100 text-green-900 rounded-xl shadow-xl p-6 max-w-md w-[90%] text-center">
                     <div className="text-xl font-bold mb-2">📬 ¡Correo enviado!</div>
-                    <p className="text-green-800">✅ Tu plan fue enviado correctamente.<br /> ¡Que la calidad te acompañe!</p>
+                    <p className="text-green-800">
+                      ✅ Tu plan fue enviado correctamente.
+                      <br /> ¡Que la calidad te acompañe!
+                    </p>
                     <button
                       onClick={() => setEmailSent(false)}
-                      className="mt-4 bg-green-700 text-white py-2 px-6 rounded-md hover:bg-green-800 transition">
+                      className="mt-4 bg-green-700 text-white py-2 px-6 rounded-md hover:bg-green-800 transition"
+                    >
                       Cerrar
                     </button>
                   </div>
                 </div>
               )}
-
             </div>
           </div>
         </div>
       )}
       <footer className="footer-distributed">
-
         <div className="footer-left">
-          <a href="https://paolozada.com" target="_blank"><h3>Paola<span>Lozada</span></h3></a>
-         
+          <a href="https://paolozada.com" target="_blank" rel="noreferrer">
+            <h3>
+              Paola<span>Lozada</span>
+            </h3>
+          </a>
 
           <p className="footer-links">
-            <a href="https://paolozada.com#about" target="_blank" className="link-1">About me</a>
+            <a href="https://paolozada.com#about" target="_blank" className="link-1" rel="noreferrer">
+              About me
+            </a>
 
-            <a href="https://paolozada.com/info/contact" target="_blank">Contact</a>
+            <a href="https://paolozada.com/info/contact" target="_blank" rel="noreferrer">
+              Contact
+            </a>
           </p>
-
-
         </div>
 
         <div className="footer-center">
-
           <div>
             <i className="bi bi-geo-alt-fill"></i>
             <p> Cundinamarca, Colombia</p>
@@ -2268,27 +2931,30 @@ export default function Home() {
 
           <div>
             <i className="bi bi-envelope-fill"></i>
-            <p className="mail "><a href="mailto:dev@paolozada.com">dev@paolozada.com</a></p>
+            <p className="mail ">
+              <a href="mailto:dev@paolozada.com">dev@paolozada.com</a>
+            </p>
           </div>
-
         </div>
 
         <div className="footer-right">
-
           <p className="footer-company-about">
-            <span>About</span>On this website, you will find a person passionate about challenges and always in search of new opportunities to learn and grow.
+            <span>About</span>On this website, you will find a person passionate about challenges and always in search
+            of new opportunities to learn and grow.
           </p>
 
           <div className="footer-icons">
-
-            <a href="https://www.linkedin.com/in/paola-a-lozada-g/" target="_blank"><i className="bi bi-linkedin"></i></a>
-            <a href="https://github.com/PaoLozada" target="_blank"><i className="bi bi-github"></i></a>
-            <a href="https://twitter.com/PaolaALoG" target="_blank"><i className="bi bi-twitter"></i></a>
-
+            <a href="https://www.linkedin.com/in/paola-a-lozada-g/" target="_blank" rel="noreferrer">
+              <i className="bi bi-linkedin"></i>
+            </a>
+            <a href="https://github.com/PaoLozada" target="_blank" rel="noreferrer">
+              <i className="bi bi-github"></i>
+            </a>
+            <a href="https://twitter.com/PaolaALoG" target="_blank" rel="noreferrer">
+              <i className="bi bi-twitter"></i>
+            </a>
           </div>
-
         </div>
-
       </footer>
     </div>
   )
