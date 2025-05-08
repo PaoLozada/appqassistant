@@ -28,6 +28,7 @@
 .bug-element {
   transition: transform 0.2s ease;
   z-index: 10;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
 }
 
 .bug-element:hover {
@@ -41,6 +42,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 10;
 }
 
 .bug-hitbox::before {
@@ -187,4 +190,55 @@
 .text-glow {
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
   color: white;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+}
+
+/* Ajustes responsivos para móvil */
+@media (max-width: 640px) {
+  .bug-emoji {
+    font-size: 1.5rem;
+  }
+
+  .bug-element {
+    transform-origin: center;
+  }
+
+  .bug-hitbox {
+    padding: 10px;
+  }
+
+  .point-animation {
+    font-size: 1rem;
+  }
+
+  .bug-splat {
+    font-size: 1.5rem;
+  }
+
+  .score-display {
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .message-display {
+    bottom: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    min-width: 150px;
+    font-size: 0.875rem;
+  }
+
+  .loading-bar {
+    bottom: 2rem;
+    height: 6px;
+  }
+}
+
+/* Mejorar la visibilidad de los elementos en el juego */
+
+/* Mejorar el contraste de los textos sobre el fondo oscuro */
+.text-white,
+.text-glow {
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
 }

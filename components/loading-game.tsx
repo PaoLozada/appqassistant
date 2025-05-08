@@ -41,6 +41,7 @@ export default function LoadingGame({ onClose }: LoadingGameProps) {
   const [pointAnimations, setPointAnimations] = useState<PointAnimation[]>([])
   const [splatAnimations, setSplatAnimations] = useState<SplatAnimation[]>([])
   const [soundEnabled, setSoundEnabled] = useState(true)
+  const [musicEnabled, setMusicEnabled] = useState(true)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const requestRef = useRef<number | null>(null)
@@ -51,6 +52,7 @@ export default function LoadingGame({ onClose }: LoadingGameProps) {
   const catchBugSound = useRef<HTMLAudioElement | null>(null)
   const catchFeatureSound = useRef<HTMLAudioElement | null>(null)
   const catchCoffeeSound = useRef<HTMLAudioElement | null>(null)
+  const backgroundMusic = useRef<HTMLAudioElement | null>(null)
 
   // Cargar sonidos
   useEffect(() => {
@@ -58,11 +60,27 @@ export default function LoadingGame({ onClose }: LoadingGameProps) {
       catchBugSound.current = new Audio("/sounds/pop.mp3")
       catchFeatureSound.current = new Audio("/sounds/wrong.mp3")
       catchCoffeeSound.current = new Audio("/sounds/bonus.mp3")
+      backgroundMusic.current = new Audio("/sounds/game-music.mp3")
+
+      // Configurar música de fondo para que se repita
+      if (backgroundMusic.current) {
+        backgroundMusic.current.loop = true
+        backgroundMusic.current.volume = 0.5 // Volumen al 50%
+      }
 
       // Precargar sonidos
       catchBugSound.current.load()
       catchFeatureSound.current.load()
       catchCoffeeSound.current.load()
+      backgroundMusic.current.load()
+
+      // Iniciar música de fondo si está habilitada
+      if (musicEnabled && backgroundMusic.current) {
+        backgroundMusic.current.play().catch((e) => {
+          console.log("Error al reproducir música de fondo:", e)
+          // La mayoría de navegadores requieren interacción del usuario antes de reproducir audio
+        })
+      }
     }
 
     return () => {
@@ -70,8 +88,25 @@ export default function LoadingGame({ onClose }: LoadingGameProps) {
       if (catchBugSound.current) catchBugSound.current = null
       if (catchFeatureSound.current) catchFeatureSound.current = null
       if (catchCoffeeSound.current) catchCoffeeSound.current = null
+      if (backgroundMusic.current) {
+        backgroundMusic.current.pause()
+        backgroundMusic.current = null
+      }
     }
   }, [])
+
+  // Controlar la música de fondo
+  useEffect(() => {
+    if (backgroundMusic.current) {
+      if (musicEnabled) {
+        backgroundMusic.current.play().catch((e) => {
+          console.log("Error al reproducir música de fondo:", e)
+        })
+      } else {
+        backgroundMusic.current.pause()
+      }
+    }
+  }, [musicEnabled])
 
   // Función para reproducir sonidos
   const playSound = (type: "bug" | "feature" | "coffee") => {
@@ -99,6 +134,13 @@ export default function LoadingGame({ onClose }: LoadingGameProps) {
     setScore(0)
     setBugs([])
     lastBugTime.current = Date.now()
+
+    // Intentar iniciar la música cuando el usuario interactúa con el juego
+    if (musicEnabled && backgroundMusic.current) {
+      backgroundMusic.current.play().catch((e) => {
+        console.log("Error al reproducir música de fondo:", e)
+      })
+    }
   }
 
   // Función para atrapar un bug
@@ -293,53 +335,126 @@ export default function LoadingGame({ onClose }: LoadingGameProps) {
     startGame()
   }, [])
 
+  // Manejar el cierre del juego
+  const handleClose = () => {
+    // Detener la música antes de cerrar
+    if (backgroundMusic.current) {
+      backgroundMusic.current.pause()
+    }
+    if (onClose) onClose()
+  }
+
   return (
-    <div className="fixed inset-0 bg-neutral-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-custom-lg p-6 max-w-4xl w-full max-h-[90vh] flex flex-col">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-primary-custom">Generando Plan de Pruebas</h2>
-          <div className="flex items-center gap-4">
-            <div className="bg-neutral-100 px-4 py-2 rounded-lg">
+    <div className="fixed inset-0 bg-neutral-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-xl shadow-custom-lg p-3 sm:p-6 max-w-4xl w-full max-h-[95vh] flex flex-col">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-primary-custom text-center sm:text-left">
+            Generando Plan de Pruebas
+          </h2>
+
+          {/* Puntuación y controles */}
+          <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 sm:gap-4">
+            <div className="bg-neutral-100 px-3 py-1 sm:px-4 sm:py-2 rounded-lg">
               <span className="font-bold text-primary-custom">Puntos: {score}</span>
             </div>
-            <button
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className="text-neutral-500 hover:text-neutral-700"
-              aria-label={soundEnabled ? "Desactivar sonido" : "Activar sonido"}
-            >
-              {soundEnabled ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M11.536 14.01A1 1 0 0 0 12.013 13c0-.18-.064-.352-.193-.493l-.398-.312a.93.93 0 0 0-.53-.178H11c.068.091.085.195.085.308v.002c0 .234-.055.488-.156.732l-.129.276.282.307c.067.073.124.147.173.22z" />
-                  <path d="M10.293 5.707 4 12V7a1 1 0 0 1 1-1h3l2.647-2.646a.5.5 0 0 1 .708.708z" />
-                  <path d="M10.293 5.707 4 12V7a1 1 0 0 1 1-1h3l2.647-2.646a.5.5 0 0 1 .708.708z" />
-                  <path d="M10.797 14.244c.076.058.163.116.267.174A10.1 10.1 0 0 13.5 13.5c.717 0 1.285-.13 1.7-.33a1 1 0 0 0 .5-.857V3.5a1 1 0 0 0-.5-.857c-.415-.2-.983-.33-1.7-.33-1.59 0-2.503.927-3.207 1.686l-.695.71-1.276-.466a3 3 0 0 0-.848-.137H4.5a1 1 0 0 0-1 1v7a1 1 0 0 0 .276.7L9.62 15.9c.412.408 1.334-.317.707-.707L4.71 9.57l-.01-.01z" />
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z" />
-                  <path d="M10.707 11.182A4.486 4.486 0 0 0 12.025 8a4.486 4.486 0 0 0-1.318-3.182L10 5.525A3.489 3.489 0 0 1 11.025 8c0 .966-.392 1.841-1.025 2.475l.707.707z" />
-                  <path d="M13.646 14.646a.5.5 0 0 1-.708 0L12 13.707l-.938.938a.5.5 0 0 1-.707 0l-.646-.647.707-.707.646.647.938-.938.646.647.707.707-.647.646z" />
-                </svg>
-              )}
-            </button>
-            {onClose && (
-              <button onClick={onClose} className="text-neutral-500 hover:text-neutral-700" aria-label="Cerrar juego">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-                </svg>
+
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Botón para música */}
+              <button
+                onClick={() => setMusicEnabled(!musicEnabled)}
+                className="text-neutral-500 hover:text-neutral-700 bg-neutral-100 p-2 rounded-full"
+                aria-label={musicEnabled ? "Desactivar música" : "Activar música"}
+              >
+                {musicEnabled ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2zm9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2z" />
+                    <path fillRule="evenodd" d="M14 11V2h1v9h-1zM6 3v10H5V3h1z" />
+                    <path d="M5 2.905a1 1 0 0 1 .9-.995l8-.8a1 1 0 0 1 1.1.995V3L5 4V2.905z" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2zm9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2z" />
+                    <path d="M14 11V3.224l-2.38.235C10.772 3.584 10 4.457 10 5.5v5.528c0 1.043.772 1.916 1.62 2.041L14 13.28V11zm-1-9.8V1l8-.8v12.8l-8-.8V1.2z" />
+                  </svg>
+                )}
               </button>
-            )}
+
+              {/* Botón para efectos de sonido */}
+              <button
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                className="text-neutral-500 hover:text-neutral-700 bg-neutral-100 p-2 rounded-full"
+                aria-label={soundEnabled ? "Desactivar efectos de sonido" : "Activar efectos de sonido"}
+              >
+                {soundEnabled ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M11.536 14.01A1 1 0 0 0 12.013 13c0-.18-.064-.352-.193-.493l-.398-.312a.93.93 0 0 0-.53-.178H11c.068.091.085.195.085.308v.002c0 .234-.055.488-.156.732l-.129.276.282.307c.067.073.124.147.173.22z" />
+                    <path d="M10.293 5.707 4 12V7a1 1 0 0 1 1-1h3l2.647-2.646a.5.5 0 0 1 .708.708z" />
+                    <path d="M10.293 5.707 4 12V7a1 1 0 0 1 1-1h3l2.647-2.646a.5.5 0 0 1 .708.708z" />
+                    <path d="M10.797 14.244c.076.058.163.116.267.174A10.1 10.1 0 0 0 13.5 13.5c.717 0 1.285-.13 1.7-.33a1 1 0 0 0 .5-.857V3.5a1 1 0 0 0-.5-.857c-.415-.2-.983-.33-1.7-.33-1.59 0-2.503.927-3.207 1.686l-.695.71-1.276-.466a3 3 0 0 0-.848-.137H4.5a1 1 0 0 0-1 1v7a1 1 0 0 0 .276.7L9.62 15.9c.412.408 1.334-.317.707-.707L4.71 9.57l-.01-.01z" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z" />
+                    <path d="M10.707 11.182A4.486 4.486 0 0 0 12.025 8a4.486 4.486 0 0 0-1.318-3.182L10 5.525A3.489 3.489 0 0 1 11.025 8c0 .966-.392 1.841-1.025 2.475l.707.707z" />
+                    <path d="M13.646 14.646a.5.5 0 0 1-.708 0L12 13.707l-.938.938a.5.5 0 0 1-.707 0l-.646-.647.707-.707.646.647.938-.938.646.647.707.707-.647.646z" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Botón para cerrar */}
+              {onClose && (
+                <button
+                  onClick={handleClose}
+                  className="text-neutral-500 hover:text-neutral-700 bg-neutral-100 p-2 rounded-full"
+                  aria-label="Cerrar juego"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="text-center mb-4">
-          <p className="text-neutral-600">{message}</p>
+        <div className="text-center mb-2 sm:mb-4">
+          <p className="text-neutral-600 text-sm sm:text-base">{message}</p>
         </div>
 
         <div
           ref={containerRef}
           className="relative flex-1 game-background rounded-lg border border-neutral-200 overflow-hidden"
-          style={{ minHeight: "400px" }}
+          style={{ minHeight: "300px", height: "calc(100vh - 220px)" }}
         >
           {bugs.map((bug) => (
             <div
@@ -387,10 +502,11 @@ export default function LoadingGame({ onClose }: LoadingGameProps) {
           </div>
         </div>
 
-        <div className="mt-4 text-center text-sm text-neutral-500">
+        <div className="mt-2 sm:mt-4 text-center text-xs sm:text-sm text-neutral-500">
           <p>
-            Atrapa los bugs (🐞) para ganar +10 puntos. ¡Cuidado! Las features (✨) restan -15 puntos y el café (☕)
-            resta -5 puntos.
+            <span className="inline-block mx-1">🐞 +10 puntos</span>
+            <span className="inline-block mx-1">✨ -15 puntos</span>
+            <span className="inline-block mx-1">☕ -5 puntos</span>
           </p>
         </div>
       </div>

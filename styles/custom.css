@@ -3,7 +3,7 @@
 /* src/App.css */
 ::selection {
   background-color: var(--primaryColor);
-  /* Un azul con transparencia */
+  
   color: var(--fifthColor);
   /* Texto blanco al seleccionar */
 }

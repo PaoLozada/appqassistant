@@ -7,6 +7,9 @@ import { sendEmail } from "@/lib/send-email"
 import type { Risk, TestCase } from "@/lib/types"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import LoadingGame from "@/components/loading-game"
+import  SectionHeader from "@/components/section-header"
+import  ActionButton from "@/components/action-button"
+import { ListItem } from "@/components/list-item"
 
 // Definición de tipos de aplicación y subtipos
 const applicationTypes = ["Web", "API", "Escritorio", "Móvil"]
@@ -767,8 +770,8 @@ export default function Home() {
       if (result.success) {
         setEmailSent(true)
         //setTimeout(() => setEmailSent(false), 3000)
-        setEmailTo("");
-        setEmailSubject("");
+        setEmailTo("")
+        setEmailSubject("")
       } else {
         alert(`Error al enviar el correo: ${result.message}`)
       }
@@ -834,7 +837,7 @@ export default function Home() {
   // Renderizar la interfaz de usuario
   return (
     <div className="container mx-auto py-8 px-4">
-            {showLoadingGame && <LoadingGame onClose={() => setShowLoadingGame(false)} />}
+      {showLoadingGame && <LoadingGame onClose={() => setShowLoadingGame(false)} />}
       <div className="bg-white text-[rgb(119,64,106)] p-6 rounded-lg shadow-xl mb-8 border border-gray-100">
         <div className="logo_tittle">
           <div className="logo_pl">
@@ -856,7 +859,7 @@ export default function Home() {
       </div>
 
       {!testPlan ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 animate-slide-up">
           {/* Formulario de entrada */}
           <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
             <h2 className="text-xl font-semibold mb-4 text-primary-custom">Información del Sistema</h2>
@@ -1040,11 +1043,11 @@ export default function Home() {
         <div className="bg-white rounded-lg shadow-md">
           {/* Pestañas */}
           <div className="border-b">
-            <div className="flex overflow-x-auto">
+            <div className="flex overflow-x-auto p-1 sm:p-2 scrollbar-hide">
               {["objectives", "scope", "risks", "testCases", "time", "strategy", "environment"].map((tab) => (
                 <button
                   key={tab}
-                  className={`px-4 py-2 font-medium ${
+                  className={`px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base font-medium rounded-lg transition-all whitespace-nowrap ${
                     activeTab === tab
                       ? "border-b-2 border-primary-custom text-primary-custom"
                       : "text-gray-500 hover:text-primary-custom"
@@ -1071,15 +1074,19 @@ export default function Home() {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-2xl font-bold text-primary-custom">Objetivos</h2>
                   <button
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    className="btn bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-sm"
                     onClick={handleAddObjective}
+                    aria-label="Añadir Objetivo"
                   >
-                    Añadir Objetivo
+                    <i className="bi bi-plus-lg text-lg"></i>
                   </button>
                 </div>
                 <ul className="space-y-2">
                   {testPlan.objectives.map((objective, index) => (
-                    <li key={index} className="flex items-start">
+                    <li
+                      key={index}
+                      className="flex items-start bg-neutral-50 p-2 sm:p-3 rounded-lg border border-neutral-200 hover:shadow-custom transition-shadow"
+                    >
                       <span className="mr-2">•</span>
                       {editingObjective && editingObjective.index === index ? (
                         <div className="flex-1">
@@ -1111,16 +1118,18 @@ export default function Home() {
                           <span>{objective}</span>
                           <div className="flex space-x-2">
                             <button
-                              className="ml-2 text-primary-custom hover:text-opacity-80"
+                              className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
                               onClick={() => setEditingObjective({ index, value: objective })}
+                              aria-label="Editar"
                             >
-                              Editar
+                              <i className="bi bi-pencil"></i>
                             </button>
                             <button
-                              className="text-red-500 hover:text-opacity-80"
+                              className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
                               onClick={() => handleDeleteObjective(index)}
+                              aria-label="Eliminar"
                             >
-                              Eliminar
+                              <i className="bi bi-dash-lg"></i>
                             </button>
                           </div>
                         </div>
@@ -1139,15 +1148,19 @@ export default function Home() {
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-xl font-semibold">Áreas Incluidas</h3>
                     <button
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      className="btn bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-sm"
                       onClick={handleAddIncludedScope}
+                      aria-label="Añadir Área Incluida"
                     >
-                      Añadir Área Incluida
+                      <i className="bi bi-plus-lg text-lg"></i>
                     </button>
                   </div>
                   <ul className="space-y-2">
                     {testPlan.scope.included.map((item, index) => (
-                      <li key={index} className="flex items-start">
+                      <li
+                        key={index}
+                        className="flex items-start bg-neutral-50 p-2 sm:p-3 rounded-lg border border-neutral-200 hover:shadow-custom transition-shadow"
+                      >
                         <span className="mr-2">•</span>
                         {editingIncludedScope && editingIncludedScope.index === index ? (
                           <div className="flex-1">
@@ -1179,16 +1192,18 @@ export default function Home() {
                             <span>{item}</span>
                             <div className="flex space-x-2">
                               <button
-                                className="ml-2 text-primary-custom hover:text-opacity-80"
+                                className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
                                 onClick={() => setEditingIncludedScope({ index, value: item })}
+                                aria-label="Editar"
                               >
-                                Editar
+                                <i className="bi bi-pencil"></i>
                               </button>
                               <button
-                                className="text-red-500 hover:text-opacity-80"
+                                className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
                                 onClick={() => handleDeleteIncludedScope(index)}
+                                aria-label="Eliminar"
                               >
-                                Eliminar
+                                <i className="bi bi-dash-lg"></i>
                               </button>
                             </div>
                           </div>
@@ -1202,15 +1217,19 @@ export default function Home() {
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-xl font-semibold">Áreas Excluidas</h3>
                     <button
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      className="btn bg-green-500 hover:bg-green-600 text-white p-2 rounded-full shadow-sm"
                       onClick={handleAddExcludedScope}
+                      aria-label="Añadir Área Excluida"
                     >
-                      Añadir Área Excluida
+                      <i className="bi bi-plus-lg text-lg"></i>
                     </button>
                   </div>
                   <ul className="space-y-2">
                     {testPlan.scope.excluded.map((item, index) => (
-                      <li key={index} className="flex items-start">
+                      <li
+                        key={index}
+                        className="flex items-start bg-neutral-50 p-2 sm:p-3 rounded-lg border border-neutral-200 hover:shadow-custom transition-shadow"
+                      >
                         <span className="mr-2">•</span>
                         {editingExcludedScope && editingExcludedScope.index === index ? (
                           <div className="flex-1">
@@ -1242,16 +1261,18 @@ export default function Home() {
                             <span>{item}</span>
                             <div className="flex space-x-2">
                               <button
-                                className="ml-2 text-primary-custom hover:text-opacity-80"
+                                className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
                                 onClick={() => setEditingExcludedScope({ index, value: item })}
+                                aria-label="Editar"
                               >
-                                Editar
+                                <i className="bi bi-pencil"></i>
                               </button>
                               <button
-                                className="text-red-500 hover:text-opacity-80"
+                                className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
                                 onClick={() => handleDeleteExcludedScope(index)}
+                                aria-label="Eliminar"
                               >
-                                Eliminar
+                                <i className="bi bi-dash-lg"></i>
                               </button>
                             </div>
                           </div>
@@ -1265,15 +1286,7 @@ export default function Home() {
             {/* Pestaña de Riesgos */}
             {activeTab === "risks" && (
               <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-primary-custom">Riesgos</h2>
-                  <button
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={handleAddRisk}
-                  >
-                    Añadir Riesgo
-                  </button>
-                </div>
+                <SectionHeader title="Riesgos" onAdd={handleAddRisk} addLabel="Añadir Riesgo" />
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
@@ -1292,133 +1305,200 @@ export default function Home() {
                           <td className="border p-2">{index + 1}</td>
                           <td className="border p-2">
                             {editingRisk && editingRisk.index === index && editingRisk.field === "description" ? (
-                              <textarea
-                                className="w-full p-1 border rounded"
-                                value={editingRisk.value}
-                                onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
-                              />
+                              <div>
+                                <textarea
+                                  className="w-full p-1 border rounded"
+                                  value={editingRisk.value}
+                                  onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
+                                />
+                                <div className="flex mt-2 space-x-2">
+                                  <button
+                                    className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                    onClick={() => {
+                                      handleEditRisk(index, editingRisk.field as keyof Risk, editingRisk.value)
+                                      setEditingRisk(null)
+                                    }}
+                                  >
+                                    Guardar
+                                  </button>
+                                  <button
+                                    className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                    onClick={() => setEditingRisk(null)}
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </div>
                             ) : (
-                              risk.description
+                              <div className="flex justify-between items-start">
+                                <span>{risk.description}</span>
+                                <button
+                                  className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
+                                  onClick={() =>
+                                    setEditingRisk({ index, field: "description", value: risk.description })
+                                  }
+                                  aria-label="Editar descripción"
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                              </div>
                             )}
                           </td>
                           <td className="border p-2">
                             {editingRisk && editingRisk.index === index && editingRisk.field === "impact" ? (
-                              <select
-                                className="w-full p-1 border rounded"
-                                value={editingRisk.value}
-                                onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
-                              >
-                                <option value="Alto">Alto</option>
-                                <option value="Medio">Medio</option>
-                                <option value="Bajo">Bajo</option>
-                              </select>
+                              <div>
+                                <select
+                                  className="w-full p-1 border rounded"
+                                  value={editingRisk.value}
+                                  onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
+                                >
+                                  <option value="Alto">Alto</option>
+                                  <option value="Medio">Medio</option>
+                                  <option value="Bajo">Bajo</option>
+                                </select>
+                                <div className="flex mt-2 space-x-2">
+                                  <button
+                                    className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                    onClick={() => {
+                                      handleEditRisk(index, editingRisk.field as keyof Risk, editingRisk.value)
+                                      setEditingRisk(null)
+                                    }}
+                                  >
+                                    Guardar
+                                  </button>
+                                  <button
+                                    className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                    onClick={() => setEditingRisk(null)}
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </div>
                             ) : (
-                              <span
-                                className={`px-2 py-1 rounded text-xs ${
-                                  risk.impact === "Alto"
-                                    ? "bg-red-100 text-red-800"
-                                    : risk.impact === "Medio"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-green-100 text-green-800"
-                                }`}
-                              >
-                                {risk.impact}
-                              </span>
+                              <div className="flex justify-between items-center">
+                                <span
+                                  className={`px-2 py-1 rounded text-xs ${
+                                    risk.impact === "Alto"
+                                      ? "bg-red-100 text-red-800"
+                                      : risk.impact === "Medio"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : "bg-green-100 text-green-800"
+                                  }`}
+                                >
+                                  {risk.impact}
+                                </span>
+                                <button
+                                  className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
+                                  onClick={() => setEditingRisk({ index, field: "impact", value: risk.impact })}
+                                  aria-label="Editar impacto"
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                              </div>
                             )}
                           </td>
                           <td className="border p-2">
                             {editingRisk && editingRisk.index === index && editingRisk.field === "probability" ? (
-                              <select
-                                className="w-full p-1 border rounded"
-                                value={editingRisk.value}
-                                onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
-                              >
-                                <option value="Alta">Alta</option>
-                                <option value="Media">Media</option>
-                                <option value="Baja">Baja</option>
-                              </select>
+                              <div>
+                                <select
+                                  className="w-full p-1 border rounded"
+                                  value={editingRisk.value}
+                                  onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
+                                >
+                                  <option value="Alta">Alta</option>
+                                  <option value="Media">Media</option>
+                                  <option value="Baja">Baja</option>
+                                </select>
+                                <div className="flex mt-2 space-x-2">
+                                  <button
+                                    className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                    onClick={() => {
+                                      handleEditRisk(index, editingRisk.field as keyof Risk, editingRisk.value)
+                                      setEditingRisk(null)
+                                    }}
+                                  >
+                                    Guardar
+                                  </button>
+                                  <button
+                                    className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                    onClick={() => setEditingRisk(null)}
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </div>
                             ) : (
-                              <span
-                                className={`px-2 py-1 rounded text-xs ${
-                                  risk.probability === "Alta"
-                                    ? "bg-red-100 text-red-800"
-                                    : risk.probability === "Media"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-green-100 text-green-800"
-                                }`}
-                              >
-                                {risk.probability}
-                              </span>
+                              <div className="flex justify-between items-center">
+                                <span
+                                  className={`px-2 py-1 rounded text-xs ${
+                                    risk.probability === "Alta"
+                                      ? "bg-red-100 text-red-800"
+                                      : risk.probability === "Media"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : "bg-green-100 text-green-800"
+                                  }`}
+                                >
+                                  {risk.probability}
+                                </span>
+                                <button
+                                  className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
+                                  onClick={() =>
+                                    setEditingRisk({ index, field: "probability", value: risk.probability })
+                                  }
+                                  aria-label="Editar probabilidad"
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                              </div>
                             )}
                           </td>
                           <td className="border p-2">
                             {editingRisk && editingRisk.index === index && editingRisk.field === "mitigation" ? (
-                              <textarea
-                                className="w-full p-1 border rounded"
-                                value={editingRisk.value}
-                                onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
-                              />
+                              <div>
+                                <textarea
+                                  className="w-full p-1 border rounded"
+                                  value={editingRisk.value}
+                                  onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
+                                />
+                                <div className="flex mt-2 space-x-2">
+                                  <button
+                                    className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                    onClick={() => {
+                                      handleEditRisk(index, editingRisk.field as keyof Risk, editingRisk.value)
+                                      setEditingRisk(null)
+                                    }}
+                                  >
+                                    Guardar
+                                  </button>
+                                  <button
+                                    className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                    onClick={() => setEditingRisk(null)}
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </div>
                             ) : (
-                              risk.mitigation
+                              <div className="flex justify-between items-start">
+                                <span>{risk.mitigation}</span>
+                                <button
+                                  className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
+                                  onClick={() => setEditingRisk({ index, field: "mitigation", value: risk.mitigation })}
+                                  aria-label="Editar mitigación"
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                              </div>
                             )}
                           </td>
                           <td className="border p-2">
-                            {editingRisk && editingRisk.index === index ? (
-                              <div className="flex space-x-1">
-                                <button
-                                  className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
-                                  onClick={() => {
-                                    handleEditRisk(index, editingRisk.field as keyof Risk, editingRisk.value)
-                                    setEditingRisk(null)
-                                  }}
-                                >
-                                  Guardar
-                                </button>
-                                <button
-                                  className="bg-gray-300 px-2 py-1 rounded text-xs"
-                                  onClick={() => setEditingRisk(null)}
-                                >
-                                  Cancelar
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col space-y-1">
-                                <button
-                                  className="text-primary-custom hover:text-opacity-80 text-xs"
-                                  onClick={() =>
-                                    setEditingRisk({ index, field: "description", value: risk.description })
-                                  }
-                                >
-                                  Editar Desc.
-                                </button>
-                                <button
-                                  className="text-primary-custom hover:text-opacity-80 text-xs"
-                                  onClick={() => setEditingRisk({ index, field: "impact", value: risk.impact })}
-                                >
-                                  Editar Imp.
-                                </button>
-                                <button
-                                  className="text-primary-custom hover:text-opacity-80 text-xs"
-                                  onClick={() =>
-                                    setEditingRisk({ index, field: "probability", value: risk.probability })
-                                  }
-                                >
-                                  Editar Prob.
-                                </button>
-                                <button
-                                  className="text-primary-custom hover:text-opacity-80 text-xs"
-                                  onClick={() => setEditingRisk({ index, field: "mitigation", value: risk.mitigation })}
-                                >
-                                  Editar Mit.
-                                </button>
-                                <button
-                                  className="text-red-500 hover:text-opacity-80 text-xs"
-                                  onClick={() => handleDeleteRisk(index)}
-                                >
-                                  Eliminar
-                                </button>
-                              </div>
-                            )}
+                            <button
+                              className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                              onClick={() => handleDeleteRisk(index)}
+                              aria-label="Eliminar"
+                            >
+                              <i className="bi bi-dash-lg"></i>
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -1433,24 +1513,26 @@ export default function Home() {
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-2xl font-bold text-primary-custom">Casos de Prueba</h2>
                   <div className="flex space-x-2">
-                    <button
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    <ActionButton
+                      type="add"
                       onClick={handleAddTestCase}
-                    >
-                      Añadir Caso de Prueba
-                    </button>
+                      label="Añadir Caso de Prueba"
+                      className="mr-2"
+                    />
                     <div className="flex">
                       <button
                         className={`px-3 py-1 rounded-l ${viewMode === "cards" ? "bg-primary-custom text-white" : "bg-gray-200"}`}
                         onClick={() => setViewMode("cards")}
                       >
-                        Tarjetas
+                        <i className="bi bi-grid mr-1"></i>
+                        <span className="hidden sm:inline">Tarjetas</span>
                       </button>
                       <button
                         className={`px-3 py-1 rounded-r ${viewMode === "table" ? "bg-primary-custom text-white" : "bg-gray-200"}`}
                         onClick={() => setViewMode("table")}
                       >
-                        Tabla
+                        <i className="bi bi-table mr-1"></i>
+                        <span className="hidden sm:inline">Tabla</span>
                       </button>
                     </div>
                   </div>
@@ -1520,7 +1602,7 @@ export default function Home() {
                               })
                             }}
                           >
-                            Editar Título
+                            <i className="bi bi-pencil mr-1"></i>Título
                           </button>
                           <button
                             className="text-primary-custom hover:text-opacity-80 text-xs border border-primary-custom px-2 py-1 rounded"
@@ -1532,7 +1614,7 @@ export default function Home() {
                               })
                             }}
                           >
-                            Editar Prioridad
+                            <i className="bi bi-pencil mr-1"></i>Prioridad
                           </button>
                           <button
                             className="text-primary-custom hover:text-opacity-80 text-xs border border-primary-custom px-2 py-1 rounded"
@@ -1544,7 +1626,7 @@ export default function Home() {
                               })
                             }}
                           >
-                            Editar Precondiciones
+                            <i className="bi bi-pencil mr-1"></i>Precondiciones
                           </button>
                           <button
                             className="text-primary-custom hover:text-opacity-80 text-xs border border-primary-custom px-2 py-1 rounded"
@@ -1556,7 +1638,7 @@ export default function Home() {
                               })
                             }}
                           >
-                            Editar Pasos
+                            <i className="bi bi-pencil mr-1"></i>Pasos
                           </button>
                           <button
                             className="text-primary-custom hover:text-opacity-80 text-xs border border-primary-custom px-2 py-1 rounded"
@@ -1568,13 +1650,13 @@ export default function Home() {
                               })
                             }}
                           >
-                            Editar Resultado
+                            <i className="bi bi-pencil mr-1"></i>Resultado
                           </button>
                           <button
                             className="text-red-500 hover:text-opacity-80 text-xs border border-red-500 px-2 py-1 rounded"
                             onClick={() => handleDeleteTestCase(index)}
                           >
-                            Eliminar
+                            <i className="bi bi-dash-lg mr-1"></i>Eliminar
                           </button>
                         </div>
                       </div>
@@ -1624,27 +1706,8 @@ export default function Home() {
                                   className="text-primary-custom hover:text-opacity-80 text-sm flex items-center"
                                   onClick={() => setActiveTestCaseDetails(index)}
                                 >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 mr-1"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                    />
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                    />
-                                  </svg>
-                                  Ver detalles
+                                  <i className="bi bi-eye mr-1"></i>
+                                  <span className="hidden sm:inline">Ver</span>
                                 </button>
                                 <button
                                   className="text-primary-custom hover:text-opacity-80 text-sm flex items-center"
@@ -1656,41 +1719,15 @@ export default function Home() {
                                     })
                                   }}
                                 >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 mr-1"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                    />
-                                  </svg>
-                                  Editar
+                                  <i className="bi bi-pencil mr-1"></i>
+                                  <span className="hidden sm:inline">Editar</span>
                                 </button>
                                 <button
                                   className="text-red-500 hover:text-opacity-80 text-sm flex items-center"
                                   onClick={() => handleDeleteTestCase(index)}
                                 >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 mr-1"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                    />
-                                  </svg>
-                                  Eliminar
+                                  <i className="bi bi-dash-lg mr-1"></i>
+                                  <span className="hidden sm:inline">Eliminar</span>
                                 </button>
                               </div>
                             </td>
@@ -1713,20 +1750,7 @@ export default function Home() {
                           className="text-gray-500 hover:text-gray-700"
                           onClick={() => setActiveTestCaseDetails(null)}
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
+                          <i className="bi bi-x-lg"></i>
                         </button>
                       </div>
 
@@ -1792,6 +1816,7 @@ export default function Home() {
                             setActiveTestCaseDetails(null)
                           }}
                         >
+                          <i className="bi bi-pencil mr-1"></i>
                           Editar Caso de Prueba
                         </button>
                       </div>
@@ -1806,20 +1831,7 @@ export default function Home() {
                       <div className="flex justify-between items-start mb-4">
                         <h3 className="text-xl font-bold">Editar Caso de Prueba {editingTestCase.index + 1}</h3>
                         <button className="text-gray-500 hover:text-gray-700" onClick={() => setEditingTestCase(null)}>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
+                          <i className="bi bi-x-lg"></i>
                         </button>
                       </div>
 
@@ -1939,15 +1951,11 @@ export default function Home() {
             {/* Pestaña de Estimación de Tiempos */}
             {activeTab === "time" && (
               <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-primary-custom">Estimación de Tiempos</h2>
-                  <button
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={handleAddTimeEstimationPhase}
-                  >
-                    Añadir Fase
-                  </button>
-                </div>
+                <SectionHeader
+                  title="Estimación de Tiempos"
+                  onAdd={handleAddTimeEstimationPhase}
+                  addLabel="Añadir Fase"
+                />
 
                 <div className="overflow-x-auto mb-6">
                   <table className="w-full border-collapse">
@@ -1969,115 +1977,193 @@ export default function Home() {
                             {editingTimeEstimation &&
                             editingTimeEstimation.index === index &&
                             editingTimeEstimation.field === "name" ? (
-                              <input
-                                type="text"
-                                className="w-full p-1 border rounded"
-                                value={editingTimeEstimation.value as string}
-                                onChange={(e) =>
-                                  setEditingTimeEstimation({ ...editingTimeEstimation, value: e.target.value })
-                                }
-                              />
+                              <div>
+                                <input
+                                  type="text"
+                                  className="w-full p-1 border rounded"
+                                  value={editingTimeEstimation.value as string}
+                                  onChange={(e) =>
+                                    setEditingTimeEstimation({ ...editingTimeEstimation, value: e.target.value })
+                                  }
+                                />
+                                <div className="flex mt-2 space-x-2">
+                                  <button
+                                    className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                    onClick={() => {
+                                      handleEditTimeEstimation(
+                                        index,
+                                        editingTimeEstimation.field,
+                                        editingTimeEstimation.value,
+                                      )
+                                      setEditingTimeEstimation(null)
+                                    }}
+                                  >
+                                    Guardar
+                                  </button>
+                                  <button
+                                    className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                    onClick={() => setEditingTimeEstimation(null)}
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </div>
                             ) : (
-                              phase.name
+                              <div className="flex justify-between items-center">
+                                <span>{phase.name}</span>
+                                <button
+                                  className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
+                                  onClick={() => setEditingTimeEstimation({ index, field: "name", value: phase.name })}
+                                  aria-label="Editar nombre"
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                              </div>
                             )}
                           </td>
                           <td className="border p-2">
                             {editingTimeEstimation &&
                             editingTimeEstimation.index === index &&
                             editingTimeEstimation.field === "duration" ? (
-                              <input
-                                type="number"
-                                className="w-full p-1 border rounded"
-                                value={editingTimeEstimation.value as number}
-                                onChange={(e) =>
-                                  setEditingTimeEstimation({ ...editingTimeEstimation, value: Number(e.target.value) })
-                                }
-                                min="1"
-                              />
+                              <div>
+                                <input
+                                  type="number"
+                                  className="w-full p-1 border rounded"
+                                  value={editingTimeEstimation.value as number}
+                                  onChange={(e) =>
+                                    setEditingTimeEstimation({
+                                      ...editingTimeEstimation,
+                                      value: Number(e.target.value),
+                                    })
+                                  }
+                                  min="1"
+                                />
+                                <div className="flex mt-2 space-x-2">
+                                  <button
+                                    className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                    onClick={() => {
+                                      handleEditTimeEstimation(
+                                        index,
+                                        editingTimeEstimation.field,
+                                        editingTimeEstimation.value,
+                                      )
+                                      setEditingTimeEstimation(null)
+                                    }}
+                                  >
+                                    Guardar
+                                  </button>
+                                  <button
+                                    className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                    onClick={() => setEditingTimeEstimation(null)}
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </div>
                             ) : (
-                              phase.duration
+                              <div className="flex justify-between items-center">
+                                <span>{phase.duration}</span>
+                                <button
+                                  className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
+                                  onClick={() =>
+                                    setEditingTimeEstimation({ index, field: "duration", value: phase.duration })
+                                  }
+                                  aria-label="Editar duración"
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                              </div>
                             )}
                           </td>
                           <td className="border p-2">
                             {editingTimeEstimation &&
                             editingTimeEstimation.index === index &&
                             editingTimeEstimation.field === "resources" ? (
-                              <input
-                                type="text"
-                                className="w-full p-1 border rounded"
-                                value={editingTimeEstimation.value as string}
-                                onChange={(e) =>
-                                  setEditingTimeEstimation({ ...editingTimeEstimation, value: e.target.value })
-                                }
-                              />
+                              <div>
+                                <input
+                                  type="text"
+                                  className="w-full p-1 border rounded"
+                                  value={editingTimeEstimation.value as string}
+                                  onChange={(e) =>
+                                    setEditingTimeEstimation({ ...editingTimeEstimation, value: e.target.value })
+                                  }
+                                />
+                                <div className="flex mt-2 space-x-2">
+                                  <button
+                                    className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                    onClick={() => {
+                                      handleEditTimeEstimation(
+                                        index,
+                                        editingTimeEstimation.field,
+                                        editingTimeEstimation.value,
+                                      )
+                                      setEditingTimeEstimation(null)
+                                    }}
+                                  >
+                                    Guardar
+                                  </button>
+                                  <button
+                                    className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                    onClick={() => setEditingTimeEstimation(null)}
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </div>
                             ) : (
-                              phase.resources
+                              <div className="flex justify-between items-start">
+                                <span>{phase.resources}</span>
+                                <button
+                                  className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
+                                  onClick={() =>
+                                    setEditingTimeEstimation({ index, field: "resources", value: phase.resources })
+                                  }
+                                  aria-label="Editar recursos"
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                              </div>
                             )}
                           </td>
                           <td className="border p-2">
                             {editingTimeEstimation &&
                             editingTimeEstimation.index === index &&
                             editingTimeEstimation.field === "justification" ? (
-                              <textarea
-                                className="w-full p-1 border rounded"
-                                value={editingTimeEstimation.value as string}
-                                onChange={(e) =>
-                                  setEditingTimeEstimation({ ...editingTimeEstimation, value: e.target.value })
-                                }
-                              />
-                            ) : (
-                              phase.justification
-                            )}
-                          </td>
-                          <td className="border p-2">
-                            {editingTimeEstimation && editingTimeEstimation.index === index ? (
-                              <div className="flex space-x-1">
-                                <button
-                                  className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
-                                  onClick={() => {
-                                    handleEditTimeEstimation(
-                                      index,
-                                      editingTimeEstimation.field,
-                                      editingTimeEstimation.value,
-                                    )
-                                    setEditingTimeEstimation(null)
-                                  }}
-                                >
-                                  Guardar
-                                </button>
-                                <button
-                                  className="bg-gray-300 px-2 py-1 rounded text-xs"
-                                  onClick={() => setEditingTimeEstimation(null)}
-                                >
-                                  Cancelar
-                                </button>
+                              <div>
+                                <textarea
+                                  className="w-full p-1 border rounded"
+                                  value={editingTimeEstimation.value as string}
+                                  onChange={(e) =>
+                                    setEditingTimeEstimation({ ...editingTimeEstimation, value: e.target.value })
+                                  }
+                                />
+                                <div className="flex mt-2 space-x-2">
+                                  <button
+                                    className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                    onClick={() => {
+                                      handleEditTimeEstimation(
+                                        index,
+                                        editingTimeEstimation.field,
+                                        editingTimeEstimation.value,
+                                      )
+                                      setEditingTimeEstimation(null)
+                                    }}
+                                  >
+                                    Guardar
+                                  </button>
+                                  <button
+                                    className="bg-gray-300 px-2 py-1 rounded text-xs"
+                                    onClick={() => setEditingTimeEstimation(null)}
+                                  >
+                                    Cancelar
+                                  </button>
+                                </div>
                               </div>
                             ) : (
-                              <div className="flex flex-col space-y-1">
+                              <div className="flex justify-between items-start">
+                                <span>{phase.justification}</span>
                                 <button
-                                  className="text-primary-custom hover:text-opacity-80 text-xs"
-                                  onClick={() => setEditingTimeEstimation({ index, field: "name", value: phase.name })}
-                                >
-                                  Editar Nombre
-                                </button>
-                                <button
-                                  className="text-primary-custom hover:text-opacity-80 text-xs"
-                                  onClick={() =>
-                                    setEditingTimeEstimation({ index, field: "duration", value: phase.duration })
-                                  }
-                                >
-                                  Editar Duración
-                                </button>
-                                <button
-                                  className="text-primary-custom hover:text-opacity-80 text-xs"
-                                  onClick={() =>
-                                    setEditingTimeEstimation({ index, field: "resources", value: phase.resources })
-                                  }
-                                >
-                                  Editar Recursos
-                                </button>
-                                <button
-                                  className="text-primary-custom hover:text-opacity-80 text-xs"
+                                  className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
                                   onClick={() =>
                                     setEditingTimeEstimation({
                                       index,
@@ -2085,16 +2171,22 @@ export default function Home() {
                                       value: phase.justification,
                                     })
                                   }
+                                  aria-label="Editar justificación"
                                 >
-                                  Editar Just.
-                                </button>
-                                <button
-                                  className="text-red-500 hover:text-opacity-80 text-xs"
-                                  onClick={() => handleDeleteTimeEstimationPhase(index)}
-                                >
-                                  Eliminar
+                                  <i className="bi bi-pencil"></i>
                                 </button>
                               </div>
+                            )}
+                          </td>
+                          <td className="border p-2">
+                            {!(editingTimeEstimation && editingTimeEstimation.index === index) && (
+                              <button
+                                className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                                onClick={() => handleDeleteTimeEstimationPhase(index)}
+                                aria-label="Eliminar"
+                              >
+                                <i className="bi bi-dash-lg"></i>
+                              </button>
                             )}
                           </td>
                         </tr>
@@ -2114,19 +2206,20 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-xl font-semibold">Factores Considerados</h3>
-                    <button
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                      onClick={handleAddTimeEstimationFactor}
-                    >
-                      Añadir Factor
-                    </button>
-                  </div>
+                  <SectionHeader
+                    title="Factores Considerados"
+                    onAdd={handleAddTimeEstimationFactor}
+                    addLabel="Añadir Factor"
+                  />
                   <ul className="space-y-2">
                     {testPlan.timeEstimation.factors.map((factor, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="mr-2">•</span>
+                      <ListItem
+                        key={index}
+                        onEdit={() => setEditingTimeEstimationFactor({ index, value: factor })}
+                        onDelete={() => handleDeleteTimeEstimationFactor(index)}
+                        icon="bi-check-circle"
+                        iconColor="text-green-500"
+                      >
                         {editingTimeEstimationFactor && editingTimeEstimationFactor.index === index ? (
                           <div className="flex-1">
                             <textarea
@@ -2153,25 +2246,9 @@ export default function Home() {
                             </div>
                           </div>
                         ) : (
-                          <div className="flex-1 flex justify-between items-start">
-                            <span>{factor}</span>
-                            <div className="flex space-x-2">
-                              <button
-                                className="ml-2 text-primary-custom hover:text-opacity-80"
-                                onClick={() => setEditingTimeEstimationFactor({ index, value: factor })}
-                              >
-                                Editar
-                              </button>
-                              <button
-                                className="text-red-500 hover:text-opacity-80"
-                                onClick={() => handleDeleteTimeEstimationFactor(index)}
-                              >
-                                Eliminar
-                              </button>
-                            </div>
-                          </div>
+                          factor
                         )}
-                      </li>
+                      </ListItem>
                     ))}
                   </ul>
                 </div>
@@ -2213,25 +2290,22 @@ export default function Home() {
                     <div className="flex justify-between items-start">
                       <p className="text-gray-700">{testPlan.strategy.approach}</p>
                       <button
-                        className="ml-2 text-primary-custom hover:text-opacity-80"
+                        className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
                         onClick={() => setEditingStrategy({ field: "approach", value: testPlan.strategy.approach })}
+                        aria-label="Editar Enfoque"
                       >
-                        Editar
+                        <i className="bi bi-pencil"></i>
                       </button>
                     </div>
                   )}
                 </div>
 
                 <div className="mb-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-xl font-semibold mb-2">Técnicas de Prueba</h3>
-                    <button
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                      onClick={handleAddStrategyTechnique}
-                    >
-                      Añadir Técnica
-                    </button>
-                  </div>
+                  <SectionHeader
+                    title="Técnicas de Prueba"
+                    onAdd={handleAddStrategyTechnique}
+                    addLabel="Añadir Técnica"
+                  />
                   <div className="space-y-4">
                     {testPlan.strategy.techniques.map((technique, index) => (
                       <div key={index} className="border rounded-lg p-4 bg-white shadow-sm">
@@ -2276,18 +2350,20 @@ export default function Home() {
                               <h4 className="font-bold">{technique.name}</h4>
                               <div className="flex space-x-2">
                                 <button
-                                  className="text-primary-custom hover:text-opacity-80 text-xs"
+                                  className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
                                   onClick={() =>
                                     setEditingStrategyTechnique({ index, field: "name", value: technique.name })
                                   }
+                                  aria-label="Editar Nombre"
                                 >
-                                  Editar Nombre
+                                  <i className="bi bi-pencil"></i>
                                 </button>
                                 <button
-                                  className="text-red-500 hover:text-opacity-80 text-xs"
+                                  className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
                                   onClick={() => handleDeleteStrategyTechnique(index)}
+                                  aria-label="Eliminar Técnica"
                                 >
-                                  Eliminar
+                                  <i className="bi bi-dash-lg"></i>
                                 </button>
                               </div>
                             </div>
@@ -2335,7 +2411,7 @@ export default function Home() {
                             <div className="flex justify-between items-start">
                               <p className="text-gray-700">{technique.description}</p>
                               <button
-                                className="ml-2 text-primary-custom hover:text-opacity-80 text-xs"
+                                className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
                                 onClick={() =>
                                   setEditingStrategyTechnique({
                                     index,
@@ -2343,8 +2419,9 @@ export default function Home() {
                                     value: technique.description,
                                   })
                                 }
+                                aria-label="Editar Descripción"
                               >
-                                Editar Desc.
+                                <i className="bi bi-pencil"></i>
                               </button>
                             </div>
                           )}
@@ -2356,19 +2433,20 @@ export default function Home() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-xl font-semibold mb-2">Criterios de Entrada</h3>
-                      <button
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={handleAddEntryCriteria}
-                      >
-                        Añadir Criterio
-                      </button>
-                    </div>
+                    <SectionHeader
+                      title="Criterios de Entrada"
+                      onAdd={handleAddEntryCriteria}
+                      addLabel="Añadir Criterio"
+                    />
                     <ul className="space-y-2">
                       {testPlan.strategy.entryCriteria.map((criteria, index) => (
-                        <li key={index} className="flex items-start">
-                          <span className="mr-2">•</span>
+                        <ListItem
+                          key={index}
+                          onEdit={() => setEditingEntryCriteria({ index, value: criteria })}
+                          onDelete={() => handleDeleteEntryCriteria(index)}
+                          icon="bi-arrow-right-circle"
+                          iconColor="text-blue-500"
+                        >
                           {editingEntryCriteria && editingEntryCriteria.index === index ? (
                             <div className="flex-1">
                               <textarea
@@ -2395,43 +2473,28 @@ export default function Home() {
                               </div>
                             </div>
                           ) : (
-                            <div className="flex-1 flex justify-between items-start">
-                              <span>{criteria}</span>
-                              <div className="flex space-x-2">
-                                <button
-                                  className="ml-2 text-primary-custom hover:text-opacity-80"
-                                  onClick={() => setEditingEntryCriteria({ index, value: criteria })}
-                                >
-                                  Editar
-                                </button>
-                                <button
-                                  className="text-red-500 hover:text-opacity-80"
-                                  onClick={() => handleDeleteEntryCriteria(index)}
-                                >
-                                  Eliminar
-                                </button>
-                              </div>
-                            </div>
+                            criteria
                           )}
-                        </li>
+                        </ListItem>
                       ))}
                     </ul>
                   </div>
 
                   <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-xl font-semibold mb-2">Criterios de Salida</h3>
-                      <button
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={handleAddExitCriteria}
-                      >
-                        Añadir Criterio
-                      </button>
-                    </div>
+                    <SectionHeader
+                      title="Criterios de Salida"
+                      onAdd={handleAddExitCriteria}
+                      addLabel="Añadir Criterio"
+                    />
                     <ul className="space-y-2">
                       {testPlan.strategy.exitCriteria.map((criteria, index) => (
-                        <li key={index} className="flex items-start">
-                          <span className="mr-2">•</span>
+                        <ListItem
+                          key={index}
+                          onEdit={() => setEditingExitCriteria({ index, value: criteria })}
+                          onDelete={() => handleDeleteExitCriteria(index)}
+                          icon="bi-box-arrow-right"
+                          iconColor="text-purple-500"
+                        >
                           {editingExitCriteria && editingExitCriteria.index === index ? (
                             <div className="flex-1">
                               <textarea
@@ -2458,25 +2521,9 @@ export default function Home() {
                               </div>
                             </div>
                           ) : (
-                            <div className="flex-1 flex justify-between items-start">
-                              <span>{criteria}</span>
-                              <div className="flex space-x-2">
-                                <button
-                                  className="ml-2 text-primary-custom hover:text-opacity-80"
-                                  onClick={() => setEditingExitCriteria({ index, value: criteria })}
-                                >
-                                  Editar
-                                </button>
-                                <button
-                                  className="text-red-500 hover:text-opacity-80"
-                                  onClick={() => handleDeleteExitCriteria(index)}
-                                >
-                                  Eliminar
-                                </button>
-                              </div>
-                            </div>
+                            criteria
                           )}
-                        </li>
+                        </ListItem>
                       ))}
                     </ul>
                   </div>
@@ -2489,15 +2536,7 @@ export default function Home() {
                 <h2 className="text-2xl font-bold mb-4 text-primary-custom">Entorno y Datos de Prueba</h2>
 
                 <div className="mb-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-xl font-semibold mb-2">Entornos Requeridos</h3>
-                    <button
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                      onClick={handleAddEnvironment}
-                    >
-                      Añadir Entorno
-                    </button>
-                  </div>
+                  <SectionHeader title="Entornos Requeridos" onAdd={handleAddEnvironment} addLabel="Añadir Entorno" />
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
                       <thead>
@@ -2543,7 +2582,16 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                env.name
+                                <div className="flex justify-between items-center">
+                                  <span>{env.name}</span>
+                                  <button
+                                    className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
+                                    onClick={() => setEditingEnvironment({ index, field: "name", value: env.name })}
+                                    aria-label="Editar nombre"
+                                  >
+                                    <i className="bi bi-pencil"></i>
+                                  </button>
+                                </div>
                               )}
                             </td>
                             <td className="border p-2">
@@ -2577,7 +2625,18 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                env.purpose
+                                <div className="flex justify-between items-start">
+                                  <span>{env.purpose}</span>
+                                  <button
+                                    className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
+                                    onClick={() =>
+                                      setEditingEnvironment({ index, field: "purpose", value: env.purpose })
+                                    }
+                                    aria-label="Editar propósito"
+                                  >
+                                    <i className="bi bi-pencil"></i>
+                                  </button>
+                                </div>
                               )}
                             </td>
                             <td className="border p-2">
@@ -2611,41 +2670,29 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                env.configuration
+                                <div className="flex justify-between items-start">
+                                  <span>{env.configuration}</span>
+                                  <button
+                                    className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
+                                    onClick={() =>
+                                      setEditingEnvironment({ index, field: "configuration", value: env.configuration })
+                                    }
+                                    aria-label="Editar configuración"
+                                  >
+                                    <i className="bi bi-pencil"></i>
+                                  </button>
+                                </div>
                               )}
                             </td>
                             <td className="border p-2">
                               {!(editingEnvironment && editingEnvironment.index === index) && (
-                                <div className="flex flex-col space-y-1">
-                                  <button
-                                    className="text-primary-custom hover:text-opacity-80 text-xs"
-                                    onClick={() => setEditingEnvironment({ index, field: "name", value: env.name })}
-                                  >
-                                    Editar Nombre
-                                  </button>
-                                  <button
-                                    className="text-primary-custom hover:text-opacity-80 text-xs"
-                                    onClick={() =>
-                                      setEditingEnvironment({ index, field: "purpose", value: env.purpose })
-                                    }
-                                  >
-                                    Editar Propósito
-                                  </button>
-                                  <button
-                                    className="text-primary-custom hover:text-opacity-80 text-xs"
-                                    onClick={() =>
-                                      setEditingEnvironment({ index, field: "configuration", value: env.configuration })
-                                    }
-                                  >
-                                    Editar Config.
-                                  </button>
-                                  <button
-                                    className="text-red-500 hover:text-opacity-80 text-xs"
-                                    onClick={() => handleDeleteEnvironment(index)}
-                                  >
-                                    Eliminar
-                                  </button>
-                                </div>
+                                <button
+                                  className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                                  onClick={() => handleDeleteEnvironment(index)}
+                                  aria-label="Eliminar"
+                                >
+                                  <i className="bi bi-dash-lg"></i>
+                                </button>
                               )}
                             </td>
                           </tr>
@@ -2656,19 +2703,16 @@ export default function Home() {
                 </div>
 
                 <div className="mb-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-xl font-semibold mb-2">Datos de Prueba</h3>
-                    <button
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                      onClick={handleAddTestData}
-                    >
-                      Añadir Dato
-                    </button>
-                  </div>
+                  <SectionHeader title="Datos de Prueba" onAdd={handleAddTestData} addLabel="Añadir Dato" />
                   <ul className="space-y-2">
                     {testPlan.environment.testData.map((data, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="mr-2">•</span>
+                      <ListItem
+                        key={index}
+                        onEdit={() => setEditingTestData({ index, value: data })}
+                        onDelete={() => handleDeleteTestData(index)}
+                        icon="bi-database"
+                        iconColor="text-yellow-500"
+                      >
                         {editingTestData && editingTestData.index === index ? (
                           <div className="flex-1">
                             <textarea
@@ -2695,39 +2739,15 @@ export default function Home() {
                             </div>
                           </div>
                         ) : (
-                          <div className="flex-1 flex justify-between items-start">
-                            <span>{data}</span>
-                            <div className="flex space-x-2">
-                              <button
-                                className="ml-2 text-primary-custom hover:text-opacity-80"
-                                onClick={() => setEditingTestData({ index, value: data })}
-                              >
-                                Editar
-                              </button>
-                              <button
-                                className="text-red-500 hover:text-opacity-80"
-                                onClick={() => handleDeleteTestData(index)}
-                              >
-                                Eliminar
-                              </button>
-                            </div>
-                          </div>
+                          data
                         )}
-                      </li>
+                      </ListItem>
                     ))}
                   </ul>
                 </div>
 
                 <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-xl font-semibold mb-2">Herramientas</h3>
-                    <button
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                      onClick={handleAddTool}
-                    >
-                      Añadir Herramienta
-                    </button>
-                  </div>
+                  <SectionHeader title="Herramientas" onAdd={handleAddTool} addLabel="Añadir Herramienta" />
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {testPlan.environment.tools.map((tool, index) => (
                       <div key={index} className="border rounded-lg p-4 bg-white shadow-sm">
@@ -2765,16 +2785,18 @@ export default function Home() {
                               <h4 className="font-bold">{tool.name}</h4>
                               <div className="flex space-x-2">
                                 <button
-                                  className="text-primary-custom hover:text-opacity-80 text-xs"
+                                  className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
                                   onClick={() => setEditingTool({ index, field: "name", value: tool.name })}
+                                  aria-label="Editar Nombre"
                                 >
-                                  Editar
+                                  <i className="bi bi-pencil"></i>
                                 </button>
                                 <button
-                                  className="text-red-500 hover:text-opacity-80 text-xs"
+                                  className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
                                   onClick={() => handleDeleteTool(index)}
+                                  aria-label="Eliminar Herramienta"
                                 >
-                                  Eliminar
+                                  <i className="bi bi-dash-lg"></i>
                                 </button>
                               </div>
                             </div>
@@ -2814,10 +2836,11 @@ export default function Home() {
                             <div className="flex justify-between items-start">
                               <p className="text-gray-700">{tool.purpose}</p>
                               <button
-                                className="ml-2 text-primary-custom hover:text-opacity-80 text-xs"
+                                className="p-1 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors ml-2"
                                 onClick={() => setEditingTool({ index, field: "purpose", value: tool.purpose })}
+                                aria-label="Editar Propósito"
                               >
-                                Editar
+                                <i className="bi bi-pencil"></i>
                               </button>
                             </div>
                           )}
@@ -2839,6 +2862,7 @@ export default function Home() {
                 </button>
 
                 <div className="w-full md:max-w-md space-y-4">
+                  <h3 className="text-lg font-semibold text-primary-custom">Enviar Plan por Email</h3>
                   <div className="space-y-3">
                     <div className="flex flex-col">
                       <label htmlFor="email-to" className="text-sm font-medium mb-1">

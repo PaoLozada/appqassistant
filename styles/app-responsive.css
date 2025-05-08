@@ -1,0 +1,170 @@
+/* Estilos responsivos para mejorar la experiencia móvil */
+
+/* Ocultar la barra de desplazamiento pero mantener la funcionalidad */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 640px) {
+
+    /* Reducir espaciado general */
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    /* Ajustar tamaños de texto */
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    /* Mejorar espaciado de tarjetas */
+    .card {
+        padding: 0.75rem;
+    }
+
+    .card-header {
+        padding: 0.75rem;
+    }
+
+    .card-body {
+        padding: 0.75rem;
+    }
+
+    .card-footer {
+        padding: 0.75rem;
+    }
+
+    /* Mejorar visualización de botones */
+    .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    /* Mejorar visualización de inputs */
+    .input {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    /* Ajustar espaciado de listas */
+    ul,
+    ol {
+        padding-left: 1rem;
+    }
+
+    /* Mejorar visualización de tablas */
+    table {
+        font-size: 0.875rem;
+    }
+
+    th,
+    td {
+        padding: 0.5rem;
+    }
+
+    /* Mejorar visualización de formularios */
+    label {
+        font-size: 0.875rem;
+    }
+
+    /* Ajustar espaciado de elementos en listas */
+    li {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Botones de acción flotantes para móvil */
+.floating-action-button {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    transition: all 0.2s ease;
+}
+
+.floating-action-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Mejorar contraste y visibilidad */
+.text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+/* Mejorar visualización de botones de acción */
+.action-button-add {
+    background-color: #22c55e;
+    color: white;
+    border-radius: 9999px;
+    padding: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.action-button-add:hover {
+    background-color: #16a34a;
+    transform: scale(1.05);
+}
+
+.action-button-edit {
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 9999px;
+    padding: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.action-button-edit:hover {
+    background-color: #2563eb;
+}
+
+.action-button-delete {
+    background-color: #ef4444;
+    color: white;
+    border-radius: 9999px;
+    padding: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.action-button-delete:hover {
+    background-color: #dc2626;
+}
