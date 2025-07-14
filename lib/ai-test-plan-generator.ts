@@ -4,7 +4,7 @@ import { generateTestPlan } from "./test-plan-generator"
 
 
 
-const DEFAULT_MODEL = "gpt-4o-mini" 
+const DEFAULT_MODEL = "gpt-4o-mini"
 
 // Actualizar la función createPrompt para incluir información del tipo de aplicación
 function createPrompt(input: TestPlanInput): string {
@@ -57,12 +57,31 @@ REQUISITOS ESPECÍFICOS Y OBLIGATORIOS:
    - Los casos deben cubrir pruebas funcionales, no funcionales, estructurales y de cambios.
    - Los casos de prueba deben estar directamente relacionados con las funcionalidades y características específicas de la aplicación descrita.
 
-5. ESTIMACIÓN DE TIEMPOS (detallada y justificada):
-   - Proporciona una estimación de tiempos realista con al menos 8 fases diferentes.
-   - Para cada fase, incluye: nombre, duración en días, recursos necesarios y justificación detallada basada en metodologías de estimación reconocidas.
-   - La justificación debe mencionar específicamente la metodología utilizada (PERT, puntos de función, juicio experto, etc.) y los factores considerados.
-   - Incluye al menos 8 factores que influyen en la estimación.
-   - La estimación debe considerar la complejidad específica del tipo de aplicación descrita.
+5. ESTIMACIÓN DE TIEMPOS (detallada y justificada teniendo en cuenta el tamaño del equipo: ${input.teamSize}):
+
+- Proporciona una estimación de tiempos realista con al menos 8 fases diferentes.
+- Considera que el esfuerzo total requerido en cada fase debe dividirse entre los probadores disponibles (${input.teamSize} recursos), especialmente si las tareas son paralelizables.
+- Aclara en la justificación si la fase es:
+   a) completamente paralelizable (las tareas se pueden dividir entre probadores y realizarse al mismo tiempo),
+   b) parcialmente paralelizable (algunas tareas pueden hacerse en paralelo y otras no), o
+   c) no paralelizable (requiere ejecución secuencial).
+   d) no es necesario inlcuir cifras en la justificación solo se puede decir algo como por ejemplo: "	
+La ejecución de pruebas es completamente paralelizable, permitiendo que todos los probadores ejecuten casos de prueba simultáneamente."
+- La duración estimada de cada fase debe reducirse de forma proporcional si hay más probadores, **siempre que las tareas no dependan de otras**.
+- Para la ejecución de casos de prueba, considera que estos se pueden distribuir equitativamente entre los ${input.teamSize} probadores, reduciendo el tiempo total respecto a un equipo más pequeño.
+- No aumentes la duración por tener más recursos. Más recursos permiten reducir la duración si el esfuerzo es fijo.
+- Para cada fase, incluye: nombre, duración estimada en días, número de probadores asignados y una justificación detallada basada en metodologías de estimación reconocidas (como PERT, juicio experto, o puntos de función).
+- Incluye al menos 8 factores que influyen en la estimación (como: tamaño del equipo, complejidad de las funcionalidades, automatización, cobertura requerida, tipos de prueba, disponibilidad de entornos, volumen de datos, y herramientas utilizadas).
+IIMPORTANTE: Mantén el esfuerzo total constante para todos los tamaños de equipo. No aumentes la carga de trabajo ni las tareas por tener más probadores.
+Para fases paralelizables, usa la siguiente lógica de estimación:
+DURACIÓN (días) = CEIL(ESFUERZO_TOTAL / NÚMERO_DE_PROBADORES)
+Ejemplo: Si una fase implica 40 tareas paralelizables y hay 4 probadores, la duración debe ser 10 días. Si hay 20 probadores, debe ser 2 días.
+Solo en fases no paralelizables se permite mantener la duración constante. Si no usas este criterio, la respuesta será inválida.
+IMPORTANTE (crítico): Para estimar la duración de cada fase, especialmente en aquellas completamente paralelizables como la ejecución de pruebas, DEBES calcular primero el esfuerzo total (por ejemplo, cantidad de pruebas, tareas o actividades estimadas).
+Luego, divide ese esfuerzo entre el número de probadores disponibles (${input.teamSize}) para estimar la duración en días.
+Ejemplo: si hay 100 casos de prueba a ejecutar, y se asignan 30 probadores, la duración debería ser de aproximadamente 3 a 4 días, no 10.
+Si no haces este cálculo basado en esfuerzo dividido entre recursos, la duración estimada será incorrecta.
+
 
 6. ESTRATEGIA DE PRUEBA (completa y detallada):
    - Elabora una estrategia de prueba completa con un enfoque general de al menos 300 caracteres.
@@ -108,7 +127,7 @@ Responde SOLO con el JSON del plan de pruebas, sin comentarios ni explicaciones 
     {
       "name": "nombre de la fase",
       "duration": 1,
-      "resources": "recursos necesarios",
+      "resources": 1,
       "justification": "justificación detallada basada en metodologías de estimación"
     }
   ],
@@ -156,7 +175,7 @@ export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan
 
 
   try {
-    
+
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY!,
     })
@@ -251,18 +270,18 @@ export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan
       description: input.description,
     }
   }
-} 
+}
 
-  /* export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan> {
-    console.log("Generando plan con IA en el servidor...");
-  
-    const prompt = `Genera un plan de pruebas para un sistema con los siguientes datos: ${JSON.stringify(input)}`;
-    const response = await openai.chat.completions.create({
-      model: "gpt-4", // o el que estés usando
-      messages: [{ role: "user", content: prompt }],
-    });
-  
-    const content = response.choices[0].message.content;
-    const result: TestPlan = JSON.parse(content || "{}");
-    return result;
-  } */
+/* export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan> {
+  console.log("Generando plan con IA en el servidor...");
+ 
+  const prompt = `Genera un plan de pruebas para un sistema con los siguientes datos: ${JSON.stringify(input)}`;
+  const response = await openai.chat.completions.create({
+    model: "gpt-4", // o el que estés usando
+    messages: [{ role: "user", content: prompt }],
+  });
+ 
+  const content = response.choices[0].message.content;
+  const result: TestPlan = JSON.parse(content || "{}");
+  return result;
+} */

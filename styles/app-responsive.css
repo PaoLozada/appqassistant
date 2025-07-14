@@ -123,7 +123,7 @@
 
 /* Mejorar visualización de botones de acción */
 .action-button-add {
-    background-color: #22c55e;
+    background-color: bg-accent-custom;
     color: white;
     border-radius: 9999px;
     padding: 0.375rem;
@@ -135,12 +135,14 @@
 }
 
 .action-button-add:hover {
-    background-color: #16a34a;
+    color: black;
+    background-color: lightgray;
     transform: scale(1.05);
+    
 }
 
 .action-button-edit {
-    background-color: #3b82f6;
+    background-color:var(--primary-color);
     color: white;
     border-radius: 9999px;
     padding: 0.375rem;
@@ -151,7 +153,7 @@
 }
 
 .action-button-edit:hover {
-    background-color: #2563eb;
+    background-color: var(--primary-color);
 }
 
 .action-button-delete {

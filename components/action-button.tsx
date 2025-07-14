@@ -14,7 +14,7 @@ export default function ActionButton({ type, onClick, label, className = "" }: A
   switch (type) {
     case "add":
       buttonClass = "action-button-add"
-      icon = "bi-plus-lg"
+      icon = "bi-plus-lg"      
       break
     case "edit":
       buttonClass = "action-button-edit"
@@ -22,7 +22,7 @@ export default function ActionButton({ type, onClick, label, className = "" }: A
       break
     case "delete":
       buttonClass = "action-button-delete"
-      icon = "bi-dash-lg"
+      icon = "bi-trash"
       break
   }
 

@@ -26,7 +26,7 @@ export interface TestPlan {
     phases: {
       name: string
       duration: number
-      resources: string
+      resources: number
       justification: string
     }[]
     totalDays: number

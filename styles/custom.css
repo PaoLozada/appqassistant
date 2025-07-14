@@ -12,6 +12,7 @@
   background-color: var(--primaryColor);
    color: var(--fifthColor);
 }
+
 .tittle_app{
   width: 70%;
 }
@@ -24,7 +25,7 @@
 }
 
 .footer-distributed {
-  background-color: var(--fourthColor);
+  /*background-color: var(--fourthColor);*/
   margin-top: 50px;
   box-sizing: border-box;
   width: 100%;
@@ -62,7 +63,7 @@
 /* Footer links */
 
 .footer-distributed .footer-links {
-  color: var(--fifthColor);
+  /*color: var(--fifthColor);*/
   margin: 20px 0 12px;
   padding: 0;
 }
@@ -96,7 +97,7 @@
 
 .footer-distributed .footer-center p {
   display: inline-block;
-  color: var(--fifthColor);
+  /*color: var(--fifthColor);*/
   font-weight: 400;
   vertical-align: middle;
   margin: 0;
@@ -107,7 +108,7 @@
   font-weight: 300;
   font-size: 20px;
   left: 0;
-  color: var(--fifthColor);
+  /*color: var(--fifthColor);*/
   display: inline-block;
   padding: 5px;
 }
@@ -124,7 +125,7 @@
 
 .footer-distributed .footer-company-about {
   line-height: 20px;
-  color: var(--fifthColor);
+  /*color: var(--fifthColor);*/
   font-size: 13px;
   font-weight: normal;
   margin: 0;
@@ -150,7 +151,7 @@
   background-color: transparent;
   border-radius: 2px;
   font-size: 20px;
-  color: var(--secondColor);
+  /*color: var(--secondColor);*/
   text-align: center;
   line-height: 35px;
   margin-right: 3px;

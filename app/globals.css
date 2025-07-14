@@ -7,7 +7,7 @@
   --secondColor: #aaabac;
   --thirdColor: #20b2aa;
   --fourthColor: #000000;
-  --fifthColor: #fff;
+  --fifthColor: #ffffff;
   --sixthColor: #8c8b8b;
 
   --background: 0 0% 100%;
@@ -78,17 +78,30 @@
 
   body {
     @apply bg-background text-foreground;
+    background-image: url('/img/morado_Program.png'); /* ✅ Ruta relativa a /public */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: top center;
+    background-attachment: fixed;
   }
+
 }
 
 /* Clases de utilidad personalizadas para los colores específicos */
 @layer utilities {
   .bg-primary-custom {
-    background-color:var(--primaryColor);
+    background-color: var(--primaryColor);
+  }
+
+  .bg-six-custom {
+    background-color: var(--sixthColor);
   }
 
   .text-primary-custom {
     color: var(--primaryColor);
+  }
+  .text-six-custom {
+    color: var(--sixthColor);
   }
 
   .bg-accent-custom {
@@ -104,7 +117,34 @@
   }
 
   .border-accent-custom {
-    border-color:var(--thirdColor);
+    border-color: var(--thirdColor);
+  }
+
+  .bg-primary-custom_drk {
+    background-color: var(--primaryColor);
+  }
+
+  .text-primary-custom_drk {
+    color: var(--secondColor);
+  }
+
+  .bg-accent-custom_drk {
+    background-color: var(--thirdColor);
+  }
+
+  .text-accent-custom_drk {
+    color: var(--thirdColor);
+  }
+
+  .border-primary-custom_drk {
+    border-color: var(--primaryColor);
+  }
+
+  .border-accent-custom_drk {
+    border-color: var(--thirdColor);
+  }
+  .border-second_custome {
+    border-color: var(--secondColor);
   }
 }
 
@@ -137,3 +177,4 @@
     @apply bg-background border border-border shadow-lg;
   }
 }
+

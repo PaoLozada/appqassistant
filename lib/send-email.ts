@@ -171,7 +171,7 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
     })
 
         // 2. Enviar correo de confirmación al remitente predeterminado
-        const remitentePredeterminado = "letmehelpyou@paolozada.com"
+        const remitentePredeterminado = "dev@paolozada.com"
         await transporter.sendMail({
           from: remitentePredeterminado,
           to: remitentePredeterminado,
