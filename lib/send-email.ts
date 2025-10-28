@@ -3,6 +3,7 @@
 import nodemailer from "nodemailer"
 import type { TestPlan } from "./types"
 import { generateTestPlanHTML } from "./html-generator"
+import { generateTestPlanExcel } from "./generateExcel"
 
 
 interface EmailParams {
@@ -11,7 +12,7 @@ interface EmailParams {
   subject: string
   planName: string
   testPlan: TestPlan
-  format?: "html" | "pdf"
+  format?: "html" | "Excel"
 }
 
 export async function sendEmail(params: EmailParams): Promise<{ success: boolean; message: string }> {
@@ -27,139 +28,149 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
       },
     })
 
-    // Generar el HTML del plan de pruebas
-    const htmlContent = generateTestPlanHTML(params.testPlan, params.planName)
+
 
     // Crear un mensaje personalizado para el cuerpo del correo
     const emailBody = `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; color: #333;">
-  <!-- Encabezado -->
-  <div style="background-color: rgb(119, 64, 106); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
-    <a href="https://paolozada.com" target="_blank">
-      <img src="https://paolozada.com/info/wp-content/uploads/2025/04/iconPL-1.png" alt="Icono de la app" width="60" height="60" style="vertical-align: middle; margin-right: 10px;">
+    <div style="font-family: 'Segoe UI', Roboto, Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #ffffff; background-color: #1a1a2e; padding: 40px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+      <a href="https://paolozada.com" target="_blank" style="display:inline-block; margin-bottom: 15px;">
+        <img src="https://paolozada.com/info/wp-content/uploads/2025/10/cropped-pl_android-chrome-512x512-1.png" alt="Icono de la app" width="70" height="70" style="vertical-align: middle;">
+      </a>
+      <h1 style="font-size: 26px; font-weight: 700; margin: 10px 0; color: #ffffff;">🚀 ¡Tu Plan de Pruebas está listo!</h1>
+      <p style="font-size: 16px; color: #d3d4e4; margin-bottom: 20px; line-height: 1.6;">
+        Hemos generado tu plan personalizado <strong>${params.planName}</strong> con ayuda de <strong>QAssistant</strong> una herramienta de 
+        <a href="https://paolozada.com" style="color: #43e97b; text-decoration: none;">paolozada.com</a> impulsada por inteligencia artificial. ✅
+      </p>
+      <a href="https://appqa.paolozada.com/" 
+    style="background:#43e97b; color:#0f0f23; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600; display:inline-block; box-shadow:0 0 15px rgba(67,233,123,0.4);">
+    Crear otro plan de pruebas
     </a>
-    <h1 style="display: inline-block; margin: 0; vertical-align: middle;">¡Tu Plan de Pruebas está listo!</h1>
-  </div>
 
-  <!-- Cuerpo -->
-  <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
-    <p style="font-size: 16px;">¡Hola!</p>
+    </div>
 
-    <p style="font-size: 16px;">
-      Gracias por confiar en <strong>QAssistant</strong>, una herramienta de 
-      <a href="https://paolozada.com" style="color: rgb(119, 64, 106); text-decoration: underline;">paolozada.com</a> 
-      impulsada por inteligencia artificial. ✅
-    </p>
+    <!-- Separador visual -->
+    <div style="height: 4px; background-color: #667eea; opacity: 0.8; margin: 40px auto; border-radius: 2px; width: 80%;"></div>
 
-    <p style="font-size: 16px;">
-      📄 Se ha generado tu plan personalizado: <strong>${params.planName}</strong>. Espero que sea de gran utilidad para tu proyecto 
-      y te ayude a encontrar todos esos pequeños detalles que hacen la diferencia en la calidad del software.
-    </p>
+    <div style="font-family:'Segoe UI',Roboto,Arial,sans-serif; background-color:#f7f7f9; color:#222; padding:30px 10px; max-width:650px; margin:0 auto; border-radius:12px;">
 
-    <p style="font-size: 16px;">
-      Lo encontrarás adjunto en formato HTML, listo para revisar, compartir o integrar en tu flujo de trabajo.
-    </p>
+      <h2 style="color: #667eea; font-size: 20px; font-weight: 600;">👋 ¡Hola!</h2>
+      <p style="font-size: 15px; line-height: 1.7;">
+        Gracias por confiar en <strong>QAssistant</strong>. Tu plan está adjunto, listo para revisar, compartir o integrar en tu flujo de trabajo. Espero que sea de gran utilidad para tu proyecto 
+        y te ayude a encontrar todos esos pequeños detalles que hacen la diferencia en la calidad del software.
+      </p>
 
-    <p style="font-size: 16px;">
-      ¿Sabías que los planes de prueba bien estructurados pueden reducir hasta un 30% el tiempo de corrección de errores?
-      ¡Espero ayudarte a detectar esos detalles clave que marcan la diferencia en la calidad del software! 🎉
-    </p><br><br>
+      <p style="font-size: 15px; line-height: 1.7;">
+        ¿Sabías que los planes de prueba bien estructurados pueden reducir hasta un <strong>30%</strong> el tiempo de corrección de errores?  
+        ¡Esperamos ayudarte a detectar esos detalles clave que elevan la calidad del software! 🎯
+      </p>
 
-    <p style="font-size: 16px; margin-top: 30px;">
-      ¡Feliz testing! 🚀
-    </p>
+      
+      <p style="font-size: 16px; margin-top: 30px;">
+        ¡Feliz testing! 🚀
+      </p><br>
+      <a href="https://paolozada.com" style="color: #667eea; text-decoration: none;"><h2><strong>Paola</strong></h2></a>
+      <!-- Frase final de valor -->
+      <p style="font-size: 14px; font-style: italic; color: #666; margin-bottom: 30px;">
+        Porque probar bien es avanzar con confianza.
+      </p>
 
-    <!-- Frase final de valor -->
-    <p style="font-size: 14px; font-style: italic; color: #666; margin-bottom: 30px;">
-      Porque probar bien es avanzar con confianza.
-    </p><br>
+      
+      <hr style="border:none; height:1px; background-color:#667eea; margin:25px 0;">
 
-    <!-- Despedida -->
-    <p style="margin-top: 20px; font-size: 16px;">
-      <em style="color: #20b2aa;"  >⚔️🤖🔦Que la calidad te acompañe,</em><br>
-      <strong>Paola</strong><br>
-      <a href="https://paolozada.com" style="color: #77406A;">paolozada.com</a>
-    </p>
+        <p style="font-size:14px; color:#667eea; text-align:center; line-height:1.6;">
+          <em style="color:#20b2aa;">🤖 Que la calidad te acompañe,</em><br>
+          
+        </p>
 
-
-
-
-
-    <!-- Botón opcional -->
-    <!--
-    <a href="[ENLACE-AL-PLAN]" style="display:inline-block;padding:12px 24px;background-color:#77406A;color:white;border-radius:6px;text-decoration:none;margin-top:20px;">
-      Ver plan de pruebas
-    </a>
-    -->
-
-    <!-- Pie de página -->
-    <p style="font-size: 10px; color: #999; text-align: center; margin-top: 40px;">
-      Este correo fue enviado automáticamente. Por favor, no respondas a este mensaje.
-    </p>
-  </div>
-</div>
-
-  `
+      <p style="font-size: 10px; color: #555; text-align: center; margin-top: 40px;">
+        Este correo fue enviado automáticamente. Por favor, no respondas a este mensaje.
+      </p>
+    </div>
+    `
 
     // Crear el cuerpo del correo de confirmación para el remitente
     const confirmationEmailBody = `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; color: #333;">
-  <!-- Encabezado -->
-  <div style="background-color: rgb(119, 64, 106); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
-    <a href="https://paolozada.com" target="_blank">
-      <img src="https://paolozada.com/info/wp-content/uploads/2025/04/iconPL-1.png" alt="Icono de la app" width="60" height="60" style="vertical-align: middle; margin-right: 10px;">
-    </a>
-    <h1 style="display: inline-block; margin: 0; vertical-align: middle;">Confirmación de Envío</h1>
-  </div>
+      <div style="font-family:'Segoe UI', Roboto, Arial, sans-serif; max-width:650px; margin:0 auto; color:#ffffff; background-color:#1a1a2e; padding:40px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); text-align:center;">
+        <a href="https://paolozada.com" target="_blank" style="display:inline-block; margin-bottom:15px;">
+          <img src="https://paolozada.com/info/wp-content/uploads/2025/10/cropped-pl_android-chrome-512x512-1.png" alt="Icono de la app" width="70" height="70" style="vertical-align: middle;">
+        </a>
+        <h1 style="font-size:26px; font-weight:700; margin:10px 0; color:#ffffff;">✅ Confirmación de Envío</h1>
+        <p style="font-size:16px; color:#d3d4e4; margin-bottom:20px; line-height:1.6;">
+          Se ha enviado correctamente el plan de pruebas <strong>${params.planName}</strong>  
+          generado con <strong>QAssistant</strong>, la herramienta de 
+          <a href="https://paolozada.com" style="color:#43e97b; text-decoration:none;">paolozada.com</a>.
+        </p>
+      </div>
 
-  <!-- Cuerpo -->
-  <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
-    <p style="font-size: 16px;">¡Hola!</p>
+      <!-- Separador visual -->
+      <div style="height:4px; background-color:#667eea; opacity:0.8; margin:40px auto; border-radius:2px; width:80%;"></div>
 
-    <p style="font-size: 16px;">
-      Se ha enviado correctamente un plan de pruebas generado con <strong>QAssistant</strong>.
-    </p>
+      <!-- Contenido -->
+      <div style="font-family:'Segoe UI',Roboto,Arial,sans-serif; background-color:#f7f7f9; color:#222; padding:30px 10px; max-width:650px; margin:0 auto; border-radius:12px;">
+        <h2 style="color:#667eea; font-size:20px; font-weight:600;">📬 Detalles del envío</h2>
 
-    <div style="background-color: #e9e9e9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-      <p style="font-size: 16px; margin: 5px 0;"><strong>Detalles del envío:</strong></p>
-      <p style="font-size: 14px; margin: 5px 0;"><strong>Destinatario:</strong> ${params.to}</p>
-      <p style="font-size: 14px; margin: 5px 0;"><strong>Asunto:</strong> ${params.subject}</p>
-      <p style="font-size: 14px; margin: 5px 0;"><strong>Nombre del plan:</strong> ${params.planName}</p>
-      <p style="font-size: 14px; margin: 5px 0;"><strong>Formato:</strong> ${params.format || "HTML"}</p>
-      <p style="font-size: 14px; margin: 5px 0;"><strong>Fecha y hora:</strong> ${new Date().toLocaleString()}</p>
-    </div>
+        <div style="background-color:#fff; padding:20px; border-radius:10px; margin:20px 0; border:1px solid #ddd;">
+          <p style="font-size:15px; margin:6px 0;"><strong>📧 Destinatario:</strong> ${params.to}</p>
+          <p style="font-size:15px; margin:6px 0;"><strong>🗂 Asunto:</strong> ${params.subject}</p>
+          <p style="font-size:15px; margin:6px 0;"><strong>📋 Nombre del plan:</strong> ${params.planName}</p>
+          <p style="font-size:15px; margin:6px 0;"><strong>💾 Formato:</strong> ${params.format}</p>
+          <p style="font-size:15px; margin:6px 0;"><strong>⏰ Fecha y hora:</strong> ${new Date().toLocaleString()}</p>
+        </div>
 
-    <p style="font-size: 16px;">
-      Se ha adjuntado una copia del plan de pruebas enviado para tu referencia.
-    </p>
+        <p style="font-size:15px; line-height:1.7;">
+          Se ha adjuntado una copia del plan de pruebas enviado para tu referencia y archivo interno.  
+          Si necesitas generar un nuevo plan, puedes hacerlo directamente desde la aplicación.
+        </p>
 
-    <p style="font-size: 16px; margin-top: 30px;">
-      ¡Gracias por usar QAssistant!
-    </p>
+        <div style="text-align:center; margin:40px 0;">
+          <a href="https://appqa.paolozada.com/" 
+            style="display:inline-block; background:#43e97b; color:#0f0f23; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600; box-shadow:0 0 15px rgba(67,233,123,0.4);">
+            🧠 Ir a QAssistant
+          </a>
+        </div>
 
-    <!-- Despedida -->
-    <p style="margin-top: 20px; font-size: 16px;">
-      <em style="color: #20b2aa;">⚔️🤖🔦Que la calidad te acompañe,</em><br>
-      <strong>Paola</strong><br>
-      <a href="https://paolozada.com" style="color: #77406A;">paolozada.com</a>
-    </p>
+        <hr style="border:none; height:1px; background-color:#667eea; margin:25px 0;">
 
-    <!-- Pie de página -->
-    <p style="font-size: 10px; color: #999; text-align: center; margin-top: 40px;">
-      Este es un correo automático de confirmación. Por favor, no respondas a este mensaje.
-    </p>
-  </div>
-</div>
-  `
+        <p style="font-size:14px; color:#667eea; text-align:center; line-height:1.6;">
+          <em style="color:#20b2aa;">🤖 Que la calidad te acompañe,</em><br>
+          <a href="https://paolozada.com" style="color:#667eea; text-decoration:none;">
+            <h2><strong>Paola</strong></h2>
+          </a>
+        </p>
+
+        <p style="font-size:11px; color:#555; text-align:center; margin-top:40px;">
+          Este es un correo automático de confirmación. Por favor, no respondas a este mensaje.
+        </p>
+      </div>
+      `
+    // Generar el HTML del plan de pruebas
+    const htmlContent = generateTestPlanHTML(params.testPlan, params.planName)
+    const excelBuffer = await generateTestPlanExcel(params.testPlan, params.planName);
 
 
-    const attachments = [
-      {
+    const attachments = [];
+    const parmas_format = params.format
+
+    if (parmas_format === "html") {
+      const htmlContent = generateTestPlanHTML(params.testPlan, params.planName);
+      attachments.push({
         filename: `${params.planName.replace(/\s+/g, "_")}_test_plan.html`,
         content: htmlContent,
         contentType: "text/html",
-      },
-    ]
+      });
+    } else {
+      try {
+        const excelBuffer = await generateTestPlanExcel(params.testPlan, params.planName);
+        attachments.push({
+          filename: `${params.planName.replace(/\s+/g, "_")}_test_plan.xlsx`,
+          content: Buffer.from(excelBuffer).toString("base64"),
+          encoding: "base64",
+          contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+      } catch (err) {
+        console.error("⚠️ Error generando Excel:", err);
+      }
+    }
 
     // 1. Enviar el correo al destinatario con el adjunto
     const info = await transporter.sendMail({
@@ -170,15 +181,15 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
       attachments: attachments,
     })
 
-        // 2. Enviar correo de confirmación al remitente predeterminado
-        const remitentePredeterminado = "dev@paolozada.com"
-        await transporter.sendMail({
-          from: remitentePredeterminado,
-          to: remitentePredeterminado,
-          subject: `Confirmación: Plan de Pruebas enviado a ${params.to}`,
-          html: confirmationEmailBody,
-          attachments: attachments, // Adjuntar también el plan de pruebas
-        })
+    // 2. Enviar correo de confirmación al remitente predeterminado
+    const remitentePredeterminado = "dev@paolozada.com"
+    await transporter.sendMail({
+      from: remitentePredeterminado,
+      to: remitentePredeterminado,
+      subject: `Confirmación: Plan de Pruebas enviado a ${params.to}`,
+      html: confirmationEmailBody,
+      attachments: attachments, // Adjuntar también el plan de pruebas
+    })
     console.log("Correo enviado:", info.messageId)
     return { success: true, message: "Correo enviado correctamente" }
   } catch (error) {

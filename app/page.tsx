@@ -80,7 +80,7 @@ const applicationFeatures: Record<string, Record<string, string[]>> = {
 export default function Home() {
   // Estado para el formulario de entrada
   const [description, setDescription] = useState("")
-  const [teamSize, setTeamSize] = useState(3)
+  const [teamSize, setTeamSize] = useState(1)
   const [testTypes, setTestTypes] = useState<string[]>([])
   const [automationAllowed, setAutomationAllowed] = useState(true)
   const [performanceTestingAllowed, setPerformanceTestingAllowed] = useState(true)
@@ -105,9 +105,10 @@ export default function Home() {
   const [editingRisk, setEditingRisk] = useState<{ index: number; field: string; value: string } | null>(null)
   const [editingTestCase, setEditingTestCase] = useState<{
     index: number
-    field: string
-    value: string | string[]
+    field: keyof TestCase | "all"
+    value: string | string[] | boolean | TestCase
   } | null>(null)
+
   const [editingTimeEstimation, setEditingTimeEstimation] = useState<{
     index: number
     field: string
@@ -120,8 +121,8 @@ export default function Home() {
   const [editingStrategy, setEditingStrategy] = useState<{ field: string; value: string } | null>(null)
   const [editingStrategyTechnique, setEditingStrategyTechnique] = useState<{
     index: number
-    field: string
-    value: string
+    name: string
+    description: string
   } | null>(null)
   const [editingEntryCriteria, setEditingEntryCriteria] = useState<{ index: number; value: string } | null>(null)
   const [editingExitCriteria, setEditingExitCriteria] = useState<{ index: number; value: string } | null>(null)
@@ -141,7 +142,7 @@ export default function Home() {
   const [emailSent, setEmailSent] = useState(false)
 
   // Estado para el formato de envío
-  const [emailFormat, setEmailFormat] = useState<"html" | "pdf">("html")
+  const [emailFormat, setEmailFormat] = useState<"html" | "Excel">("html")
 
   // Establecer Dark
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -432,25 +433,38 @@ export default function Home() {
     })
   }
 
-  const handleEditTestCase = (index: number, field: keyof TestCase, value: string | string[] | boolean) => {
+  const handleEditTestCase = (
+    index: number,
+    field: keyof TestCase | "all",
+    value: string | string[] | boolean | TestCase
+  ) => {
     if (!testPlan) return
+
     const updatedTestCases = [...testPlan.testCases]
 
-    // Convertir el valor si es necesario
     let processedValue = value
-    if (field === "automatable" && typeof value === "string") {
-      processedValue = value === "true"
+
+    // Si es actualización completa del test case
+    if (field === "all" && typeof value === "object" && !Array.isArray(value)) {
+      updatedTestCases[index] = value as TestCase
+    } else {
+      // Convertir valor si es necesario (mantiene tu lógica original)
+      if (field === "automatable" && typeof value === "string") {
+        processedValue = value === "true"
+      }
+
+      updatedTestCases[index] = {
+        ...updatedTestCases[index],
+        [field]: processedValue,
+      }
     }
 
-    updatedTestCases[index] = {
-      ...updatedTestCases[index],
-      [field]: processedValue,
-    }
     setTestPlan({
       ...testPlan,
       testCases: updatedTestCases,
     })
   }
+
 
   // Funciones para añadir y editar estimación de tiempos
   const handleAddTimeEstimationPhase = () => {
@@ -565,12 +579,13 @@ export default function Home() {
     })
   }
 
-  const handleEditStrategyTechnique = (index: number, field: string, value: string) => {
+  const handleEditStrategyTechnique = (index: number, name: string, description: string) => {
     if (!testPlan) return
     const updatedTechniques = [...testPlan.strategy.techniques]
     updatedTechniques[index] = {
       ...updatedTechniques[index],
-      [field]: value,
+      name,
+      description,
     }
     setTestPlan({
       ...testPlan,
@@ -579,8 +594,9 @@ export default function Home() {
         techniques: updatedTechniques,
       },
     })
-    setEditingStrategyTechnique(null) // Asegurarse de que se cierre el modo de edición
+    setEditingStrategyTechnique(null)
   }
+
 
   const handleEditEntryCriteria = (index: number, value: string) => {
     if (!testPlan) return
@@ -796,7 +812,7 @@ export default function Home() {
     }
   }
 
-  // Corregir la función handleEditEnvironment
+  // Función handleEditEnvironment
   const handleEditEnvironment = (index: number, field: string, value: string) => {
     if (!testPlan) return
     const updatedEnvironments = [...testPlan.environment.environments]
@@ -814,7 +830,7 @@ export default function Home() {
     setEditingEnvironment(null) // Cerrar el modo de edición
   }
 
-  // Corregir la función handleEditTestData
+  // Función handleEditTestData
   const handleEditTestData = (index: number, value: string) => {
     if (!testPlan) return
     const updatedTestData = [...testPlan.environment.testData]
@@ -829,7 +845,7 @@ export default function Home() {
     setEditingTestData(null) // Cerrar el modo de edición
   }
 
-  // Corregir la función handleEditTool
+  // Función handleEditTool
   const handleEditTool = (index: number, field: string, value: string) => {
     if (!testPlan) return
     const updatedTools = [...testPlan.environment.tools]
@@ -850,288 +866,374 @@ export default function Home() {
   // Renderizar la interfaz de usuario
   return (
 
-    <div className={`min-h-screen ${isDarkMode ? 'dark' : ''} bg-white/85 dark:bg-black/85 text-foreground`}>
-                
-       <div className="container mx-auto py-8 px-4">
+    <div className="min-h-screen">
+      <div className="animated-background">
+        <div className="geometric-pattern"></div>
+        <div className="particle particle-1"></div>
+        <div className="particle particle-2"></div>
+        <div className="particle particle-3"></div>
+        <div className="particle particle-4"></div>
+        <div className="particle particle-5"></div>
+        <div className="particle particle-6"></div>
+        <div className="particle particle-7"></div>
+        <div className="particle particle-8"></div>
+        <div className="particle particle-9"></div>
+        <div className="particle particle-10"></div>
+      </div>
+
+      <div className="container mx-auto py-8 px-4 max-w-7xl relative z-10">
         {showLoadingGame && <LoadingGame onClose={() => setShowLoadingGame(false)} />}
 
-        <div className="bg-white/60 text-black dark:bg-black/60 dark:text-six-custom border dark:border-black p-6 rounded-lg shadow-xl mb-8 border border-gray-100 backdrop-blur">
-        <div className="logo_tittle flex flex-col md:flex-row items-center justify-between gap-0">
-        {/* Logo */}
-        <div className="logo_pl flex-shrink-0 scale-90 md:scale-100">
-          <img
-            src="/img/iconPL.png"
-            alt="Icono de la app"
-            className="w-10 h-auto md:w-24"
-          />
-                    <h1 className="text-3xl font-bold relative pb-3 mb-2 text-primary-custom dark:text-primary-custom_drk">
-            QAssistant
-            <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-white/10 dark:bg-black/10 backdrop-blur"></span>
-          </h1>
-        </div>
+        {/* Header futurista */}
+        <div className="futuristic-header fade-in-up mb-8">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              <div
+                className="w-20 h-20 rounded-2xl flex items-center justify-center"
 
-        {/* Título y textos */}
-        <div className="tittle_app flex-1 text-center mx-auto">
-
-          <p className="bg-white/10 dark:bg-transparent text-primary-custom dark:text-primary-custom_drk text-center mt-2 font-bold">
-            Genera planes de prueba profesionales para tus proyectos
-          </p>
-          {testPlan?.source && (
-            <p className="text-center mt-3 text-sm p-2 rounded bg-white/10 dark:bg-transparent text-black dark:text-six-custom">
-              <span className="font-medium">Generado: </span> {testPlan.source}
-            </p>
-          )}
-        </div>
-            <div> 
-              <div className="container mx-auto px-4">
-                <div onClick={() => setIsDarkMode(!isDarkMode)}
-                  className="flex justify-end items-center"
-                  role="button"
-                  aria-label="Cambiar modo de color"
-                  tabIndex={0}
-                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsDarkMode(!isDarkMode)}>
-                
-                  {/* Lámpara mejorada */}
-                  <div className="relative group scale-50 md:scale-75">
-                    {/* Cable mejorado */}
-                    <div className="w-1 h-8 bg-gradient-to-b from-gray-400 to-gray-600 dark:from-gray-500 dark:to-gray-300 mx-auto shadow-sm"></div>
-
-                    {/* Soporte de la lámpara */}
-                    <div className="w-16 h-2 bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-500 rounded-full mx-auto shadow-md mb-0"></div>
-
-                    {/* Indicador de estado mejorado */}
-                    <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-s md:text-xs font-medium px-3 py-0 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 transition-all duration-300 shadow-sm">
-                      <span className="flex items-center space-x-1">
-                        <span
-                          className={`w-2 h-2 rounded-full transition-colors duration-300 ${isDarkMode ? "bg-yellow-400 shadow-sm shadow-yellow-400/50" : "bg-gray-400"}`}
-                        ></span>
-                        <span className="text-gray-700 dark:text-gray-300">{isDarkMode ? "Oscuro" : "Claro"}</span>
-                      </span>
-                    </div>
-
-                    {/* Lámpara principal mejorada */}
-                    <div
-                      
-                      className="cursor-pointer relative z-10 w-20 h-10 bg-gradient-to-b from-gray-200 via-gray-300 to-gray-400 dark:from-gray-700 dark:via-gray-800 dark:to-gray-900 rounded-t-full mx-auto shadow-lg transition-all duration-500 hover:scale-105 group-hover:shadow-xl border border-gray-300 dark:border-gray-600"
-                      title={isDarkMode ? "Cambiar a modo claro ☀️" : "Cambiar a modo oscuro 🌙"}
-                    >
-                      {/* Reflejo en la lámpara - CORREGIDO */}
-                      <div className="absolute top-2 left-3 w-3 h-2 bg-white/40 rounded-full blur-sm"></div>
-
-                      {/* Bombilla mejorada - CORREGIDA */}
-                      <div
-                        className={`absolute top-[75%] left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full z-20 transition-all duration-700 border ${
-                          isDarkMode
-                            ? "bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 shadow-lg border-yellow-200"
-                            : "bg-gradient-to-br from-gray-400 to-gray-500 border-gray-400"
-                        }`}
-                        style={{
-                          clipPath: "inset(50% 0 0 0)",
-                          boxShadow: isDarkMode ? "0 0 20px rgba(255, 255, 0, 0.4), 0 0 40px rgba(255, 255, 0, 0.2)" : "none",
-                        }}
-                      ></div>
-                    </div>
-
-                    {/* Luz proyectada mejorada - CORREGIDA */}
-                    <div
-                      className={`transition-all duration-1000 ease-in-out ${
-                        !isDarkMode ? "opacity-0 scale-95" : "opacity-100 scale-100"
-                      } absolute top-[3rem] left-1/2 transform -translate-x-1/2 w-24 h-32 pointer-events-none z-0`}
-                      style={{
-                        background: isDarkMode
-                          ? "radial-gradient(ellipse at top, rgba(255, 255, 150, 0.6) 0%, rgba(255, 255, 100, 0.4) 30%, rgba(255, 255, 50, 0.2) 60%, transparent 100%)"
-                          : "transparent",
-                        clipPath: "polygon(40% 0%, 60% 0%, 85% 100%, 15% 100%)",
-                        filter: "blur(12px)",
-                      }}
-                    />
-
-                    {/* Partículas de luz flotantes - CORREGIDAS */}
-                    {isDarkMode && (
-                      <>
-                        <div
-                          className="absolute w-1 h-1 bg-yellow-300 rounded-full animate-pulse opacity-60"
-                          style={{
-                            top: "4.5rem",
-                            left: "2.5rem",
-                            animationDelay: "0s",
-                            animationDuration: "2s",
-                          }}
-                        ></div>
-                        <div
-                          className="absolute w-0.5 h-0.5 bg-yellow-200 rounded-full animate-pulse opacity-40"
-                          style={{
-                            top: "5.5rem",
-                            right: "2rem",
-                            animationDelay: "0.7s",
-                            animationDuration: "3s",
-                          }}
-                        ></div>
-                        <div
-                          className="absolute w-0.5 h-0.5 bg-yellow-400 rounded-full animate-pulse opacity-50"
-                          style={{
-                            top: "5rem",
-                            left: "3.5rem",
-                            animationDelay: "1.4s",
-                            animationDuration: "2.5s",
-                          }}
-                        ></div>
-                      </>
-                    )}                    
-                  </div>
-                </div>
+              >
+                <img src="img/logo_app_2.png" alt="" />
+              </div>
+              <div>
+                <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">QAssistant</h1>
+                <p className="text-base md:text-lg font-medium" style={{ color: "var(--text-secondary)" }}>
+                  Generador Profesional de Planes de Prueba con IA
+                </p>
               </div>
             </div>
-          </div>          
+          </div>
+          {testPlan?.source && (
+            <div
+              className="mt-6 px-4 py-3 rounded-xl text-sm font-medium"
+              style={{
+                background: "rgba(102, 126, 234, 0.1)",
+                border: "1px solid rgba(102, 126, 234, 0.3)",
+                color: "var(--text-secondary)",
+              }}
+            >
+              <i className="bi bi-info-circle mr-2"></i>
+              <span className="font-semibold">Generado por:</span> {testPlan.source}
+            </div>
+          )}
         </div>
         {/* Modal de edición para casos de prueba */}
         {editingTestCase && testPlan && (
-        <div className="fixed inset-0 bg-white/80 dark:bg-black/80 bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600 rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-xl font-bold">Editar Caso de Prueba {editingTestCase.index + 1}</h3>
-              <button className="text-gray-500 hover:text-gray-700" onClick={() => setEditingTestCase(null)}>
-                <i className="bi bi-x-lg"></i>
-              </button>
-            </div>
-
-            {editingTestCase.field === "title" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Título</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
-                  value={editingTestCase.value as string}
-                  onChange={(e) => setEditingTestCase({ ...editingTestCase, value: e.target.value })}
-                />
-              </div>
-            )}
-
-            {editingTestCase.field === "priority" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Prioridad</label>
-                <select
-                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
-                  value={editingTestCase.value as string}
-                  onChange={(e) => setEditingTestCase({ ...editingTestCase, value: e.target.value })}
+          <div className="cinematic-modal-overlay transition-all duration-300">
+            <div className="cinematic-modal p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-3xl font-bold mb-2">
+                  Editar Caso de Prueba {editingTestCase.index + 1}
+                </h3>
+                <button
+                  className="btn-3d btn-3d-secondary"
+                  onClick={() => setEditingTestCase(null)}
                 >
-                  <option value="Alta">Alta</option>
-                  <option value="Media">Media</option>
-                  <option value="Baja">Baja</option>
-                </select>
+                  <i className="bi bi-x-lg"></i>
+                </button>
               </div>
-            )}
 
-            {editingTestCase.field === "type" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Tipo</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
-                  value={editingTestCase.value as string}
-                  onChange={(e) => setEditingTestCase({ ...editingTestCase, value: e.target.value })}
-                />
-              </div>
-            )}
+              {editingTestCase.field === "all" &&
+                typeof editingTestCase.value === "object" &&
+                !Array.isArray(editingTestCase.value) ? (
+                <>
+                  {(() => {
+                    const testCaseValue = editingTestCase.value as TestCase;
+                    return (
+                      <>
+                        {/* Título */}
+                        <div className="mb-4">
+                          <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>Título</label>
+                          <textarea
+                            className="futuristic-input"
+                            style={{ maxWidth: "100%" }}
+                            value={testCaseValue.title}
+                            onChange={(e) =>
+                              setEditingTestCase({
+                                ...editingTestCase,
+                                value: { ...testCaseValue, title: e.target.value },
+                              })
+                            }
+                          />
+                        </div>
+                        {/* Prioridad */}
+                        <div className="mb-4">
+                          <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>Prioridad</label>
+                          <select
+                            className="futuristic-input futuristic-select"
+                            value={testCaseValue.priority}
+                            onChange={(e) =>
+                              setEditingTestCase({
+                                ...editingTestCase,
+                                value: { ...testCaseValue, priority: e.target.value },
+                              })
+                            }
+                          >
+                            <option
+                              style={{ backgroundColor: "rgb(66, 63, 109)" }}
+                              value="Alta">Alta</option>
+                            <option
+                              style={{ backgroundColor: "rgb(66, 63, 109)" }}
+                              value="Media">Media</option>
+                            <option
+                              style={{ backgroundColor: "rgb(66, 63, 109)" }}
+                              value="Baja">Baja</option>
+                          </select>
+                        </div>
+                        {/* Tipo */}
+                        <div className="mb-4">
+                          <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>Tipo</label>
+                          <input
+                            type="text"
+                            className="w-full p-2 border rounded-md futuristic-input"
+                            value={testCaseValue.type}
+                            onChange={(e) =>
+                              setEditingTestCase({
+                                ...editingTestCase,
+                                value: { ...testCaseValue, type: e.target.value },
+                              })
+                            }
+                          />
+                        </div>
 
-            {editingTestCase.field === "automatable" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Automatizable</label>
-                <select
-                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
-                  value={String(editingTestCase.value)}
-                  onChange={(e) => setEditingTestCase({ ...editingTestCase, value: e.target.value })}
+                        {/* Automatizable */}
+                        <div className="mb-4">
+                          <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>Automatizable</label>
+                          <select
+                            className="futuristic-input futuristic-select"
+                            value={String(testCaseValue.automatable)}
+                            onChange={(e) =>
+                              setEditingTestCase({
+                                ...editingTestCase,
+                                value: {
+                                  ...testCaseValue,
+                                  automatable: e.target.value === "true",
+                                },
+                              })
+                            }
+                          >
+                            <option
+                              style={{ backgroundColor: "rgb(66, 63, 109)" }}
+                              value="true">Sí</option>
+                            <option
+                              style={{ backgroundColor: "rgb(66, 63, 109)" }}
+                              value="false">No</option>
+                          </select>
+                        </div>
+
+                        {/* Precondiciones */}
+                        <div className="mb-4">
+                          <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>
+                            Precondiciones (una por línea)
+                          </label>
+                          <textarea
+                            className="w-full p-2 border rounded-md min-h-[150px] futuristic-input"
+                            value={testCaseValue.preconditions.join("\n")}
+                            onChange={(e) =>
+                              setEditingTestCase({
+                                ...editingTestCase,
+                                value: {
+                                  ...testCaseValue,
+                                  preconditions: e.target.value.split("\n"),
+                                },
+                              })
+                            }
+                          />
+                        </div>
+
+                        {/* Pasos */}
+                        <div className="mb-4">
+                          <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>
+                            Pasos (uno por línea)
+                          </label>
+                          <textarea
+                            className="w-full p-2 border rounded-md min-h-[150px] futuristic-input"
+                            value={testCaseValue.steps.join("\n")}
+                            onChange={(e) =>
+                              setEditingTestCase({
+                                ...editingTestCase,
+                                value: {
+                                  ...testCaseValue,
+                                  steps: e.target.value.split("\n"),
+                                },
+                              })
+                            }
+                          />
+                        </div>
+
+                        {/* Resultado Esperado */}
+                        <div className="mb-4">
+                          <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>
+                            Resultado Esperado
+                          </label>
+                          <textarea
+                            className="w-full p-2 border rounded-md min-h-[100px] futuristic-input"
+                            value={testCaseValue.expectedResult}
+                            onChange={(e) =>
+                              setEditingTestCase({
+                                ...editingTestCase,
+                                value: {
+                                  ...testCaseValue,
+                                  expectedResult: e.target.value,
+                                },
+                              })
+                            }
+                          />
+                        </div>
+                      </>
+                    );
+                  })()}
+                </>
+              ) : (
+                <>
+                  {editingTestCase.field === "title" && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1">Título</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
+                        value={editingTestCase.value as string}
+                        onChange={(e) => setEditingTestCase({ ...editingTestCase, value: e.target.value })}
+                      />
+                    </div>
+                  )}
+
+                  {editingTestCase.field === "priority" && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1">Prioridad</label>
+                      <select
+                        className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
+                        value={editingTestCase.value as string}
+                        onChange={(e) => setEditingTestCase({ ...editingTestCase, value: e.target.value })}
+                      >
+                        <option value="Alta">Alta</option>
+                        <option value="Media">Media</option>
+                        <option value="Baja">Baja</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {editingTestCase.field === "type" && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1">Tipo</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
+                        value={editingTestCase.value as string}
+                        onChange={(e) => setEditingTestCase({ ...editingTestCase, value: e.target.value })}
+                      />
+                    </div>
+                  )}
+
+                  {editingTestCase.field === "automatable" && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1">Automatizable</label>
+                      <select
+                        className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
+                        value={String(editingTestCase.value)}
+                        onChange={(e) => setEditingTestCase({ ...editingTestCase, value: e.target.value })}
+                      >
+                        <option value="true">Sí</option>
+                        <option value="false">No</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {editingTestCase.field === "preconditions" && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1">Precondiciones (una por línea)</label>
+                      <textarea
+                        className="w-full p-2 border rounded-md min-h-[150px]"
+                        value={(editingTestCase.value as string[]).join("\n")}
+                        onChange={(e) =>
+                          setEditingTestCase({ ...editingTestCase, value: e.target.value.split("\n") })
+                        }
+                      />
+                    </div>
+                  )}
+
+                  {editingTestCase.field === "steps" && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1">Pasos (uno por línea)</label>
+                      <textarea
+                        className="w-full p-2 border rounded-md min-h-[150px]"
+                        value={(editingTestCase.value as string[]).join("\n")}
+                        onChange={(e) =>
+                          setEditingTestCase({ ...editingTestCase, value: e.target.value.split("\n") })
+                        }
+                      />
+                    </div>
+                  )}
+
+                  {editingTestCase.field === "expectedResult" && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1">Resultado Esperado</label>
+                      <textarea
+                        className="w-full p-2 border rounded-md min-h-[100px]"
+                        value={editingTestCase.value as string}
+                        onChange={(e) => setEditingTestCase({ ...editingTestCase, value: e.target.value })}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+
+              <div className="flex justify-end space-x-2">
+
+                <button
+                  className="btn-3d btn-3d-primary"
+                  style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
+                  onClick={() => {
+                    if (editingTestCase.field === "all") {
+                      handleEditTestCase(editingTestCase.index, "all", editingTestCase.value);
+                    } else {
+                      handleEditTestCase(
+                        editingTestCase.index,
+                        editingTestCase.field,
+                        editingTestCase.value
+                      );
+                    }
+                    setEditingTestCase(null);
+                  }}
                 >
-                  <option value="true">Sí</option>
-                  <option value="false">No</option>
-                </select>
+                  Guardar
+                </button>
+                <button
+                  className="btn-3d btn-3d-secondary"
+                  style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
+                  onClick={() => setEditingTestCase(null)}
+                >
+                  Cancelar
+                </button>
               </div>
-            )}
-
-            {editingTestCase.field === "preconditions" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Precondiciones (una por línea)</label>
-                <textarea
-                  className="w-full p-2 border rounded-md min-h-[150px] bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
-                  value={(editingTestCase.value as string[]).join("\n")}
-                  onChange={(e) =>
-                    setEditingTestCase({ ...editingTestCase, value: e.target.value.split("\n") })
-                  }
-                />
-              </div>
-            )}
-
-            {editingTestCase.field === "steps" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Pasos (uno por línea)</label>
-                <textarea
-                  className="w-full p-2 border rounded-md min-h-[150px] bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
-                  value={(editingTestCase.value as string[]).join("\n")}
-                  onChange={(e) =>
-                    setEditingTestCase({ ...editingTestCase, value: e.target.value.split("\n") })
-                  }
-                />
-              </div>
-            )}
-
-            {editingTestCase.field === "expectedResult" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Resultado Esperado</label>
-                <textarea
-                  className="w-full p-2 border rounded-md min-h-[100px] bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
-                  value={editingTestCase.value as string}
-                  onChange={(e) => setEditingTestCase({ ...editingTestCase, value: e.target.value })}
-                />
-              </div>
-            )}
-
-            <div className="flex justify-end space-x-2">
-              <button className="bg-gray-300 text-black px-4 py-2 rounded-md hover:bg-accent-custom_drk hover:dark:bg-six-custom" onClick={() => setEditingTestCase(null)}>
-                Cancelar
-              </button>
-              <button
-                className="bg-primary-custom text-white px-4 py-2 rounded-md hover:bg-accent-custom_drk hover:dark:bg-six-custom"
-                onClick={() => {
-                  handleEditTestCase(
-                    editingTestCase.index,
-                    editingTestCase.field as keyof TestCase,
-                    editingTestCase.value as string | string[] | boolean,
-                  )
-                  setEditingTestCase(null)
-                }}
-              >
-                Guardar
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Modal de detalles del caso de prueba */}
-      {activeTestCaseDetails !== null && testPlan && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 dark:bg-black/70 p-4 overflow-y-auto">
-            <div className="bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600 rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-start mb-4">
+        {/* Modal de detalles del caso de prueba */}
+        {activeTestCaseDetails !== null && testPlan && (
+          <div className="cinematic-modal-overlay">
+            <div className="cinematic-modal p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="cinematic-modal-header flex justify-between items-start mb-4">
                 <h3 className="text-xl font-bold">
                   TC-{activeTestCaseDetails + 1}: {testPlan.testCases[activeTestCaseDetails].title}
                 </h3>
                 <button
-                  className="text-gray-500 hover:text-gray-700"
+                  className="btn-3d btn-3d-secondary"
                   onClick={() => setActiveTestCaseDetails(null)}
                 >
                   <i className="bi bi-x-lg"></i>
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="glass-card grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <h4 className="font-semibold mb-2">Prioridad</h4>
                   <span
-                    className={`px-2 py-1 rounded text-xs ${testPlan.testCases[activeTestCaseDetails].priority === "Alta"
-                      ? "bg-red-100 text-red-800"
+                    className={`futuristic-badge ${testPlan.testCases[activeTestCaseDetails].priority === "Alta"
+                      ? "badge-danger"
                       : testPlan.testCases[activeTestCaseDetails].priority === "Media"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-green-100 text-green-800"
+                        ? "badge-warning"
+                        : "badge-success"
                       }`}
                   >
                     {testPlan.testCases[activeTestCaseDetails].priority}
@@ -1149,7 +1251,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="mb-4">
+              <div className="glass-card mb-4">
                 <h4 className="font-semibold mb-2">Precondiciones</h4>
                 <ul className="list-disc pl-5">
                   {testPlan.testCases[activeTestCaseDetails].preconditions.map((precondition, i) => (
@@ -1158,7 +1260,7 @@ export default function Home() {
                 </ul>
               </div>
 
-              <div className="mb-4">
+              <div className="glass-card mb-4">
                 <h4 className="font-semibold mb-2">Pasos</h4>
                 <ol className="list-decimal pl-5">
                   {testPlan.testCases[activeTestCaseDetails].steps.map((step, i) => (
@@ -1167,383 +1269,515 @@ export default function Home() {
                 </ol>
               </div>
 
-              <div className="mb-4">
+              <div className="glass-card mb-4">
                 <h4 className="font-semibold mb-2">Resultado Esperado</h4>
                 <p>{testPlan.testCases[activeTestCaseDetails].expectedResult}</p>
               </div>
 
               <div className="flex justify-end mt-4">
                 <button
-                  className="bg-primary-custom dark:bg-accent-custom_drk text-white dark:text-black px-4 py-2 rounded-md hover:bg-accent-custom_drk hover:dark:bg-six-custom"
+                  className="btn-icon"
                   onClick={() => {
                     setEditingTestCase({
                       index: activeTestCaseDetails,
-                      field: "title",
-                      value: testPlan.testCases[activeTestCaseDetails].title,
+                      field: "all",
+                      value: testPlan.testCases[activeTestCaseDetails],
                     })
                     setActiveTestCaseDetails(null)
                   }}
                 >
-                  <i className="bi bi-pencil mr-1"></i>
-                  Editar Caso de Prueba
+                  <i className="bi bi-pencil"></i>
                 </button>
               </div>
             </div>
           </div>
         )}
 
-          {/* Mensaje de éxito */}
-          {emailSent && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-              <div className="bg-green-100 text-green-900 rounded-xl shadow-xl p-6 max-w-md w-[90%] text-center">
-                <div className="text-xl font-bold mb-2">📬 ¡Correo enviado!</div>
-                <p className="text-green-800">
-                  ✅ Tu plan fue enviado correctamente.
-                  <br /> ¡Que la calidad te acompañe!
-                </p>
-                <button
-                  onClick={() => setEmailSent(false)}
-                  className="mt-4 bg-green-700 text-white py-2 px-6 rounded-md hover:bg-green-800 transition"
-                >
-                  Cerrar
-                </button>
-              </div>
-            </div>
-          )}
-
-        {!testPlan ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 animate-slide-up">
-            {/* Formulario de entrada */}
-            <div className="bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-black p-6 rounded-lg shadow-lg border border-gray-100">
-              <h2 className="bg-white/10 text-black dark:bg-transparent dark:text-six-custom text-xl font-semibold mb-4">Información del Sistema</h2>
-
-              {/* Tipo de aplicación */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Tipo de Aplicación</label>
-                <select
-                  className="w-full p-2 border rounded-md bg-white/30 text-black dark:bg-black dark:text-primary-custom_drk border dark:border-gray-600"
-                  value={applicationType}
-                  onChange={(e) => setApplicationType(e.target.value)}
-                >
-                  <option value="">Selecciona un tipo</option>
-                  {applicationTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Subtipo de aplicación */}
-              {applicationType && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">Subtipo</label>
-                  <select
-                    className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-primary-custom_drk border dark:border-gray-600"
-                    value={applicationSubtype}
-                    onChange={(e) => setApplicationSubtype(e.target.value)}
-                  >
-                    <option value="">Selecciona un subtipo</option>
-                    {availableSubtypes.map((subtype) => (
-                      <option key={subtype} value={subtype}>
-                        {subtype}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* Características */}
-              {applicationSubtype && availableFeatures.length > 0 && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">Características</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {availableFeatures.map((feature) => (
-                      <div key={feature} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={`feature-${feature}`}
-                          checked={selectedFeatures.includes(feature)}
-                          onChange={() => handleFeatureChange(feature)}
-                          className="mr-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom border dark:border-white"
-                        />
-                        <label htmlFor={`feature-${feature}`} className="text-sm">
-                          {feature}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Descripción del sistema */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Descripción del Sistema (Obligatorio)</label>
-                <textarea
-                  className="w-full p-2 border rounded-md min-h-[150px] bg-white/10 text-black dark:bg-transparent dark:text-six-custom border dark:border-gray-600"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe el sistema o aplicación para el que necesitas un plan de pruebas..."
-                />
-              </div>
-
-              {/* Tamaño del equipo */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Tamaño del Equipo</label>
-                <input
-                  type="number"
-                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-transparent dark:text-primary-custom_drk border dark:border-gray-600"
-                  value={teamSize}
-                  onChange={(e) => setTeamSize(Number.parseInt(e.target.value) || 1)}
-                  min="1"
-                />
-              </div>
-            </div>
-
-            {/* Opciones adicionales */}
-            <div className="bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-black p-6 rounded-lg shadow-lg border border-gray-100">
-              <h2 className="text-xl font-semibold mb-4">Opciones Adicionales</h2>
-
-              {/* Tipos de prueba */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Tipos de Prueba</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {[
-                    "Funcional",
-                    "Rendimiento",
-                    "Seguridad",
-                    "Usabilidad",
-                    "Accesibilidad",
-                    "Compatibilidad",
-                    "Integración",
-                    "Regresión",
-                    "Smoke",
-                    "Sanity",
-                    "Exploratorio",
-                    "A/B",
-                    "Carga",
-                    "Estrés",
-                    "Volumen",
-                    "Recuperación",
-                  ].map((type) => (
-                    <div key={type} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`type-${type}`}
-                        checked={testTypes.includes(type)}
-                        onChange={() => handleTestTypeChange(type)}
-                        className="mr-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-gray-600"
-                      />
-                      <label htmlFor={`type-${type}`} className="text-sm">
-                        {type}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Automatización */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Automatización</label>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="automation"
-                    checked={automationAllowed}
-                    onChange={() => setAutomationAllowed(!automationAllowed)}
-                    className="mr-2 bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
-                  />
-                  <label htmlFor="automation" className="text-sm">
-                    Permitir automatización de pruebas
-                  </label>
-                </div>
-              </div>
-
-              {/* Pruebas de rendimiento */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Pruebas de Rendimiento</label>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="performance"
-                    checked={performanceTestingAllowed}
-                    onChange={() => setPerformanceTestingAllowed(!performanceTestingAllowed)}
-                    className="mr-2 bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
-                  />
-                  <label htmlFor="performance" className="text-sm">
-                    Incluir pruebas de rendimiento
-                  </label>
-                </div>
-              </div>
-
-              {/* Botón para generar */}
-              <div className="mt-8">
-                <button
-                  className={`w-full py-2 px-4 rounded-md transition-colors ${isGenerating || !description
-                    ? "bg-gray-400 cursor-not-allowed text-black"
-                    : "bg-primary-custom dark:bg-accent-custom text-white hover:bg-accent-custom dark:hover:bg-six-custom py-2 px-6 rounded-md transition-colors text-gray-800"
-                    }`}
-                  onClick={handleGenerateTestPlan}
-                  disabled={isGenerating || !description}
-                >
-                  {isGenerating ? "Generando..." : "Generar Plan de Pruebas"}
-                </button>
-              </div>
+        {/* Mensaje de éxito */}
+        {emailSent && (
+          <div className="cinematic-modal-overlay">
+            <div className="futuristic-success" style={{ maxWidth: "400px" }}>
+              <div className="text-6xl mb-4">✓</div>
+              <h3 className="text-3xl font-bold mb-2">¡Correo Enviado!</h3>
+              <p className="mb-6 text-lg">Tu plan fue enviado correctamente.</p>
+              <button className="btn-3d btn-3d-secondary" onClick={() => setEmailSent(false)}>
+                Cerrar
+              </button>
             </div>
           </div>
-        ) : (
-          <div className="bg-white/60 text-black dark:bg-black/60 dark:text-white backdrop-blur rounded-lg shadow-md">
-            {/* Pestañas */}
-            <div className="border-b bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur">
-              <div className="flex overflow-x-auto p-1 sm:p-2 scrollbar-hide">
-                {["objectives", "scope", "risks", "testCases", "time", "strategy", "environment"].map((tab) => (
-                  <button
-                    key={tab}
-                    className={`px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base font-medium rounded-lg transition-all whitespace-nowrap ${activeTab === tab
-                      ? "border-b-4 border-primary-custom dark:border-accent-custom"
-                      : "hover:text-accent-custom"
-                      }`}
-                    onClick={() => setActiveTab(tab)}
-                  >
-                    {tab === "objectives" && "Objetivos"}
-                    {tab === "scope" && "Alcance"}
-                    {tab === "risks" && "Riesgos"}
-                    {tab === "testCases" && "Casos de Prueba"}
-                    {tab === "time" && "Estimación"}
-                    {tab === "strategy" && "Estrategia"}
-                    {tab === "environment" && "Entorno"}
-                  </button>
-                ))}
+        )}
+
+        {!testPlan ? (
+          <>
+            <section className="hero-section">
+              <div className="hero-content">
+                <h1>Tu Asistente de QA Inteligente</h1>
+                <p>
+                  Crea tu plan de pruebas en minutos. QAssistant genera una estructura inicial personalizada para que empieces rápido.
+                  Ajusta, amplía y envíalo a tu correo cuando esté listo.
+                </p>
+                <button
+                  className="hero-button"
+                  onClick={() =>
+                    document
+                      .querySelector("#qa-form-section")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                >
+                  Comenzar sin registros
+                  <span className="arrow">↓</span>
+                </button>
               </div>
+            </section>
+            <section id="qa-form-section">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-in-up">
+                {/* Formulario de entrada */}
+                <div className="glass-card">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="futuristic-list-icon">
+                      <i className="bi bi-gear-fill"></i>
+                    </div>
+                    <h2 className="text-2xl font-bold text-white">Información del Sistema</h2>
+                  </div>
+
+                  <div className="space-y-4 desc-sistema">
+                    <div>
+                      <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>
+                        Tipo de Aplicación
+                      </label>
+                      <select
+                        className="futuristic-input futuristic-select"
+                        value={applicationType}
+                        onChange={(e) => setApplicationType(e.target.value)}
+                      >
+                        <option style={{ backgroundColor: "rgb(75, 81, 106)" }} value="">Selecciona un tipo</option>
+                        {applicationTypes.map((type) => (
+                          <option style={{ backgroundColor: "rgb(75, 81, 106)" }} key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {applicationType && (
+                      <div>
+                        <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>
+                          Subtipo
+                        </label>
+                        <select
+                          className="futuristic-input futuristic-select"
+                          value={applicationSubtype}
+                          onChange={(e) => setApplicationSubtype(e.target.value)}
+                        >
+                          <option style={{ backgroundColor: "rgb(75, 81, 106)" }} value="">Selecciona un subtipo</option>
+                          {availableSubtypes.map((subtype) => (
+                            <option style={{ backgroundColor: "rgb(75, 81, 106)" }} key={subtype} value={subtype}>
+                              {subtype}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {applicationSubtype && availableFeatures.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-semibold mb-3" style={{ color: "var(--text-secondary)" }}>
+                          Características
+                        </label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {availableFeatures.map((feature) => (
+                            <label key={feature} className="futuristic-checkbox">
+                              <input
+                                type="checkbox"
+                                checked={selectedFeatures.includes(feature)}
+                                onChange={() => handleFeatureChange(feature)}
+                              />
+                              <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                                {feature}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>
+                        Descripción del Sistema <span style={{ color: "#f857a6" }}>*</span>
+                      </label>
+                      <textarea
+                        className="futuristic-input futuristic-textarea"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Describe el sistema o aplicación para el que necesitas un plan de pruebas..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Opciones adicionales */}
+                <div className="glass-card">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="futuristic-list-icon" style={{ background: "var(--secondary-gradient)" }}>
+                      <i className="bi bi-sliders"></i>
+                    </div>
+                    <h2 className="text-2xl font-bold text-white">Opciones de Prueba</h2>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold mb-3" style={{ color: "var(--text-secondary)" }}>
+                        Tipos de Prueba
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {[
+                          "Funcional",
+                          "Rendimiento",
+                          "Seguridad",
+                          "Usabilidad",
+                          "Accesibilidad",
+                          "Compatibilidad",
+                          "Integración",
+                          "Regresión",
+                          "Smoke",
+                          "Sanity",
+                          "Exploratorio",
+                          "A/B",
+                          "Carga",
+                          "Estrés",
+                          "Volumen",
+                          "Recuperación",
+                        ].map((type) => (
+                          <label key={type} className="futuristic-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={testTypes.includes(type)}
+                              onChange={() => handleTestTypeChange(type)}
+                            />
+                            <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                              {type}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div
+                      className="pt-4"
+                      style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)", marginTop: "1.5rem" }}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <label className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
+                          Automatización de Pruebas
+                        </label>
+                        <label className="futuristic-toggle">
+                          <input
+                            type="checkbox"
+                            checked={automationAllowed}
+                            onChange={() => setAutomationAllowed(!automationAllowed)}
+                          />
+                          <span className="toggle-slider"></span>
+                        </label>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
+                          Pruebas de Rendimiento
+                        </label>
+                        <label className="futuristic-toggle">
+                          <input
+                            type="checkbox"
+                            checked={performanceTestingAllowed}
+                            onChange={() => setPerformanceTestingAllowed(!performanceTestingAllowed)}
+                          />
+                          <span className="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <button
+                      className={`btn-3d btn-3d-primary w-full mt-6 ${isGenerating || !description ? "opacity-50 cursor-not-allowed" : "glow-on-hover"
+                        }`}
+                      onClick={handleGenerateTestPlan}
+                      disabled={isGenerating || !description}
+                    >
+                      {isGenerating ? (
+                        <>
+                          <span className="futuristic-spinner"></span>
+                          Generando Plan...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-magic"></i>
+                          Generar Plan de Pruebas
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+            {/* Sección de estadísticas */}
+            <div className="stats-section fade-in-up" style={{ animationDelay: "0.2s" }}>
+              <div className="stat-card">
+                <span className="stat-number">1K+</span>
+                <span className="stat-label">Planes Generados</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-number">98%</span>
+                <span className="stat-label">Satisfacción</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-number">24/7</span>
+                <span className="stat-label">Disponibilidad</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-number">100%</span>
+                <span className="stat-label">Coherencia</span>
+              </div>
+            </div>
+
+            {/* Sección de características */}
+            <div className="glass-card mt-6 fade-in-up" style={{ animationDelay: "0.3s" }}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="futuristic-list-icon" style={{ background: "var(--accent-gradient)" }}>
+                  <i className="bi bi-star-fill"></i>
+                </div>
+                <h2 className="text-2xl font-bold text-white">¿Por qué QAssistant?</h2>
+              </div>
+
+              <div className="features-grid">
+                <div className="feature-card">
+                  <div className="feature-icon">
+                    <i className="bi bi-lightning-charge-fill"></i>
+                  </div>
+                  <h3 className="feature-title">Impulso de IA</h3>
+                  <p className="feature-description">
+                    Genera el borrador inicial de tu plan de pruebas en minutos. Un punto de partida sólido para tu estrategia de QA
+                  </p>
+                </div>
+
+                <div className="feature-card">
+                  <div className="feature-icon" style={{ background: "var(--success-gradient)" }}>
+                    <i className="bi bi-shield-check"></i>
+                  </div>
+                  <h3 className="feature-title">Facilita tu análisis</h3>
+                  <p className="feature-description">
+                    Análisis de riesgos y mitigación asistido por IA, dándote el esqueleto completo de tu plan, listo para refinar
+                  </p>
+                </div>
+
+                <div className="feature-card">
+                  <div className="feature-icon" style={{ background: "var(--warning-gradient)" }}>
+                    <i className="bi bi-graph-up-arrow"></i>
+                  </div>
+                  <h3 className="feature-title">Control de Recursos</h3>
+                  <p className="feature-description">
+                    Cálculos de tiempo y recursos basados en las mejores prácticas. Reduce la incertidumbre en tus presupuestos y cronogramas
+                  </p>
+                </div>
+
+                <div className="feature-card">
+                  <div className="feature-icon" style={{ background: "var(--accent-gradient)" }}>
+                    <i className="bi bi-file-earmark-pdf"></i>
+                  </div>
+                  <h3 className="feature-title">Integración ágil</h3>
+                  <p className="feature-description">
+                    Exporta tu plan final a múltiples formatos (EXCEL, HTML) y continúa el trabajo con tu equipo, sin fricciones
+                  </p>
+                </div>
+
+                <div className="feature-card">
+                  <div className="feature-icon" style={{ background: "var(--danger-gradient)" }}>
+                    <i className="bi bi-pencil-square"></i>
+                  </div>
+                  <h3 className="feature-title">Refinamiento instantáneo</h3>
+                  <p className="feature-description">
+                    Modifica y personaliza cualquier sección del plan con nuestra interfaz intuitiva. El control final siempre es tuyo
+                  </p>
+                </div>
+
+                <div className="feature-card">
+                  <div className="feature-icon" style={{ background: "var(--secondary-gradient)" }}>
+                    <i className="bi bi-robot"></i>
+                  </div>
+                  <h3 className="feature-title">Aprendizaje continuo</h3>
+                  <p className="feature-description">Modelo que mejora constantemente basado en el feedback y las mejores prácticas</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer profesional */}
+            <div className="professional-footer fade-in-up" style={{ animationDelay: "0.4s" }}>
+              <div className="footer-content">
+                <div className=" w-40 h-40 footer-logo">
+                  <img src="img/logo_app_2.png" alt="" />
+                </div>
+                
+                  <span>QAssistant</span>
+                <p className="footer-text">
+                  Tu asistente inteligente para crear planes de prueba profesionales en minutos.
+                  Combinamos inteligencia artificial y experiencia QA para ayudarte a optimizar tu trabajo con precisión y estilo.
+                </p>
+                <div className="footer-badges">
+                  <div className="footer-badge">
+                    <i className="bi bi-lightning-charge-fill"></i>
+                    <span>Impulsado por IA</span>
+                  </div>
+                  <div className="footer-badge">
+                    <i className="bi bi-people-fill"></i>
+                    <span>Diseñado para testers</span>
+                  </div>
+                  <div className="footer-badge">
+                    <i className="bi bi-gear-fill"></i>
+                    <span>Automatización inteligente</span>
+                  </div>
+                  <div className="footer-badge">
+                    <i className="bi bi-stars"></i>
+                    <span>En constante mejora</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </>
+        ) : (
+          <div className="glass-card p-0 overflow-hidden fade-in-up">
+            {/* Pestañas */}
+            <div className="futuristic-tabs">
+              {[
+                { id: "objectives", label: "Objetivos", icon: "bi-bullseye" },
+                { id: "scope", label: "Alcance", icon: "bi-diagram-3" },
+                { id: "risks", label: "Riesgos", icon: "bi-exclamation-triangle" },
+                { id: "testCases", label: "Casos de Prueba", icon: "bi-list-check" },
+                { id: "time", label: "Estimación", icon: "bi-clock" },
+                { id: "strategy", label: "Estrategia", icon: "bi-lightbulb" },
+                { id: "environment", label: "Entorno", icon: "bi-hdd-stack" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`futuristic-tab ${activeTab === tab.id ? "active" : ""}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  <i className={`bi ${tab.icon} mr-2`}></i>
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
             {/* Contenido de las pestañas */}
-            <div className="p-6">
+            <div className="p-0 sm:p-6 lg:p-8">
               {/* Pestaña de Objetivos */}
               {activeTab === "objectives" && (
                 <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold">Objetivos</h2>
-                    <button
-                      className="btn bg-accent-custom hover:bg-primary-custom_drk text-white p-2 rounded-full shadow-sm"
-                      onClick={handleAddObjective}
-                      aria-label="Añadir Objetivo"
-                    >
-                      <i className="bi bi-plus-lg text-lg"></i>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-3xl font-bold flex items-center gap-3 text-white"><i className="bi bi-bullseye" style={{ color: "#667eea" }}></i>
+                      Objetivos</h2>
+                    <button className="btn-icon glow-on-hover btn-space" onClick={handleAddObjective} title="Añadir Objetivo">
+                      <i className="bi bi-plus-lg"></i>
                     </button>
                   </div>
-                  <ul className="space-y-2">
+                  <div className="space-y-3">
                     {testPlan.objectives.map((objective, index) => (
-                      <li
-                        key={index}
-                        className="bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur flex items-start bg-neutral-50 p-2 sm:p-3 rounded-lg border border-neutral-200 hover:shadow-custom transition-shadow"
-                      >
-                        <span
-                          className="bi bi-bullseye text-[var(--thirdColor)]"
-                          role="img"
-                          aria-label="Icono de éxito"
-                        />
-                        &nbsp;
+                      <div key={index} className="futuristic-list-item">
+                        <div className="futuristic-list-icon">
+                          <i className="bi bi-check2"></i>
+                        </div>
                         {editingObjective && editingObjective.index === index ? (
                           <div className="flex-1">
                             <textarea
-                              className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
+                              className="futuristic-input futuristic-textarea"
                               value={editingObjective.value}
                               onChange={(e) => setEditingObjective({ index, value: e.target.value })}
                             />
-                            <div className="flex mt-2 space-x-2">
+                            <div className="flex gap-2 mt-3">
                               <button
-                                className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
+                                className="btn-3d btn-3d-primary"
                                 onClick={() => {
                                   handleEditObjective(index, editingObjective.value)
                                   setEditingObjective(null)
                                 }}
                               >
+                                <i className="bi bi-check2"></i>
                                 Guardar
                               </button>
-                              <button 
-                                className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
-                                onClick={() => setEditingObjective(null)}
-                              >
+                              <button className="btn-3d btn-3d-secondary" onClick={() => setEditingObjective(null)}>
                                 Cancelar
                               </button>
                             </div>
                           </div>
                         ) : (
-                          <div className="flex-1 flex justify-between items-start">
-                            <span>{objective}</span>
-                            <div className="flex space-x-2">
+                          <>
+                            <span className="flex-1 font-medium" style={{ color: "var(--text-primary)" }}>
+                              {objective}
+                            </span>
+                            <div className="flex gap-2">
                               <button
-                                className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                className="btn-icon"
                                 onClick={() => setEditingObjective({ index, value: objective })}
-                                aria-label="Editar"
-                                title="Editar"
                               >
                                 <i className="bi bi-pencil"></i>
                               </button>
                               <button
-                                className="p-1 text-primary-custom_drk hover:text-accent-custom transition-colors"
+                                className="btn-icon"
                                 onClick={() => handleDeleteObjective(index)}
-                                aria-label="Eliminar"
-                                title="Eliminar"
+                                style={{ color: "#f857a6" }}
                               >
                                 <i className="bi bi-trash"></i>
                               </button>
                             </div>
-                          </div>
+                          </>
                         )}
-                      </li>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
               {/* Pestaña de Alcance */}
               {activeTab === "scope" && (
                 <div>
-                  <h2 className="text-2xl font-bold mb-4">Alcance</h2>
+                  <h2 className="text-3xl font-bold mb-6 flex items-center gap-3 text-white" style={{ marginTop: "30px" }}>
+                    <i className="bi bi-diagram-3" style={{ color: "#667eea" }}></i>
+                    Alcance
+                  </h2>
 
-                  <div className="mb-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-xl font-semibold">Áreas Incluidas</h3>
+                  <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-bold text-white">Áreas Incluidas</h3>
                       <button
-                        className="btn bg-accent-custom hover:bg-primary-custom_drk text-white p-2 rounded-full shadow-sm"
+                        className="btn-icon glow-on-hover"
                         onClick={handleAddIncludedScope}
-                        aria-label="Añadir Área Incluida"
+                        title="Añadir Área Incluida"
                       >
-                        <i className="bi bi-plus-lg text-lg"></i>
+                        <i className="bi bi-plus-lg"></i>
                       </button>
                     </div>
-                    <ul className="space-y-2">
+                    <div className="space-y-3">
                       {testPlan.scope.included.map((item, index) => (
-                        <li
-                          key={index}
-                          className="bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur flex items-start bg-neutral-50 p-2 sm:p-3 rounded-lg border border-neutral-200 hover:shadow-custom transition-shadow"
-                        >
-                          <span
-                            className="bi bi-diagram-3 text-[var(--thirdColor)]"
-                            role="img"
-                            aria-label="Icono de éxito"
-                          />
-                          &nbsp;
+                        <div key={index} className="futuristic-list-item">
+                          <div className="futuristic-list-icon" style={{ background: "var(--success-gradient)" }}>
+                            <i className="bi bi-check2"></i>
+                          </div>
                           {editingIncludedScope && editingIncludedScope.index === index ? (
                             <div className="flex-1">
                               <textarea
-                                className="bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600 w-full p-2 border rounded-md"
+                                className="futuristic-input futuristic-textarea"
                                 value={editingIncludedScope.value}
                                 onChange={(e) => setEditingIncludedScope({ index, value: e.target.value })}
                               />
-                              <div className="flex mt-2 space-x-2">
+                              <div className="flex gap-2 mt-3">
                                 <button
-                                  className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
+                                  className="btn-3d btn-3d-primary"
                                   onClick={() => {
                                     handleEditIncludedScope(index, editingIncludedScope.value)
                                     setEditingIncludedScope(null)
                                   }}
                                 >
+                                  <i className="bi bi-check2"></i>
                                   Guardar
                                 </button>
                                 <button
-                                  className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
+                                  className="btn-3d btn-3d-secondary"
                                   onClick={() => setEditingIncludedScope(null)}
                                 >
                                   Cancelar
@@ -1551,76 +1785,69 @@ export default function Home() {
                               </div>
                             </div>
                           ) : (
-                            <div className="flex-1 flex justify-between items-start">
-                              <span>{item}</span>
-                              <div className="flex space-x-2">
+                            <>
+                              <span className="flex-1 font-medium" style={{ color: "var(--text-primary)" }}>
+                                {item}
+                              </span>
+                              <div className="flex gap-2">
                                 <button
-                                  className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                  className="btn-icon"
                                   onClick={() => setEditingIncludedScope({ index, value: item })}
-                                  aria-label="Editar"
-                                  title="Editar"
                                 >
                                   <i className="bi bi-pencil"></i>
                                 </button>
                                 <button
-                                  className="p-1 text-primary-custom_drk hover:text-accent-custom transition-colors"
+                                  className="btn-icon"
                                   onClick={() => handleDeleteIncludedScope(index)}
-                                  aria-label="Eliminar"
-                                  title="Eliminar"
+                                  style={{ color: "#f857a6" }}
                                 >
                                   <i className="bi bi-trash"></i>
                                 </button>
                               </div>
-                            </div>
+                            </>
                           )}
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
 
                   <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-xl font-semibold">Áreas Excluidas</h3>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-bold text-white">Áreas Excluidas</h3>
                       <button
-                        className="btn bg-accent-custom hover:bg-primary-custom_drk text-white p-2 rounded-full shadow-sm"
+                        className="btn-icon glow-on-hover"
                         onClick={handleAddExcludedScope}
-                        aria-label="Añadir Área Excluida"
+                        title="Añadir Área Excluida"
                       >
-                        <i className="bi bi-plus-lg text-lg"></i>
+                        <i className="bi bi-plus-lg"></i>
                       </button>
                     </div>
-                    <ul className="space-y-2">
+                    <div className="space-y-3">
                       {testPlan.scope.excluded.map((item, index) => (
-                        <li
-                          key={index}
-                          className="bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur flex items-start bg-neutral-50 p-2 sm:p-3 rounded-lg border border-neutral-200 hover:shadow-custom transition-shadow"
-                        >
-                          <span
-                            className="bi bi-arrows-fullscreen text-[var(--thirdColor)]"
-                            role="img"
-                            aria-label="Icono de éxito"
-                          />
-                          &nbsp;
-
+                        <div key={index} className="futuristic-list-item">
+                          <div className="futuristic-list-icon" style={{ background: "var(--danger-gradient)" }}>
+                            <i className="bi bi-x-lg"></i>
+                          </div>
                           {editingExcludedScope && editingExcludedScope.index === index ? (
                             <div className="flex-1">
                               <textarea
-                                className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
+                                className="futuristic-input futuristic-textarea"
                                 value={editingExcludedScope.value}
                                 onChange={(e) => setEditingExcludedScope({ index, value: e.target.value })}
                               />
-                              <div className="flex mt-2 space-x-2">
+                              <div className="flex gap-2 mt-3">
                                 <button
-                                  className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
+                                  className="btn-3d btn-3d-primary"
                                   onClick={() => {
                                     handleEditExcludedScope(index, editingExcludedScope.value)
                                     setEditingExcludedScope(null)
                                   }}
                                 >
+                                  <i className="bi bi-check2"></i>
                                   Guardar
                                 </button>
                                 <button
-                                  className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black backdrop-blur"
+                                  className="btn-3d btn-3d-secondary"
                                   onClick={() => setEditingExcludedScope(null)}
                                 >
                                   Cancelar
@@ -1628,65 +1855,74 @@ export default function Home() {
                               </div>
                             </div>
                           ) : (
-                            <div className="flex-1 flex justify-between items-start">
-                              <span>{item}</span>
-                              <div className="flex space-x-2">
+                            <>
+                              <span className="flex-1 font-medium" style={{ color: "var(--text-primary)" }}>
+                                {item}
+                              </span>
+                              <div className="flex gap-2">
                                 <button
-                                  className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                  className="btn-icon"
                                   onClick={() => setEditingExcludedScope({ index, value: item })}
-                                  aria-label="Editar"
-                                  title="Editar"
                                 >
                                   <i className="bi bi-pencil"></i>
                                 </button>
                                 <button
-                                  className="p-1 text-primary-custom_drk hover:text-accent-custom transition-colors"
+                                  className="btn-icon"
                                   onClick={() => handleDeleteExcludedScope(index)}
-                                  aria-label="Eliminar"
-                                  title="Eliminar"
+                                  style={{ color: "#f857a6" }}
                                 >
                                   <i className="bi bi-trash"></i>
                                 </button>
                               </div>
-                            </div>
+                            </>
                           )}
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 </div>
               )}
               {/* Pestaña de Riesgos */}
               {activeTab === "risks" && (
                 <div>
-                  <SectionHeader title="Riesgos" onAdd={handleAddRisk} addLabel="Añadir Riesgo"/>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-3xl font-bold flex items-center gap-3 text-white">
+                      <i className="bi bi-exclamation-triangle" style={{ color: "#fa709a" }}></i>
+                      Riesgos
+                    </h2>
+                    <button className="btn-icon glow-on-hover btn-space" onClick={handleAddRisk} title="Añadir Riesgo">
+                      <i className="bi bi-plus-lg"></i>
+                    </button>
+                  </div>
                   <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
+                    <table className="futuristic-table">
                       <thead>
-                        <tr className="bg-gray-100">
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">#</th>
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Descripción</th>
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Impacto</th>
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Probabilidad</th>
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Mitigación</th>
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Acciones</th>
+                        <tr>
+                          <th>#</th>
+                          <th>Descripción</th>
+                          <th>Impacto</th>
+                          <th>Probabilidad</th>
+                          <th>Mitigación</th>
+                          <th>Acciones</th>
                         </tr>
                       </thead>
                       <tbody>
                         {testPlan.risks.map((risk, index) => (
-                          <tr key={index} className={index % 2 === 0 ? "bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur" : "bg-gray-50 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur"}>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">{index + 1}</td>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">
+                          <tr key={index}>
+                            <td className="font-bold">{index + 1}</td>
+                            <td className="width-item">
                               {editingRisk && editingRisk.index === index && editingRisk.field === "description" ? (
                                 <div>
                                   <textarea
-                                    className="w-full p-1 border rounded bg-white/60 text-black dark:bg-black/60 dark:text-white backdrop-blur border dark:border-gray-600"
+                                    className="futuristic-input"
+                                    style={{ minHeight: "80px" }}
                                     value={editingRisk.value}
                                     onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
                                   />
-                                  <div className="flex mt-2 space-x-2">
+                                  <div className="flex gap-2 mt-2">
                                     <button
-                                      className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                      className="btn-3d btn-3d-primary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => {
                                         handleEditRisk(index, editingRisk.field as keyof Risk, editingRisk.value)
                                         setEditingRisk(null)
@@ -1695,7 +1931,8 @@ export default function Home() {
                                       Guardar
                                     </button>
                                     <button
-                                      className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
+                                      className="btn-3d btn-3d-secondary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => setEditingRisk(null)}
                                     >
                                       Cancelar
@@ -1703,35 +1940,36 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="flex justify-between items-start">
-                                  <span>{risk.description}</span>
+                                <div className="flex flex-col gap-1">
+                                  <span className="flex-1">{risk.description}</span>
                                   <button
-                                    className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                    className="btn-icon"
+                                    style={{ padding: "1rem, 0.25rem, 0.25rem, 0.25rem", width: "32px", height: "32px" }}
                                     onClick={() =>
                                       setEditingRisk({ index, field: "description", value: risk.description })
                                     }
-                                    aria-label="Editar descripción"
                                   >
-                                    <i className="bi bi-pencil" title="Editar"></i>
+                                    <i className="bi bi-pencil"></i>
                                   </button>
                                 </div>
                               )}
                             </td>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-white">
+                            <td>
                               {editingRisk && editingRisk.index === index && editingRisk.field === "impact" ? (
                                 <div>
                                   <select
-                                    className="w-full p-1 border rounded bg-white/60 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
+                                    className="futuristic-input futuristic-select"
                                     value={editingRisk.value}
                                     onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
                                   >
-                                    <option value="Alto">Alto</option>
-                                    <option value="Medio">Medio</option>
-                                    <option value="Bajo">Bajo</option>
+                                    <option value="Alto" style={{ backgroundColor: "rgb(75, 81, 106)" }}>Alto</option>
+                                    <option value="Medio" style={{ backgroundColor: "rgb(75, 81, 106)" }}>Medio</option>
+                                    <option value="Bajo" style={{ backgroundColor: "rgb(75, 81, 106)" }}>Bajo</option>
                                   </select>
-                                  <div className="flex mt-2 space-x-2">
+                                  <div className="flex gap-2 mt-2">
                                     <button
-                                      className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                      className="btn-3d btn-3d-primary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => {
                                         handleEditRisk(index, editingRisk.field as keyof Risk, editingRisk.value)
                                         setEditingRisk(null)
@@ -1740,7 +1978,8 @@ export default function Home() {
                                       Guardar
                                     </button>
                                     <button
-                                      className="bg-gray-300 px-2 py-1 rounded text-xs text-black"
+                                      className="btn-3d btn-3d-secondary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => setEditingRisk(null)}
                                     >
                                       Cancelar
@@ -1748,43 +1987,43 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-center gap-2">
                                   <span
-                                    className={`px-2 py-1 rounded text-xs ${risk.impact === "Alto"
-                                      ? "bg-red-100 text-red-800"
+                                    className={`futuristic-badge ${risk.impact === "Alto"
+                                      ? "badge-danger"
                                       : risk.impact === "Medio"
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : "bg-green-100 text-green-800"
+                                        ? "badge-warning"
+                                        : "badge-success"
                                       }`}
                                   >
                                     {risk.impact}
                                   </span>
                                   <button
-                                    className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                    className="btn-icon"
+                                    style={{ padding: "0.25rem", width: "32px", height: "32px" }}
                                     onClick={() => setEditingRisk({ index, field: "impact", value: risk.impact })}
-                                    aria-label="Editar impacto"
-                                    title="Editar"
                                   >
                                     <i className="bi bi-pencil"></i>
                                   </button>
                                 </div>
                               )}
                             </td>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-white">
+                            <td>
                               {editingRisk && editingRisk.index === index && editingRisk.field === "probability" ? (
                                 <div>
                                   <select
-                                    className="w-full p-1 border rounded bg-white/60 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
+                                    className="futuristic-input futuristic-select"
                                     value={editingRisk.value}
                                     onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
                                   >
-                                    <option value="Alta">Alta</option>
-                                    <option value="Media">Media</option>
-                                    <option value="Baja">Baja</option>
+                                    <option value="Alta" style={{ backgroundColor: "rgb(75, 81, 106)" }}>Alta</option>
+                                    <option value="Media" style={{ backgroundColor: "rgb(75, 81, 106)" }}>Media</option>
+                                    <option value="Baja" style={{ backgroundColor: "rgb(75, 81, 106)" }}>Baja</option>
                                   </select>
-                                  <div className="flex mt-2 space-x-2">
+                                  <div className="flex gap-2 mt-2">
                                     <button
-                                      className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                      className="btn-3d btn-3d-primary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => {
                                         handleEditRisk(index, editingRisk.field as keyof Risk, editingRisk.value)
                                         setEditingRisk(null)
@@ -1793,7 +2032,8 @@ export default function Home() {
                                       Guardar
                                     </button>
                                     <button
-                                      className="bg-gray-300 px-2 py-1 rounded text-xs text-black"
+                                      className="btn-3d btn-3d-secondary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => setEditingRisk(null)}
                                     >
                                       Cancelar
@@ -1801,41 +2041,42 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-center gap-2">
                                   <span
-                                    className={`px-2 py-1 rounded text-xs ${risk.probability === "Alta"
-                                      ? "bg-red-100 text-red-800"
+                                    className={`futuristic-badge ${risk.probability === "Alta"
+                                      ? "badge-danger"
                                       : risk.probability === "Media"
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : "bg-green-100 text-green-800"
+                                        ? "badge-warning"
+                                        : "badge-success"
                                       }`}
                                   >
                                     {risk.probability}
                                   </span>
                                   <button
-                                    className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                    className="btn-icon"
+                                    style={{ padding: "0.25rem", width: "32px", height: "32px" }}
                                     onClick={() =>
                                       setEditingRisk({ index, field: "probability", value: risk.probability })
                                     }
-                                    aria-label="Editar probabilidad"
-                                    title="Editar"
                                   >
                                     <i className="bi bi-pencil"></i>
                                   </button>
                                 </div>
                               )}
                             </td>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-white">
+                            <td className="width-item">
                               {editingRisk && editingRisk.index === index && editingRisk.field === "mitigation" ? (
                                 <div>
                                   <textarea
-                                    className="w-full p-1 border rounded bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
+                                    className="futuristic-input"
+                                    style={{ minHeight: "80px" }}
                                     value={editingRisk.value}
                                     onChange={(e) => setEditingRisk({ ...editingRisk, value: e.target.value })}
                                   />
-                                  <div className="flex mt-2 space-x-2">
+                                  <div className="flex gap-2 mt-2">
                                     <button
-                                      className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                      className="btn-3d btn-3d-primary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => {
                                         handleEditRisk(index, editingRisk.field as keyof Risk, editingRisk.value)
                                         setEditingRisk(null)
@@ -1844,7 +2085,8 @@ export default function Home() {
                                       Guardar
                                     </button>
                                     <button
-                                      className="bg-gray-300 px-2 py-1 rounded text-xs text-black"
+                                      className="btn-3d btn-3d-secondary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => setEditingRisk(null)}
                                     >
                                       Cancelar
@@ -1852,25 +2094,25 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="flex justify-between items-start">
-                                  <span>{risk.mitigation}</span>
+                                <div className="flex flex-col gap-1">
+                                  <span className="flex-1">{risk.mitigation}</span>
                                   <button
-                                    className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
-                                    onClick={() => setEditingRisk({ index, field: "mitigation", value: risk.mitigation })}
-                                    aria-label="Editar mitigación"
-                                    title="Editar"
+                                    className="btn-icon"
+                                    style={{ padding: "0.25rem", width: "32px", height: "32px" }}
+                                    onClick={() =>
+                                      setEditingRisk({ index, field: "mitigation", value: risk.mitigation })
+                                    }
                                   >
                                     <i className="bi bi-pencil"></i>
                                   </button>
                                 </div>
                               )}
                             </td>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-white text-center">
+                            <td>
                               <button
-                                className="p-1 text-primary-custom_drk hover:text-accent-custom transition-colors"
+                                className="btn-icon"
                                 onClick={() => handleDeleteRisk(index)}
-                                aria-label="Eliminar"
-                                title="Eliminar"
+                                style={{ color: "#f857a6" }}
                               >
                                 <i className="bi bi-trash"></i>
                               </button>
@@ -1885,33 +2127,43 @@ export default function Home() {
               {/* Pestaña de Casos de Prueba */}
               {activeTab === "testCases" && (
                 <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold">Casos de Prueba</h2>
-                    <div className="flex space-x-2">
-                      <ActionButton
-                        type="add"
-                        onClick={handleAddTestCase}
-                        label="Añadir Caso de Prueba"
-                        className="mr-2 btn bg-accent-custom hover:bg-primary-custom_drk text-white p-2 rounded-full shadow-sm"
-                      />
-                      <div className="flex">
-                        <button
-                          className={`px-3 py-1 rounded-l ${viewMode === "cards" ? "bg-primary-custom dark:bg-accent-custom text-white" : "bg-black-200"}`}
-                          onClick={() => setViewMode("cards")}
-                        >
-                          <i className="bi bi-grid mr-1"></i>
-                          <span className="hidden sm:inline">Tarjetas</span>
-                        </button>
-                        <button
-                          className={`px-3 py-1 rounded-r ${viewMode === "table" ? "bg-primary-custom dark:bg-accent-custom text-white" : "bg-black-200"}`}
-                          onClick={() => setViewMode("table")}
-                        >
-                          <i className="bi bi-table mr-1"></i>
-                          <span className="hidden sm:inline">Tabla</span>
-                        </button>
-                      </div>
+
+                  <h2 className="text-3xl font-bold flex items-center gap-3 text-white" style={{ marginTop: "30px" }}>
+                    <i className="bi bi-list-check" style={{ color: "#667eea" }}></i>
+                    Casos de Prueba
+                  </h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex">
+                      <button
+                        className={`btn-3d btn-3d-secondary btn-space ${viewMode === "cards"
+                          ? "btn-select"
+                          : ""
+                          }`}
+                        onClick={() => setViewMode("cards")}
+                      >
+                        <i className="bi bi-grid mr-1"></i>
+                        <span className="hidden sm:inline">Tarjetas</span>
+                      </button>
+                      <button
+                        className={`btn-3d btn-3d-secondary btn-space ${viewMode === "table"
+                          ? "btn-select"
+                          : ""
+                          }`}
+                        onClick={() => setViewMode("table")}
+                      >
+                        <i className="bi bi-table mr-1"></i>
+                        <span className="hidden sm:inline">Tabla</span>
+                      </button>
                     </div>
+                    <button
+                      className="btn-icon glow-on-hover"
+                      onClick={handleAddTestCase}
+                      title="Añadir Caso de Prueba"
+                    >
+                      <i className="bi bi-plus-lg"></i>
+                    </button>
                   </div>
+
 
                   {/* Vista de Tarjetas */}
                   {viewMode === "cards" && (
@@ -1919,27 +2171,32 @@ export default function Home() {
                       {testPlan.testCases.map((testCase, index) => (
                         <div
                           key={index}
-                          className="border rounded-lg p-4 bg-white/10 text-black dark:bg-gray-800/40 dark:text-six-custom backdrop-blur dark:border-gray-600 shadow-md hover:shadow-lg transition-shadow"
+                          className="border rounded-lg p-4 glass-card-inner p-4 rounded-xl"
                         >
-                          <div className="flex justify-between items-start mb-2">
+                          <div className="flex justify-between items-center mb-3">
                             <h3 className="font-bold">
                               TC-{index + 1}: {testCase.title}
                             </h3>
+
+                          </div>
+                          <div className="mb-2">
+                            <p className="text-sm font-semibold mb-1" style={{ color: "var(--text-secondary)" }}>
+                              Prioridad:
+                            </p>
                             <span
-                              className={`px-2 py-1 rounded text-xs ${testCase.priority === "Alta"
-                                ? "bg-red-100 text-red-800"
+                              className={`futuristic-badge ${testCase.priority === "Alta"
+                                ? "badge-danger"
                                 : testCase.priority === "Media"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-green-100 text-green-800"
+                                  ? "badge-warning"
+                                  : "badge-success"
                                 }`}
                             >
                               {testCase.priority}
                             </span>
                           </div>
-
                           <div className="mb-2">
                             <p className="text-sm font-medium">Tipo: {testCase.type}</p>
-                            <p className="text-sm">Automatizable: {testCase.automatable ? "Sí" : "No"}</p>
+
                           </div>
 
                           <div className="mb-2">
@@ -1964,98 +2221,49 @@ export default function Home() {
                             <p className="text-sm font-medium">Resultado Esperado:</p>
                             <p className="text-sm">{testCase.expectedResult}</p>
                           </div>
-
+                          <div className="mt-4 flex items-center gap-2">
+                            <p className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
+                              Automatizable:
+                            </p>
+                            {editingTestCase?.index === index && editingTestCase?.field === "automatable" ? (
+                              <label className="futuristic-toggle">
+                                <input
+                                  type="checkbox"
+                                  checked={editingTestCase?.value === true}
+                                  onChange={(e) =>
+                                    setEditingTestCase({
+                                      index,
+                                      field: "automatable",
+                                      value: e.target.checked,
+                                    })
+                                  }
+                                />
+                                <span className="toggle-slider"></span>
+                              </label>
+                            ) : (
+                              <i
+                                className={`bi ${testCase.automatable ? "bi-check-lg text-green-500" : "bi-x-lg text-red-500"}`}
+                              ></i>
+                            )}
+                          </div>
                           <div className="mt-2 flex flex-wrap gap-2">
                             <button
-                              className="text-primary-custom dark:text-accent-custom hover:bg-accent-custom hover:text-white dark:hover:text-white text-xs border border-primary-custom px-2 py-1 rounded dark:border-second_custome"
-                              onClick={() => {
+                              className="btn-icon"
+                              onClick={() =>
                                 setEditingTestCase({
                                   index,
-                                  field: "title",
-                                  value: testCase.title,
+                                  field: "all",
+                                  value: testCase,
                                 })
-                              }}
+                              }
                             >
-                              <i className="bi bi-pencil mr-1"></i>Título
-                            </button>
-
-                            <button
-                              className="text-primary-custom dark:text-accent-custom hover:bg-accent-custom hover:text-white dark:hover:text-white text-xs border border-primary-custom px-2 py-1 rounded dark:border-second_custome"
-                              onClick={() => {
-                                setEditingTestCase({
-                                  index,
-                                  field: "type",
-                                  value: testCase.type,
-                                })
-                              }}
-                            >
-                              <i className="bi bi-pencil mr-1"></i>Tipo
+                              <i className="bi bi-pencil"></i>
                             </button>
                             <button
-                              className="text-primary-custom dark:text-accent-custom hover:bg-accent-custom hover:text-white dark:hover:text-white text-xs border border-primary-custom px-2 py-1 rounded dark:border-second_custome"
-                              onClick={() => {
-                                setEditingTestCase({
-                                  index,
-                                  field: "automatable",
-                                  value: String(testCase.automatable),
-                                })
-                              }}
-                            >
-                              <i className="bi bi-pencil mr-1"></i>Automatizable
-                            </button>
-
-                            <button
-                              className="text-primary-custom dark:text-accent-custom hover:bg-accent-custom hover:text-white dark:hover:text-white text-xs border border-primary-custom px-2 py-1 rounded dark:border-second_custome"
-                              onClick={() => {
-                                setEditingTestCase({
-                                  index,
-                                  field: "priority",
-                                  value: testCase.priority,
-                                })
-                              }}
-                            >
-                              <i className="bi bi-pencil mr-1"></i>Prioridad
-                            </button>
-                            <button
-                              className="text-primary-custom dark:text-accent-custom hover:bg-accent-custom hover:text-white dark:hover:text-white text-xs border border-primary-custom px-2 py-1 rounded dark:border-second_custome"
-                              onClick={() => {
-                                setEditingTestCase({
-                                  index,
-                                  field: "preconditions",
-                                  value: testCase.preconditions,
-                                })
-                              }}
-                            >
-                              <i className="bi bi-pencil mr-1"></i>Precondiciones
-                            </button>
-                            <button
-                              className="text-primary-custom dark:text-accent-custom hover:bg-accent-custom hover:text-white dark:hover:text-white text-xs border border-primary-custom px-2 py-1 rounded dark:border-second_custome"
-                              onClick={() => {
-                                setEditingTestCase({
-                                  index,
-                                  field: "steps",
-                                  value: testCase.steps,
-                                })
-                              }}
-                            >
-                              <i className="bi bi-pencil mr-1"></i>Pasos
-                            </button>
-                            <button
-                              className="text-primary-custom dark:text-accent-custom hover:bg-accent-custom hover:text-white dark:hover:text-white text-xs border border-primary-custom px-2 py-1 rounded dark:border-second_custome"
-                              onClick={() => {
-                                setEditingTestCase({
-                                  index,
-                                  field: "expectedResult",
-                                  value: testCase.expectedResult,
-                                })
-                              }}
-                            >
-                              <i className="bi bi-pencil mr-1"></i>Resultado
-                            </button>
-                            <button
-                              className="hover:text-white hover:bg-accent-custom text-xs px-2 py-1 rounded"
+                              className="btn-icon"
                               onClick={() => handleDeleteTestCase(index)}
                               title="Eliminar"
+                              style={{ color: "#f857a6" }}
                             >
                               <i className="bi bi-trash"></i>
                             </button>
@@ -2068,64 +2276,67 @@ export default function Home() {
                   {/* Vista de Tabla */}
                   {viewMode === "table" && (
                     <div className="overflow-x-auto">
-                      <table className="w-full border-collapse">
+                      <table className="futuristic-table">
                         <thead>
-                          <tr className="bg-gray-100">
-                            <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">#</th>
-                            <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Título</th>
-                            <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Prioridad</th>
-                            <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Tipo</th>
-                            <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Automatizable</th>
-                            <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Acciones</th>
+                          <tr>
+                            <th>#</th>
+                            <th>Título</th>
+                            <th>Prioridad</th>
+                            <th>Tipo</th>
+                            <th>Automatizable</th>
+                            <th>Acciones</th>
                           </tr>
                         </thead>
                         <tbody>
                           {testPlan.testCases.map((testCase, index) => (
-                            <tr key={index} className={index % 2 === 0 ? "bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur" : "bg-gray-50 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur"}>
-                              <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">TC-{index + 1}</td>
-                              <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white" title={testCase.title}>
+                            <tr key={index}>
+                              <td className="font-bold">{index + 1}</td>
+                              <td title={testCase.title}>
                                 {testCase.title}
                               </td>
-                              <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">
+                              <td>
                                 <span
-                                  className={`px-2 py-1 rounded text-xs ${testCase.priority === "Alta"
-                                    ? "bg-red-100 text-red-800"
+                                  className={`futuristic-badge ${testCase.priority === "Alta"
+                                    ? "badge-danger"
                                     : testCase.priority === "Media"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-green-100 text-green-800"
+                                      ? "badge-warning"
+                                      : "badge-success"
                                     }`}
                                 >
                                   {testCase.priority}
                                 </span>
                               </td>
-                              <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">{testCase.type}</td>
-                              <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">{testCase.automatable ? "Sí" : "No"}</td>
-                              <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">
+                              <td>{testCase.type}</td>
+                              <td>{testCase.automatable ? "Sí" : "No"}</td>
+                              <td>
                                 <div className="flex space-x-2">
                                   <button
-                                    className="text-primary-custom dark:text-accent-custom hover:bg-accent-custom hover:text-white dark:hover:text-white text-xs px-2 py-1 rounded text-sm flex items-center"
+                                    className="btn-icon"
                                     onClick={() => setActiveTestCaseDetails(index)}
                                   >
-                                    <i className="bi bi-eye mr-1"></i>
+                                    <i className="bi bi-eye"></i>
                                   </button>
                                   <button
-                                    className="text-primary-custom dark:text-accent-custom hover:bg-accent-custom hover:text-white dark:hover:text-white text-xs px-2 py-1 rounded text-sm flex items-center"
-                                    onClick={() => {
+                                    className="btn-icon"
+                                    onClick={() =>
                                       setEditingTestCase({
                                         index,
-                                        field: "title",
-                                        value: testCase.title,
+                                        field: "all",
+                                        value: testCase,
                                       })
-                                    }}
+                                    }
                                   >
-                                    <i className="bi bi-pencil mr-1"></i>
+                                    <i className="bi bi-pencil"></i>
                                   </button>
                                   <button
-                                    className="text-primary-custom dark:text-accent-custom hover:bg-accent-custom hover:text-white dark:hover:text-white text-xs px-2 py-1 rounded text-sm flex items-center"
+                                    className="btn-icon"
                                     onClick={() => handleDeleteTestCase(index)}
+                                    title="Eliminar"
+                                    style={{ color: "#f857a6" }}
                                   >
-                                    <i className="bi bi-trash mr-1"></i>
+                                    <i className="bi bi-trash"></i>
                                   </button>
+
                                 </div>
                               </td>
                             </tr>
@@ -2139,36 +2350,41 @@ export default function Home() {
               {/* Pestaña de Estimación de Tiempos */}
               {activeTab === "time" && (
                 <div>
-                  <SectionHeader
-                    title="Estimación de Tiempos"
-                    onAdd={handleAddTimeEstimationPhase}
-                    addLabel="Añadir Fase"
-                  />
 
-                  <div className="overflow-x-auto mb-6">
-                    <table className="w-full border-collapse">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-3xl font-bold flex items-center gap-3 text-white">
+                      <i className="bi bi-clock" style={{ color: "#70fa9cff" }}></i>
+                      Estimación
+                    </h2>
+                    <button className="btn-icon glow-on-hover" onClick={handleAddTimeEstimationPhase} title="Añadir Fase">
+                      <i className="bi bi-plus-lg"></i>
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="futuristic-table">
                       <thead>
-                        <tr className="bg-gray-100">
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">#</th>
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Fase</th>
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Duración (días)</th>
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Recursos</th>
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Justificación</th>
-                          <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white text-center">Acciones</th>
+                        <tr>
+                          <th>#</th>
+                          <th>Fase</th>
+                          <th>Duración (días)</th>
+                          {/*<th>Recursos</th>*/}
+                          <th>Justificación</th>
+                          <th>Acciones</th>
                         </tr>
                       </thead>
                       <tbody>
                         {testPlan.timeEstimation.phases.map((phase, index) => (
-                          <tr key={index} className={index % 2 === 0 ? "bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur" : "bg-gray-50 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur"}>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">{index + 1}</td>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">
+                          <tr key={index}>
+                            <td className="font-bold">{index + 1}</td>
+                            <td>
                               {editingTimeEstimation &&
                                 editingTimeEstimation.index === index &&
                                 editingTimeEstimation.field === "name" ? (
                                 <div>
-                                  <input
-                                    type="text"
-                                    className="w-full p-1 border rounded bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
+                                  <textarea
+                                    className="futuristic-input"
+                                    style={{ minHeight: "80px" }}
                                     value={editingTimeEstimation.value as string}
                                     onChange={(e) =>
                                       setEditingTimeEstimation({ ...editingTimeEstimation, value: e.target.value })
@@ -2176,7 +2392,8 @@ export default function Home() {
                                   />
                                   <div className="flex mt-2 space-x-2">
                                     <button
-                                      className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                      className="btn-3d btn-3d-primary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => {
                                         handleEditTimeEstimation(
                                           index,
@@ -2189,7 +2406,8 @@ export default function Home() {
                                       Guardar
                                     </button>
                                     <button
-                                      className="bg-gray-300 text-black px-2 py-1 rounded text-xs"
+                                      className="btn-3d btn-3d-secondary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => setEditingTimeEstimation(null)}
                                     >
                                       Cancelar
@@ -2197,10 +2415,11 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-start gap-2">
                                   <span>{phase.name}</span>
                                   <button
-                                    className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                    className="btn-icon"
+                                    style={{ padding: "0.25rem", width: "32px", height: "32px" }}
                                     onClick={() => setEditingTimeEstimation({ index, field: "name", value: phase.name })}
                                     aria-label="Editar nombre"
                                     title="Editar"
@@ -2210,14 +2429,14 @@ export default function Home() {
                                 </div>
                               )}
                             </td>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">
+                            <td>
                               {editingTimeEstimation &&
                                 editingTimeEstimation.index === index &&
                                 editingTimeEstimation.field === "duration" ? (
                                 <div>
                                   <input
                                     type="number"
-                                    className="w-full p-1 border rounded bg-white dark:bg-black"
+                                    className="futuristic-input"
                                     value={editingTimeEstimation.value as number}
                                     onChange={(e) =>
                                       setEditingTimeEstimation({
@@ -2227,9 +2446,10 @@ export default function Home() {
                                     }
                                     min="1"
                                   />
-                                  <div className="flex mt-2 space-x-2">
+                                  <div className="flex gap-2 mt-2">
                                     <button
-                                      className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                      className="btn-3d btn-3d-primary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => {
                                         handleEditTimeEstimation(
                                           index,
@@ -2242,7 +2462,8 @@ export default function Home() {
                                       Guardar
                                     </button>
                                     <button
-                                      className="bg-gray-300 px-2 py-1 rounded text-xs text-black"
+                                      className="btn-3d btn-3d-secondary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => setEditingTimeEstimation(null)}
                                     >
                                       Cancelar
@@ -2250,10 +2471,11 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="flex justify-between items-center">
-                                  <span>{phase.duration}</span>
+                                <div className="flex justify-between items-start gap-2">
+                                  <span className="flex-1">{phase.duration}</span>
                                   <button
-                                    className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                    className="btn-icon"
+                                    style={{ padding: "0.25rem", width: "32px", height: "32px" }}
                                     onClick={() =>
                                       setEditingTimeEstimation({ index, field: "duration", value: phase.duration })
                                     }
@@ -2264,7 +2486,7 @@ export default function Home() {
                                 </div>
                               )}
                             </td>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">
+                            {/*<td className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">
                               {editingTimeEstimation &&
                                 editingTimeEstimation.index === index &&
                                 editingTimeEstimation.field === "resources" ? (
@@ -2313,22 +2535,24 @@ export default function Home() {
                                   </button>
                                 </div>
                               )}
-                            </td>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur border dark:border-white">
+                            </td>*/}
+                            <td>
                               {editingTimeEstimation &&
                                 editingTimeEstimation.index === index &&
                                 editingTimeEstimation.field === "justification" ? (
                                 <div>
                                   <textarea
-                                    className="w-full p-1 border rounded bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
+                                    className="futuristic-input"
+                                    style={{ minHeight: "80px" }}
                                     value={editingTimeEstimation.value as string}
                                     onChange={(e) =>
                                       setEditingTimeEstimation({ ...editingTimeEstimation, value: e.target.value })
                                     }
                                   />
-                                  <div className="flex mt-2 space-x-2">
+                                  <div className="flex gap-2 mt-2">
                                     <button
-                                      className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                      className="btn-3d btn-3d-primary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => {
                                         handleEditTimeEstimation(
                                           index,
@@ -2341,7 +2565,8 @@ export default function Home() {
                                       Guardar
                                     </button>
                                     <button
-                                      className="bg-gray-300 px-2 py-1 rounded text-xs text-black"
+                                      className="btn-3d btn-3d-secondary"
+                                      style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                       onClick={() => setEditingTimeEstimation(null)}
                                     >
                                       Cancelar
@@ -2349,10 +2574,11 @@ export default function Home() {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="flex justify-between items-start">
-                                  <span>{phase.justification}</span>
+                                <div className="flex justify-between items-start gap-2">
+                                  <span className="flex-1">{phase.justification}</span>
                                   <button
-                                    className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                    className="btn-icon"
+                                    style={{ padding: "0.25rem", width: "32px", height: "32px" }}
                                     onClick={() =>
                                       setEditingTimeEstimation({
                                         index,
@@ -2367,12 +2593,13 @@ export default function Home() {
                                 </div>
                               )}
                             </td>
-                            <td className="border p-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-white text-center">
+                            <td>
                               {!(editingTimeEstimation && editingTimeEstimation.index === index) && (
                                 <button
-                                  className="p-1 hover:text-accent-custom transition-colors"
+                                  className="btn-icon"
                                   onClick={() => handleDeleteTimeEstimationPhase(index)}
                                   aria-label="Eliminar"
+                                  style={{ color: "#f857a6" }}
                                 >
                                   <i className="bi bi-trash"></i>
                                 </button>
@@ -2382,11 +2609,12 @@ export default function Home() {
                         ))}
                       </tbody>
                       <tfoot>
-                        <tr className="bg-gray-100 bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-white">
-                          <td colSpan={2} className="border p-2 text-right font-bold bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-white">
+                        <tr className="glass-card">
+                          <td colSpan={2} className="text-right font-bold"
+                          >
                             Tiempo total estimado:
                           </td>
-                          <td colSpan={3} className="border p-2 bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur border dark:border-white">
+                          <td colSpan={3}>
                             {testPlan.timeEstimation.totalDays} días
                           </td>
                         </tr>
@@ -2394,84 +2622,107 @@ export default function Home() {
                     </table>
                   </div>
 
-                  <div className="bg-white/10 text-black dark:bg-black dark:text-six-custom backdrop-blur">
-                    <SectionHeader
-                      title="Factores Considerados"
-                      onAdd={handleAddTimeEstimationFactor}
-                      addLabel="Añadir Factor"
-                    />
-                    <ul className="space-y-2">
-                      
-                      {testPlan.timeEstimation.factors.map((factor, index) => (
-                        <ListItem
-                        
-                          key={index}
-                          onEdit={() => setEditingTimeEstimationFactor({ index, value: factor })}
-                          onDelete={() => handleDeleteTimeEstimationFactor(index)}
-                          icon="bi-check-circle"
-                          iconColor="text-accent-custom"
-                        >
-                          {editingTimeEstimationFactor && editingTimeEstimationFactor.index === index ? (
-                            <div className="flex-1">
-                              <textarea
-                                className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
-                                value={editingTimeEstimationFactor.value}
-                                onChange={(e) => setEditingTimeEstimationFactor({ index, value: e.target.value })}
-                              />
-                              <div className="flex mt-2 space-x-2">
-                                <button
-                                  className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
-                                  onClick={() => {
-                                    handleEditTimeEstimationFactor(index, editingTimeEstimationFactor.value)
-                                    setEditingTimeEstimationFactor(null)
-                                  }}
-                                >
-                                  Guardar
-                                </button>
-                                <button
-                                  className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
-                                  onClick={() => setEditingTimeEstimationFactor(null)}
-                                >
-                                  Cancelar
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            factor
-                          )}
-                        </ListItem>
-                      ))}
-                      
-                    </ul>
+                  <div className="flex items-center justify-between mb-6"
+                    style={{ marginTop: "100px" }}>
+                    <h2 className="text-3xl font-bold flex items-center gap-3 text-white">
+                      <i className="bi bi-node-plus" style={{ color: "#70fa9cff" }}></i>
+                      Factores Considerados
+                    </h2>
+                    <button className="btn-icon glow-on-hover" onClick={handleAddTimeEstimationFactor} title="Añadir Factor">
+                      <i className="bi bi-plus-lg"></i>
+                    </button>
                   </div>
+
+                  <div className="space-y-3">
+                    {testPlan.timeEstimation.factors.map((factor, index) => (
+                      <div key={index} className="futuristic-list-item">
+                        <div className="futuristic-list-icon" style={{ background: "var(--success-gradient)" }}>
+                          <i className="bi-check-circle"></i>
+                        </div>
+                        {editingTimeEstimationFactor && editingTimeEstimationFactor.index === index ? (
+                          <div className="flex-1">
+                            <textarea
+                              className="futuristic-input futuristic-textarea"
+                              value={editingTimeEstimationFactor.value}
+                              onChange={(e) => setEditingTimeEstimationFactor({ index, value: e.target.value })}
+                            />
+                            <div className="flex gap-2 mt-3">
+                              <button
+                                className="btn-3d btn-3d-primary"
+                                onClick={() => {
+                                  handleEditTimeEstimationFactor(index, editingTimeEstimationFactor.value)
+                                  setEditingTimeEstimationFactor(null)
+                                }}
+                              >
+                                <i className="bi bi-check2"></i>
+                                Guardar
+                              </button>
+                              <button className="btn-3d btn-3d-secondary" onClick={() => setEditingTimeEstimationFactor(null)}>
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <span className="flex-1 font-medium" style={{ color: "var(--text-primary)" }}>
+                              {factor}
+                            </span>
+                            <div className="flex gap-2">
+                              <button
+                                className="btn-icon"
+                                onClick={() => setEditingTimeEstimationFactor({ index, value: factor })}
+                              >
+                                <i className="bi bi-pencil"></i>
+                              </button>
+                              <button
+                                className="btn-icon"
+                                onClick={() => handleDeleteTimeEstimationFactor(index)}
+                                style={{ color: "#f857a6" }}
+                              >
+                                <i className="bi bi-trash"></i>
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
                 </div>
               )}
+
+              {/* Pestaña de Estrategias*/}
               {activeTab === "strategy" && (
                 <div>
-                  <h2 className="text-2xl font-bold mb-4">Estrategia de Prueba</h2>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-3xl font-bold flex items-center gap-3 text-white">
+                      <i className="bi bi-lightbulb" style={{ color: "#667eea" }}></i>
+                      Estrategia de Pruebas
+                    </h2>
+                  </div>
 
                   <div className="mb-6">
                     <h3 className="text-xl font-semibold mb-2">Enfoque General</h3>
                     {editingStrategy && editingStrategy.field === "approach" ? (
                       <div>
                         <textarea
-                          className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
+                          className="futuristic-input"
                           value={editingStrategy.value}
                           onChange={(e) => setEditingStrategy({ field: "approach", value: e.target.value })}
                           rows={5}
                         />
                         <div className="flex mt-2 space-x-2">
                           <button
-                            className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
+                            className="btn-3d btn-3d-primary"
                             onClick={() => {
                               handleEditStrategy("approach", editingStrategy.value)
                               setEditingStrategy(null)
                             }}
                           >
-                            Guardar
+                            <i className="bi bi-check2"></i>Guardar
                           </button>
                           <button
-                            className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
+                            className="btn-3d btn-3d-secondary"
                             onClick={() => setEditingStrategy(null)}
                           >
                             Cancelar
@@ -2479,10 +2730,10 @@ export default function Home() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex justify-between items-start">
-                        <p className="text-gray-700 dark:text-primary-custom_drk">{testPlan.strategy.approach}</p>
+                      <div className="glass-card">
+                        <p style={{ color: "var(--text-primary)" }}>{testPlan.strategy.approach}</p>
                         <button
-                          className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                          className="btn-icon mt-2"
                           onClick={() => setEditingStrategy({ field: "approach", value: testPlan.strategy.approach })}
                           aria-label="Editar Enfoque"
                           title="Editar"
@@ -2493,266 +2744,287 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div className="mb-6">
-                    <SectionHeader
-                      title="Técnicas de Prueba"
-                      onAdd={handleAddStrategyTechnique}
-                      addLabel="Añadir Técnica"
-                    />
-                    <div className="space-y-4">
-                      {testPlan.strategy.techniques.map((technique, index) => (
-                        <div key={index} className="border rounded-lg p-4 bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600 shadow-sm">
-                          {/* Nombre de la técnica */}
-                          <div className="mb-3">
-                            {editingStrategyTechnique &&
-                              editingStrategyTechnique.index === index &&
-                              editingStrategyTechnique.field === "name" ? (
-                              <div>
-                                <label className="block text-sm font-medium mb-1">Nombre de la técnica</label>
-                                <input
-                                  type="text"
-                                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
-                                  value={editingStrategyTechnique.value}
-                                  onChange={(e) =>
-                                    setEditingStrategyTechnique({ ...editingStrategyTechnique, value: e.target.value })
-                                  }
-                                />
-                                <div className="flex mt-2 space-x-2">
-                                  <button
-                                    className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
-                                    onClick={() => {
-                                      handleEditStrategyTechnique(
-                                        index,
-                                        editingStrategyTechnique.field,
-                                        editingStrategyTechnique.value,
-                                      )
-                                    }}
-                                  >
-                                    Guardar
-                                  </button>
-                                  <button
-                                    className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
-                                    onClick={() => setEditingStrategyTechnique(null)}
-                                  >
-                                    Cancelar
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex justify-between items-center dark:text-primary-custom_drk">
-                                <h4 className="font-bold dark:text-primary-custom_drk">{technique.name}</h4>
-                                <div className="flex space-x-2">
-                                  <button
-                                    className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
-                                    onClick={() =>
-                                      setEditingStrategyTechnique({ index, field: "name", value: technique.name })
-                                    }
-                                    aria-label="Editar Nombre"
-                                    title="Editar"
-                                  >
-                                    <i className="bi bi-pencil"></i>
-                                  </button>
-                                  <button
-                                    className="p-1 hover:text-accent-custom transition-colors"
-                                    onClick={() => handleDeleteStrategyTechnique(index)}
-                                    aria-label="Eliminar Técnica"
-                                    title="Eliminar"
-                                  >
-                                    <i className="bi bi-trash"></i>
-                                  </button>
-                                </div>
-                              </div>
-                            )}
+                  {/* Técnicas */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-xl font-bold text-white">Técnicas</h3>
+                      <button
+                        className="btn-icon glow-on-hover"
+                        onClick={handleAddStrategyTechnique}
+                        title="Añadir Técnica"
+                      >
+                        <i className="bi bi-plus-lg"></i>
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {testPlan.strategy.techniques.map((tech, index) => (
+                        <div key={index} className="futuristic-list-item">
+                          <div
+                            className="futuristic-list-icon"
+                            style={{ background: "var(--accent-gradient)" }}
+                          >
+                            <i className="bi bi-lightbulb"></i>
                           </div>
 
-                          {/* Descripción de la técnica */}
-                          <div>
-                            {editingStrategyTechnique &&
-                              editingStrategyTechnique.index === index &&
-                              editingStrategyTechnique.field === "description" ? (
-                              <div>
-                                <label className="block text-sm font-medium mb-1">Descripción</label>
-                                <textarea
-                                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
-                                  value={editingStrategyTechnique.value}
-                                  onChange={(e) =>
-                                    setEditingStrategyTechnique({ ...editingStrategyTechnique, value: e.target.value })
-                                  }
-                                  rows={3}
-                                />
-                                <div className="flex mt-2 space-x-2">
-                                  <button
-                                    className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
-                                    onClick={() => {
-                                      handleEditStrategyTechnique(
-                                        index,
-                                        editingStrategyTechnique.field,
-                                        editingStrategyTechnique.value,
-                                      )
-                                      setEditingStrategyTechnique(null)
-                                    }}
-                                  >
-                                    Guardar
-                                  </button>
-                                  <button
-                                    className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
-                                    onClick={() => setEditingStrategyTechnique(null)}
-                                  >
-                                    Cancelar
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex justify-between items-start">
-                                <p className="text-gray-700 dark:text-primary-custom_drk">{technique.description}</p>
+                          {editingStrategyTechnique && editingStrategyTechnique.index === index ? (
+                            <div className="flex-1">
+                              {/* Campo nombre */}
+                              <input
+                                type="text"
+                                className="futuristic-input mb-2"
+                                value={editingStrategyTechnique.name}
+                                placeholder="Nombre de la técnica"
+                                onChange={(e) =>
+                                  setEditingStrategyTechnique({
+                                    ...editingStrategyTechnique,
+                                    name: e.target.value,
+                                  })
+                                }
+                              />
+
+                              {/* Campo descripción */}
+                              <textarea
+                                className="futuristic-input futuristic-textarea"
+                                value={editingStrategyTechnique.description}
+                                placeholder="Descripción de la técnica"
+                                onChange={(e) =>
+                                  setEditingStrategyTechnique({
+                                    ...editingStrategyTechnique,
+                                    description: e.target.value,
+                                  })
+                                }
+                              />
+
+                              <div className="flex gap-2 mt-3">
                                 <button
-                                  className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                  className="btn-3d btn-3d-primary"
+                                  onClick={() => {
+                                    handleEditStrategyTechnique(
+                                      index,
+                                      editingStrategyTechnique.name,
+                                      editingStrategyTechnique.description
+                                    )
+                                    setEditingStrategyTechnique(null)
+                                  }}
+                                >
+                                  <i className="bi bi-check2"></i> Guardar
+                                </button>
+                                <button
+                                  className="btn-3d btn-3d-secondary"
+                                  onClick={() => setEditingStrategyTechnique(null)}
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex-1">
+                                <h4 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+                                  {tech.name}
+                                </h4>
+                                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                                  {tech.description}
+                                </p>
+                              </div>
+
+                              <div className="flex gap-2">
+                                <button
+                                  className="btn-icon"
                                   onClick={() =>
                                     setEditingStrategyTechnique({
                                       index,
-                                      field: "description",
-                                      value: technique.description,
+                                      name: tech.name,
+                                      description: tech.description,
                                     })
                                   }
-                                  aria-label="Editar Descripción"
                                 >
                                   <i className="bi bi-pencil"></i>
                                 </button>
+                                <button
+                                  className="btn-icon"
+                                  onClick={() => handleDeleteStrategyTechnique(index)}
+                                  style={{ color: "#f857a6" }}
+                                >
+                                  <i className="bi bi-trash"></i>
+                                </button>
                               </div>
-                            )}
-                          </div>
+                            </>
+                          )}
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/10 text-black dark:bg-black dark:text-six-custom backdrop-blur">
-                    <div>
-                      <SectionHeader
-                        title="Criterios de Entrada"
-                        onAdd={handleAddEntryCriteria}
-                        addLabel="Añadir Criterio"
-                      />
-                      <ul className="space-y-2">
-                        {testPlan.strategy.entryCriteria.map((criteria, index) => (
-                          <ListItem
-                            key={index}
-                            onEdit={() => setEditingEntryCriteria({ index, value: criteria })}
-                            onDelete={() => handleDeleteEntryCriteria(index)}
-                            icon="bi-arrow-right-circle"
-                            iconColor="text-accent-custom"
+                  <div className="w-full">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Criterios de Entrada */}
+                      <div className="space-y-2 py-10">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-xl font-bold text-white">Criterios de Entrada</h3>
+                          <button
+                            className="btn-icon glow-on-hover"
+                            onClick={handleAddEntryCriteria}
+                            title="Añadir Criterio de Entrada"
                           >
-                            {editingEntryCriteria && editingEntryCriteria.index === index ? (
-                              <div className="flex-1">
-                                <textarea
-                                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
-                                  value={editingEntryCriteria.value}
-                                  onChange={(e) => setEditingEntryCriteria({ index, value: e.target.value })}
-                                />
-                                <div className="flex mt-2 space-x-2">
-                                  <button
-                                    className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
-                                    onClick={() => {
-                                      handleEditEntryCriteria(index, editingEntryCriteria.value)
-                                      setEditingEntryCriteria(null)
-                                    }}
-                                  >
-                                    Guardar
-                                  </button>
-                                  <button
-                                    className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
-                                    onClick={() => setEditingEntryCriteria(null)}
-                                  >
-                                    Cancelar
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              criteria
-                            )}
-                          </ListItem>
-                        ))}
-                      </ul>
-                    </div>
+                            <i className="bi bi-plus-lg"></i>
+                          </button>
+                        </div>
 
-                    <div>
-                      <SectionHeader
-                        title="Criterios de Salida"
-                        onAdd={handleAddExitCriteria}
-                        addLabel="Añadir Criterio"
-                      />
-                      <ul className="space-y-2">
-                        {testPlan.strategy.exitCriteria.map((criteria, index) => (
-                          <ListItem
-                            key={index}
-                            onEdit={() => setEditingExitCriteria({ index, value: criteria })}
-                            onDelete={() => handleDeleteExitCriteria(index)}
-                            icon="bi-box-arrow-right"
-                            iconColor="text-accent-custom"
-                          >
-                            {editingExitCriteria && editingExitCriteria.index === index ? (
-                              <div className="flex-1">
-                                <textarea
-                                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
-                                  value={editingExitCriteria.value}
-                                  onChange={(e) => setEditingExitCriteria({ index, value: e.target.value })}
-                                />
-                                <div className="flex mt-2 space-x-2">
-                                  <button
-                                    className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
-                                    onClick={() => {
-                                      handleEditExitCriteria(index, editingExitCriteria.value)
-                                      setEditingExitCriteria(null)
-                                    }}
-                                  >
-                                    Guardar
-                                  </button>
-                                  <button
-                                    className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
-                                    onClick={() => setEditingExitCriteria(null)}
-                                  >
-                                    Cancelar
-                                  </button>
-                                </div>
+                        <div className="space-y-3">
+                          {testPlan.strategy.entryCriteria.map((criteria, index) => (
+                            <div key={index} className="futuristic-list-item">
+                              <div className="futuristic-list-icon" style={{ background: "var(--success-gradient)" }}>
+                                <i className="bi bi-check2-circle"></i>
                               </div>
-                            ) : (
-                              criteria
-                            )}
-                          </ListItem>
-                        ))}
-                      </ul>
+
+                              {editingEntryCriteria && editingEntryCriteria.index === index ? (
+                                <div className="flex-1">
+                                  <textarea
+                                    className="futuristic-input futuristic-textarea"
+                                    value={editingEntryCriteria.value}
+                                    onChange={(e) => setEditingEntryCriteria({ index, value: e.target.value })}
+                                  />
+                                  <div className="flex gap-2 mt-3">
+                                    <button
+                                      className="btn-3d btn-3d-primary"
+                                      onClick={() => {
+                                        handleEditEntryCriteria(index, editingEntryCriteria.value)
+                                        setEditingEntryCriteria(null)
+                                      }}
+                                    >
+                                      <i className="bi bi-check2"></i> Guardar
+                                    </button>
+                                    <button className="btn-3d btn-3d-secondary" onClick={() => setEditingEntryCriteria(null)}>
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <span className="flex-1 font-medium" style={{ color: "var(--text-primary)" }}>
+                                    {criteria}
+                                  </span>
+                                  <div className="flex gap-2">
+                                    <button className="btn-icon" onClick={() => setEditingEntryCriteria({ index, value: criteria })}>
+                                      <i className="bi bi-pencil"></i>
+                                    </button>
+                                    <button className="btn-icon" onClick={() => handleDeleteEntryCriteria(index)} style={{ color: "#f857a6" }}>
+                                      <i className="bi bi-trash"></i>
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/*Criterios de Salida */}
+                      <div className="space-y-2 py-10">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-xl font-bold text-white">Criterios de Salida</h3>
+                          <button
+                            className="btn-icon glow-on-hover"
+                            onClick={handleAddExitCriteria}
+                            title="Añadir Criterio de Salida"
+                          >
+                            <i className="bi bi-plus-lg"></i>
+                          </button>
+                        </div>
+
+                        <div className="space-y-3">
+                          {testPlan.strategy.exitCriteria.map((criteria, index) => (
+                            <div key={index} className="futuristic-list-item">
+                              <div className="futuristic-list-icon" style={{ background: "var(--danger-gradient)" }}>
+                                <i className="bi bi-flag-fill"></i>
+                              </div>
+
+                              {editingExitCriteria && editingExitCriteria.index === index ? (
+                                <div className="flex-1">
+                                  <textarea
+                                    className="futuristic-input futuristic-textarea"
+                                    value={editingExitCriteria.value}
+                                    onChange={(e) => setEditingExitCriteria({ index, value: e.target.value })}
+                                  />
+                                  <div className="flex gap-2 mt-3">
+                                    <button
+                                      className="btn-3d btn-3d-primary"
+                                      onClick={() => {
+                                        handleEditExitCriteria(index, editingExitCriteria.value)
+                                        setEditingExitCriteria(null)
+                                      }}
+                                    >
+                                      <i className="bi bi-check2"></i> Guardar
+                                    </button>
+                                    <button className="btn-3d btn-3d-secondary" onClick={() => setEditingExitCriteria(null)}>
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <span className="flex-1 font-medium" style={{ color: "var(--text-primary)" }}>
+                                    {criteria}
+                                  </span>
+                                  <div className="flex gap-2">
+                                    <button className="btn-icon" onClick={() => setEditingExitCriteria({ index, value: criteria })}>
+                                      <i className="bi bi-pencil"></i>
+                                    </button>
+                                    <button className="btn-icon" onClick={() => handleDeleteExitCriteria(index)} style={{ color: "#f857a6" }}>
+                                      <i className="bi bi-trash"></i>
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
+
               {/* Pestaña de Entorno */}
               {activeTab === "environment" && (
                 <div>
-                  <h2 className="text-2xl font-bold mb-4 text-primary-custom dark:text-primary-custom_drk">Entorno y Datos de Prueba</h2>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-3xl font-bold flex items-center gap-3 text-white">
+                      <i className="bi bi-hdd-stack" style={{ color: "#667eea" }}></i>
+                      Entorno y Datos de Prueba
+                    </h2>
+                  </div>
 
                   <div className="mb-6">
-                    <SectionHeader title="Entornos Requeridos" onAdd={handleAddEnvironment} addLabel="Añadir Entorno" />
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-bold mb-3 text-white">Entornos Requeridos</h3>
+                      <button className="btn-icon glow-on-hover" onClick={handleAddEnvironment} title="Añadir Entorno">
+                        <i className="bi bi-plus-lg"></i>
+                      </button>
+                    </div>
                     <div className="overflow-x-auto">
-                      <table className="w-full border-collapse">
+                      <table className="futuristic-table">
                         <thead>
-                          <tr className="bg-gray-100">
-                            <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur backdrop-blur border dark:border-gray-600 text-center">Entorno</th>
-                            <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur backdrop-blur border dark:border-gray-600 text-center">Propósito</th>
-                            <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur backdrop-blur border dark:border-gray-600 text-center">Configuración</th>
-                            <th className="border p-2 bg-white/60 text-black dark:bg-black dark:text-six-custom backdrop-blur backdrop-blur border dark:border-gray-600 text-center">Acciones</th>
+                          <tr>
+                            <th>Entorno</th>
+                            <th>Propósito</th>
+                            <th>Configuración</th>
+                            <th>Acciones</th>
                           </tr>
                         </thead>
                         <tbody>
                           {testPlan.environment.environments.map((env, index) => (
-                            <tr key={index} className={index % 2 === 0 ? "bg-white/60 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur" : "bg-gray-50 text-black dark:bg-black/10 dark:text-six-custom backdrop-blur"}>
-                              <td className="border p-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-white">
+                            <tr key={index}>
+                              <td>
                                 {editingEnvironment &&
                                   editingEnvironment.index === index &&
                                   editingEnvironment.field === "name" ? (
                                   <div>
-                                    <input
-                                      type="text"
-                                      className="w-full p-1 border rounded bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
+                                    <textarea
+                                      className="futuristic-input"
+                                      style={{ minHeight: "80px" }}
                                       value={editingEnvironment.value}
                                       onChange={(e) =>
                                         setEditingEnvironment({ ...editingEnvironment, value: e.target.value })
@@ -2760,7 +3032,8 @@ export default function Home() {
                                     />
                                     <div className="flex mt-2 space-x-2">
                                       <button
-                                        className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                        className="btn-3d btn-3d-primary"
+                                        style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                         onClick={() => {
                                           handleEditEnvironment(index, editingEnvironment.field, editingEnvironment.value)
                                           setEditingEnvironment(null)
@@ -2769,7 +3042,8 @@ export default function Home() {
                                         Guardar
                                       </button>
                                       <button
-                                        className="bg-gray-300 px-2 py-1 rounded text-xs text-black"
+                                        className="btn-3d btn-3d-secondary"
+                                        style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                         onClick={() => setEditingEnvironment(null)}
                                       >
                                         Cancelar
@@ -2777,10 +3051,11 @@ export default function Home() {
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="flex justify-between items-center">
-                                    <span>{env.name}</span>
+                                  <div className="flex justify-between items-start gap-2">
+                                    <span className="flex-1">{env.name}</span>
                                     <button
-                                      className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                      className="btn-icon"
+                                      style={{ padding: "0.25rem", width: "32px", height: "32px" }}
                                       onClick={() => setEditingEnvironment({ index, field: "name", value: env.name })}
                                       aria-label="Editar nombre"
                                     >
@@ -2789,13 +3064,14 @@ export default function Home() {
                                   </div>
                                 )}
                               </td>
-                              <td className="border p-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-white">
+                              <td>
                                 {editingEnvironment &&
                                   editingEnvironment.index === index &&
                                   editingEnvironment.field === "purpose" ? (
                                   <div>
                                     <textarea
-                                      className="w-full p-1 border rounded bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
+                                      className="futuristic-input"
+                                      style={{ minHeight: "80px" }}
                                       value={editingEnvironment.value}
                                       onChange={(e) =>
                                         setEditingEnvironment({ ...editingEnvironment, value: e.target.value })
@@ -2803,7 +3079,8 @@ export default function Home() {
                                     />
                                     <div className="flex mt-2 space-x-2">
                                       <button
-                                        className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                        className="btn-3d btn-3d-primary"
+                                        style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                         onClick={() => {
                                           handleEditEnvironment(index, editingEnvironment.field, editingEnvironment.value)
                                           setEditingEnvironment(null)
@@ -2812,7 +3089,8 @@ export default function Home() {
                                         Guardar
                                       </button>
                                       <button
-                                        className="bg-gray-300 px-2 py-1 rounded text-xs text-black"
+                                        className="btn-3d btn-3d-secondary"
+                                        style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                         onClick={() => setEditingEnvironment(null)}
                                       >
                                         Cancelar
@@ -2821,9 +3099,10 @@ export default function Home() {
                                   </div>
                                 ) : (
                                   <div className="flex justify-between items-start">
-                                    <span>{env.purpose}</span>
+                                    <span className="flex-1">{env.purpose}</span>
                                     <button
-                                      className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                      className="btn-icon"
+                                      style={{ padding: "0.25rem", width: "32px", height: "32px" }}
                                       onClick={() =>
                                         setEditingEnvironment({ index, field: "purpose", value: env.purpose })
                                       }
@@ -2834,13 +3113,14 @@ export default function Home() {
                                   </div>
                                 )}
                               </td>
-                              <td className="border p-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-white">
+                              <td>
                                 {editingEnvironment &&
                                   editingEnvironment.index === index &&
                                   editingEnvironment.field === "configuration" ? (
                                   <div>
                                     <textarea
-                                      className="w-full p-1 border rounded bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
+                                      className="futuristic-input"
+                                      style={{ minHeight: "80px" }}
                                       value={editingEnvironment.value}
                                       onChange={(e) =>
                                         setEditingEnvironment({ ...editingEnvironment, value: e.target.value })
@@ -2848,7 +3128,8 @@ export default function Home() {
                                     />
                                     <div className="flex mt-2 space-x-2">
                                       <button
-                                        className="bg-primary-custom text-white px-2 py-1 rounded text-xs"
+                                        className="btn-3d btn-3d-primary"
+                                        style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                         onClick={() => {
                                           handleEditEnvironment(index, editingEnvironment.field, editingEnvironment.value)
                                           setEditingEnvironment(null)
@@ -2857,7 +3138,8 @@ export default function Home() {
                                         Guardar
                                       </button>
                                       <button
-                                        className="bg-gray-300 px-2 py-1 rounded text-xs text-black"
+                                        className="btn-3d btn-3d-secondary"
+                                        style={{ fontSize: "0.75rem", padding: "0.5rem 1rem" }}
                                         onClick={() => setEditingEnvironment(null)}
                                       >
                                         Cancelar
@@ -2866,9 +3148,9 @@ export default function Home() {
                                   </div>
                                 ) : (
                                   <div className="flex justify-between items-start">
-                                    <span>{env.configuration}</span>
+                                    <span className="flex-1">{env.configuration}</span>
                                     <button
-                                      className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                      className="btn-icon"
                                       onClick={() =>
                                         setEditingEnvironment({ index, field: "configuration", value: env.configuration })
                                       }
@@ -2879,11 +3161,12 @@ export default function Home() {
                                   </div>
                                 )}
                               </td>
-                              <td className="border p-2 bg-white/60 text-black dark:bg-black/60 dark:text-six-custom backdrop-blur border dark:border-white">
+                              <td>
                                 {!(editingEnvironment && editingEnvironment.index === index) && (
                                   <button
-                                    className="p-1 hover:text-accent-custom transition-colors"
+                                    className="btn-icon"
                                     onClick={() => handleDeleteEnvironment(index)}
+                                    style={{ color: "#f857a6" }}
                                     aria-label="Eliminar"
                                   >
                                     <i className="bi bi-trash"></i>
@@ -2898,26 +3181,36 @@ export default function Home() {
                   </div>
 
                   <div className="mb-6">
-                    <SectionHeader title="Datos de Prueba" onAdd={handleAddTestData} addLabel="Añadir Dato" />
-                    <ul className="space-y-2  text-black dark:text-six-custom">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-xl font-bold text-white">Datos de Prueba</h3>
+                      <button
+                        className="btn-icon glow-on-hover"
+                        onClick={handleAddTestData}
+                        title="Añadir Dato"
+                      >
+                        <i className="bi bi-plus-lg"></i>
+                      </button>
+                    </div>
+                    <div className="space-y-3">
                       {testPlan.environment.testData.map((data, index) => (
-                        <ListItem
+                        <div
                           key={index}
-                          onEdit={() => setEditingTestData({ index, value: data })}
-                          onDelete={() => handleDeleteTestData(index)}
-                          icon="bi-database"
-                          iconColor="text-accent-custom"
-                        >
+                          className="futuristic-list-item">
+                          <div className="futuristic-list-icon"
+                            style={{ background: "var(--warning-gradient)" }}>
+                            <i className="bi bi-database"></i>
+                          </div>
+
                           {editingTestData && editingTestData.index === index ? (
                             <div className="flex-1">
                               <textarea
-                                className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black dark:text-white backdrop-blur border dark:border-gray-600"
+                                className="futuristic-input futuristic-textarea"
                                 value={editingTestData.value}
                                 onChange={(e) => setEditingTestData({ index, value: e.target.value })}
                               />
                               <div className="flex mt-2 space-x-2">
                                 <button
-                                  className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
+                                  className="btn-3d btn-3d-primary"
                                   onClick={() => {
                                     handleEditTestData(index, editingTestData.value)
                                     setEditingTestData(null)
@@ -2926,7 +3219,7 @@ export default function Home() {
                                   Guardar
                                 </button>
                                 <button
-                                  className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
+                                  className="btn-3d btn-3d-secondary"
                                   onClick={() => setEditingTestData(null)}
                                 >
                                   Cancelar
@@ -2934,32 +3227,60 @@ export default function Home() {
                               </div>
                             </div>
                           ) : (
-                            data
+                            <>
+                              <span className="flex-1 font-medium" style={{ color: "var(--text-primary)" }}>
+                                {data}
+                              </span>
+                              <div className="flex gap-2">
+                                <button
+                                  className="btn-icon"
+                                  onClick={() => setEditingTestData({ index, value: data })}
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                                <button
+                                  className="btn-icon"
+                                  onClick={() => handleDeleteTestData(index)}
+                                  style={{ color: "#f857a6" }}
+                                >
+                                  <i className="bi bi-trash"></i>
+                                </button>
+                              </div>
+                            </>
+
                           )}
-                        </ListItem>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
 
                   <div>
-                    <SectionHeader title="Herramientas" onAdd={handleAddTool} addLabel="Añadir Herramienta" />
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-xl font-bold text-white">Herramientas</h3>
+                      <button
+                        className="btn-icon glow-on-hover"
+                        onClick={handleAddTool}
+                        title="Añadir Herramienta"
+                      >
+                        <i className="bi bi-plus-lg"></i>
+                      </button>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {testPlan.environment.tools.map((tool, index) => (
-                        <div key={index} className="border rounded-lg p-4 bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600 shadow-sm">
+                        <div key={index} className="p-4 glass-card fade-in-up">
                           {/* Nombre de la herramienta */}
                           <div className="mb-3">
                             {editingTool && editingTool.index === index && editingTool.field === "name" ? (
                               <div>
                                 <label className="block text-sm font-medium mb-1">Nombre de la herramienta</label>
-                                <input
-                                  type="text"
-                                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
+                                <textarea
+                                  className="futuristic-input futuristic-textarea"
                                   value={editingTool.value}
                                   onChange={(e) => setEditingTool({ ...editingTool, value: e.target.value })}
                                 />
                                 <div className="flex mt-2 space-x-2">
                                   <button
-                                    className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
+                                    className="btn-3d btn-3d-primary"
                                     onClick={() => {
                                       handleEditTool(index, editingTool.field, editingTool.value)
                                       setEditingTool(null)
@@ -2968,7 +3289,7 @@ export default function Home() {
                                     Guardar
                                   </button>
                                   <button
-                                    className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
+                                    className="btn-3d btn-3d-secondary"
                                     onClick={() => setEditingTool(null)}
                                   >
                                     Cancelar
@@ -2980,15 +3301,16 @@ export default function Home() {
                                 <h4 className="font-bold">{tool.name}</h4>
                                 <div className="flex space-x-2">
                                   <button
-                                    className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                    className="btn-icon"
                                     onClick={() => setEditingTool({ index, field: "name", value: tool.name })}
                                     aria-label="Editar Nombre"
                                   >
                                     <i className="bi bi-pencil"></i>
                                   </button>
                                   <button
-                                    className="p-1 hover:text-accent-custom transition-colors"
+                                    className="btn-icon"
                                     onClick={() => handleDeleteTool(index)}
+                                    style={{ color: "#f857a6" }}
                                     aria-label="Eliminar Herramienta"
                                   >
                                     <i className="bi bi-trash"></i>
@@ -3004,14 +3326,14 @@ export default function Home() {
                               <div>
                                 <label className="block text-sm font-medium mb-1">Propósito</label>
                                 <textarea
-                                  className="w-full p-2 border rounded-md bg-white/10 text-black dark:bg-black/10 dark:text-white backdrop-blur border dark:border-gray-600"
+                                  className="futuristic-input futuristic-textarea"
                                   value={editingTool.value}
                                   onChange={(e) => setEditingTool({ ...editingTool, value: e.target.value })}
                                   rows={3}
                                 />
                                 <div className="flex mt-2 space-x-2">
                                   <button
-                                    className="bg-primary-custom text-white px-3 py-1 rounded-md text-sm"
+                                    className="btn-3d btn-3d-primary"
                                     onClick={() => {
                                       handleEditTool(index, editingTool.field, editingTool.value)
                                       setEditingTool(null)
@@ -3020,7 +3342,7 @@ export default function Home() {
                                     Guardar
                                   </button>
                                   <button
-                                    className="bg-gray-300 px-3 py-1 rounded-md text-sm text-black"
+                                    className="btn-3d btn-3d-secondary"
                                     onClick={() => setEditingTool(null)}
                                   >
                                     Cancelar
@@ -3029,9 +3351,9 @@ export default function Home() {
                               </div>
                             ) : (
                               <div className="flex justify-between items-start">
-                                <p className="text-black dark:text-six-custom">{tool.purpose}</p>
+                                <p style={{ color: "var(--text-secondary)" }}>{tool.purpose}</p>
                                 <button
-                                  className="p-1 text-accent-custom_drk hover:text-primary-custom_drk transition-colors"
+                                  className="btn-icon"
                                   onClick={() => setEditingTool({ index, field: "purpose", value: tool.purpose })}
                                   aria-label="Editar Propósito"
                                 >
@@ -3047,56 +3369,91 @@ export default function Home() {
                 </div>
               )}
               {/* Botones de acción */}
-              <div className="mt-8 border-t pt-6">
+              <div className="mt-8 pt-6" style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}>
                 <div className="flex flex-col md:flex-row justify-between gap-6">
-                  <button
-                    className="bg-primary-custom dark:bg-accent-custom text-white hover:bg-accent-custom dark:hover:bg-six-custom py-2 px-6 rounded-md transition-colors text-gray-800 font-medium h-10"
-                    onClick={() => setTestPlan(null)}
-                  >
+                  <button className="btn-3d btn-3d-secondary h-10" onClick={() => setTestPlan(null)}>
+                    <i className="bi bi-arrow-left"></i>
                     Volver
                   </button>
 
-                  <div className="w-full md:max-w-md space-y-4">
-                    <h3 className="text-lg font-semibold text-primary-custom dark:text-six-custom">Enviar Plan por Email</h3>
-                    <div className="space-y-3">
-                      <div className="flex flex-col">
-                        <label htmlFor="email-to" className="text-sm font-medium mb-1">
-                          Correo electrónico
-                        </label>
-                        <input
-                          id="email-to"
-                          type="email"
-                          className="p-2 border rounded-md w-full text-black"
-                          placeholder="Destinatario"
-                          value={emailTo}
-                          onChange={(e) => setEmailTo(e.target.value)}
-                        />
-                      </div>
-                      <div className="flex flex-col">
-                        <label htmlFor="email-subject" className="text-sm font-medium mb-1">
-                          Asunto
-                        </label>
-                        <input
-                          id="email-subject"
-                          type="text"
-                          className="p-2 border rounded-md w-full text-black"
-                          placeholder="Asunto del correo"
-                          value={emailSubject}
-                          onChange={(e) => setEmailSubject(e.target.value)}
-                        />
-                      </div>
+                  <div className="flex-1 max-w-md">
+                    <h3 className="text-lg font-bold mb-4 text-white">Enviar Plan por Email</h3>
+
+
+
+                    <div style={{ display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap", margin: "10px" }}>
+                      <button
+                        type="button"
+                        onClick={() => setEmailFormat("html")}
+                        style={{
+                          background: emailFormat === "html" ? "#667eea" : "transparent",
+                          color: emailFormat === "html" ? "#fff" : "#b8b9d0",
+                          border: "1px solid #667eea",
+                          borderRadius: "8px",
+                          padding: "10px 18px",
+                          cursor: "pointer",
+                          transition: "0.2s",
+                        }}
+                      >
+                        📄 HTML
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setEmailFormat("Excel")}
+                        style={{
+                          background: emailFormat === "Excel" ? "#20b2aa" : "transparent",
+                          color: emailFormat === "Excel" ? "#fff" : "#b8b9d0",
+                          border: "1px solid #20b2aa",
+                          borderRadius: "8px",
+                          padding: "10px 18px",
+                          cursor: "pointer",
+                          transition: "0.2s",
+                        }}
+                      >
+                        📊 Excel
+                      </button>
+
                     </div>
-                    <button
-                      className="bg-primary-custom dark:bg-accent-custom text-white hover:bg-accent-custom dark:hover:bg-six-custom py-2 px-4 rounded-md transition-colors w-full"
-                      onClick={handleSendEmail}
-                      disabled={isSending || !emailTo}
-                    >
-                      {isSending ? "Enviando..." : `Enviar por Email`}
-                    </button>
+
+
+
+                    <div className="space-y-3">
+                      <input
+                        type="email"
+                        className="futuristic-input"
+                        placeholder="Correo electrónico"
+                        value={emailTo}
+                        onChange={(e) => setEmailTo(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className="futuristic-input"
+                        placeholder="Asunto del correo"
+                        value={emailSubject}
+                        onChange={(e) => setEmailSubject(e.target.value)}
+                      />
+                      <button
+                        className={`btn-3d btn-3d-primary w-full ${isSending || !emailTo ? "opacity-50 cursor-not-allowed" : "glow-on-hover"
+                          }`}
+                        onClick={handleSendEmail}
+                        disabled={isSending || !emailTo}
+                      >
+                        {isSending ? (
+                          <>
+                            <span className="futuristic-spinner"></span>
+                            Enviando...
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-envelope-fill"></i>
+                            Enviar por Email
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
-
-            
               </div>
             </div>
           </div>
@@ -3104,18 +3461,20 @@ export default function Home() {
         <footer className="footer-distributed text-foreground backdrop-blur">
           <div className="footer-left">
             <a href="https://paolozada.com" target="_blank" rel="noreferrer">
-              <h3>
-                Paola<span>Lozada</span>
-              </h3>
+              <img
+                src="/img/iconPL.png"
+                alt="Icono de la app"
+                className="w-40 h-auto md:w-44"
+              />
             </a>
 
             <p className="footer-links">
-              <a href="https://paolozada.com#about" target="_blank" className="link-1" rel="noreferrer">
-                About me
+              <a href="https://paolozada.com" target="_blank" className="link-1" rel="noreferrer">
+                Sobre mi
               </a>
 
               <a href="https://paolozada.com/info/contact" target="_blank" rel="noreferrer">
-                Contact
+                Contacto
               </a>
             </p>
           </div>
@@ -3141,8 +3500,8 @@ export default function Home() {
 
           <div className="footer-right">
             <p className="footer-company-about">
-              <span>About</span>On this website, you will find a person passionate about challenges and always in search
-              of new opportunities to learn and grow.
+              <span>Acerca de</span>Este sitio web, es realizado por una persona apasionada por los desafíos y siempre
+               en búsqueda de nuevas oportunidades para aprender y crecer.
             </p>
 
             <div className="footer-icons">
@@ -3158,8 +3517,13 @@ export default function Home() {
             </div>
           </div>
         </footer>
-      </div>      
+        <div className="text-center p-3" style={{ backgroundColor: "rgba(0, 0, 0, 0.1)", fontSize: "11px" }}>
+          Copyright © 2025 | Creado con 💜 por
+          <a className="text-white" href="https://paolozada.com"> Paola Lozada</a>
+        </div>
+
+      </div>
     </div>
-    
+
   )
 }

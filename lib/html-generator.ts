@@ -10,18 +10,23 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
     <title>Plan de Pruebas: ${planName}</title>
     <style>
       :root {
-        --primary-color: rgb(119, 64, 106);
-        --second-color: #aaabac;
-        --third-color: #20b2aa;
-        --fourth-color: #000000;
-        --fifth-color: #fff;
-        --sixth-color: #8c8b8b;
-      }
+    --primary-color: #667eea;   /* azul violeta profesional */
+    --accent-color: #764ba2;    /* lila oscuro */
+    --background-color: #1a1a2e; /* fondo oscuro elegante */
+    --card-color: #23233a;       /* fondo de secciones */
+    --border-color: #2f2f48;     /* bordes suaves */
+    --text-color: #e6e6e6;       /* texto principal */
+    --text-muted: #a5a5c3;       /* texto secundario */
+    --highlight: #18837dff;        /* acento verde-agua */
+    --danger: #ff4d6d;           /* rojo moderno */
+    --warning: #fee140;
+  }
       
       body {
         font-family: Arial, sans-serif;
         line-height: 1.6;
-        color: var(--fourth-color);
+        color: var(--text-color);
+        background-color: var(--background-color);
         max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
@@ -40,49 +45,50 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
         border-collapse: collapse;
         margin: 20px 0;
       }
-      th, td {
-        border: 1px solid var(--second-color);
+      td, th {
+        border: 1px solid var(--border-color);
         padding: 8px 12px;
         text-align: left;
       }
       th {
-        background-color: var(--second-color);
-        color: var(--fifth-color);
+        background-color: var(--text-muted);
+        color: var(--background-color);
+        border: 1px solid var(--background-color);
         font-weight: bold;
       }
       tr:nth-child(even) {
-        background-color: rgba(170, 171, 172, 0.1);
+        background-color: var(--background-color);
       }
       .section {
         margin-bottom: 30px;
-        border: 1px solid var(--second-color);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 20px;
-        background-color: var(--fifth-color);
+        background-color: var(--card-color);
       }
       .priority-high {
-        background-color: #fee2e2;
-        color: #b91c1c;
+        background-color: var(--danger);
+        color: var(--text-color);
         padding: 3px 8px;
         border-radius: 12px;
         font-size: 0.85em;
       }
       .priority-medium {
-        background-color: #fef3c7;
-        color: #92400e;
+        background-color: var(--warning);
+        color: var(--background-color);
         padding: 3px 8px;
         border-radius: 12px;
         font-size: 0.85em;
       }
       .priority-low {
-        background-color: #dcfce7;
-        color: #166534;
+        background-color: var(--highlight);
+        color: var(--text-color);
         padding: 3px 8px;
         border-radius: 12px;
         font-size: 0.85em;
       }
       .test-case {
-        border: 1px solid var(--second-color);
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         padding: 15px;
         margin-bottom: 15px;
@@ -109,24 +115,24 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
       }
       .tab-button {
         padding: 10px 20px;
-        background-color: var(--second-color);
-        border: 1px solid var(--second-color);
+        background-color: var(--background-color);
+        border: 1px solid var(--primary-color);
         border-bottom: none;
         cursor: pointer;
         border-radius: 8px 8px 0 0;
         margin-right: 5px;
-        color: var(--fifth-color);
+        color: var(--text-color);
       }
       .tab-button.active {
         background-color: var(--primary-color);
-        border-color: var(--primary-color);
+        border-color: var(--border-color);
         font-weight: bold;
-        color: var(--fifth-color);
+        color: var(--text-color);
       }
       .tab-content {
         display: none;
         padding: 20px;
-        border: 1px solid var(--second-color);
+        border: 1px solid var(--card-color);
         border-radius: 0 8px 8px 8px;
       }
       .tab-content.active {
@@ -141,17 +147,17 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
       }
       .view-button {
         padding: 5px 10px;
-        background-color: var(--second-color);
-        border: 1px solid var(--second-color);
+        background-color: var(--background-color);
+        border: 1px solid var(--card-color);
         cursor: pointer;
         margin-left: 5px;
         border-radius: 4px;
-        color: var(--fifth-color);
+        color: var(--text-color);
       }
       .view-button.active {
         background-color: var(--primary-color);
-        color: var(--fifth-color);
-        border-color: var(--primary-color);
+        color: var(--text-color);
+        border-color: var(--border-color);
       }
       .test-cases-table {
         display: none;
@@ -178,10 +184,10 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
         top: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: var(--background-color);
       }
       .modal-content {
-        background-color: var(--fifth-color);
+        background-color: var(--card-color);
         margin: 10% auto;
         padding: 20px;
         border-radius: 8px;
@@ -190,19 +196,19 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
       .close-modal {
-        color: var(--sixth-color);
+        color: var(--text-muted);
         float: right;
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
       }
       .close-modal:hover {
-        color: var(--fourth-color);
+        color: var(--highligth-color);
       }
       .modal-header {
         margin-bottom: 15px;
         padding-bottom: 10px;
-        border-bottom: 1px solid var(--second-color);
+        border-bottom: 1px solid var(--border-color);
       }
       .modal-body {
         margin-bottom: 15px;
@@ -210,8 +216,8 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
       
       /* Botón de detalles */
       .details-button {
-        background-color: var(--third-color);
-        color: var(--fifth-color);
+        background-color: var(--primary-color);
+        color: var(--text-color);
         border: none;
         padding: 5px 10px;
         border-radius: 4px;
@@ -219,7 +225,7 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
         font-size: 0.9em;
       }
       .details-button:hover {
-        background-color: #1a9690;
+        background-color: var(--highlight);
       }
     </style>
   </head>
@@ -228,7 +234,7 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
   <div style="display:flex;">
       <div style="width: 30%; align-items: end; display:flex;">
         <a href="https://paolozada.com" target="_blank">
-          <img src="https://paolozada.com/info/wp-content/uploads/2025/04/iconPL-1.png" alt="Icono de la app" style="width: 30%; height: auto;"/>
+          <img src="https://paolozada.com/info/wp-content/uploads/2025/10/cropped-pl_android-chrome-512x512-1.png" alt="Icono de la app" style="width: 30%; height: auto;"/>
         </a>
       </div>
       <div style="width: 70%; display:flex; align-items: center;  padding-left: 20px;">
@@ -439,7 +445,6 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
             <tr>
               <th>Fase</th>
               <th>Duración (días)</th>
-              <th>Recursos</th>
               <th>Justificación</th>
             </tr>
           </thead>
@@ -450,7 +455,6 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
               <tr>
                 <td>${phase.name}</td>
                 <td>${phase.duration}</td>
-                <td>${phase.resources}</td>
                 <td>${phase.justification}</td>
               </tr>
             `,
@@ -541,7 +545,7 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
           ${testPlan.environment.tools
       .map(
         (tool) => `
-            <div style="background-color: #f1f5f9; padding: 15px; border-radius: 8px;">
+            <div style="background-color: #1a1a2e; padding: 15px; border-radius: 8px; border-bottom: 2px solid var(--border-color);">
               <h4 style="margin-top: 0;">${tool.name}</h4>
               <p>${tool.purpose}</p>
             </div>

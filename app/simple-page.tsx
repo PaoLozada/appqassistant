@@ -10,7 +10,7 @@ import { FileText } from "lucide-react"
 
 export default function SimplePage() {
   const [description, setDescription] = useState("")
-  const [teamSize, setTeamSize] = useState("3")
+  const [teamSize, setTeamSize] = useState("1")
   const [generated, setGenerated] = useState(false)
 
   const handleGenerate = () => {

@@ -1,0 +1,249 @@
+import ExcelJS from "exceljs";
+import type { TestPlan } from "./types";
+import { Row } from "react-day-picker";
+
+// 🎨 Paleta de colores
+const COLORS = {
+    primary: "667eea",
+    accent: "764ba2",
+    textLight: "FFFFFF",
+    rowAlt: "F9F6FA", // fondo alterno para filas
+    border: "E6E6E6",
+};
+
+// ✅ Helper para crear un estilo de borde uniforme
+const BORDER_STYLE: Partial<ExcelJS.Borders> = {
+    top: { style: "thin", color: { argb: COLORS.border } },
+    left: { style: "thin", color: { argb: COLORS.border } },
+    bottom: { style: "thin", color: { argb: COLORS.border } },
+    right: { style: "thin", color: { argb: COLORS.border } },
+};
+
+// ✅ Helper para aplicar estilo de encabezado con degradado
+function applyHeaderGradient(cell: ExcelJS.Cell) {
+    cell.fill = {
+        type: "gradient",
+        gradient: "angle",
+        degree: 0,
+        stops: [
+            { position: 0, color: { argb: COLORS.primary } },
+            { position: 1, color: { argb: "000000" } },
+        ],
+    };
+    cell.font = { color: { argb: COLORS.textLight }, bold: true, size: 13 };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+}
+
+// ✅ Helper para aplicar estilo a filas alternas
+function applyAlternateRows(sheet: ExcelJS.Worksheet) {
+    sheet.eachRow((row, rowNumber) => {
+        if (rowNumber > 1 && rowNumber % 2 === 0) {
+            row.eachCell((cell) => {
+                cell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: COLORS.rowAlt },
+                };
+            });
+        }
+    });
+}
+
+// ✅ Función principal
+export async function generateTestPlanExcel(
+    testPlan: TestPlan,
+    planName: string
+): Promise<Buffer> {
+    const wb = new ExcelJS.Workbook();
+    wb.creator = "QAssistant";
+    wb.created = new Date();
+
+    // 🟣 HOJA: Resumen
+    const resumen = wb.addWorksheet("💎 Resumen", {
+        properties: { tabColor: { argb: COLORS.primary } },
+    });
+
+    resumen.getColumn(1).width = 25;
+    resumen.getColumn(2).width = 70;
+    resumen.mergeCells("A2:B2");
+    resumen.mergeCells("A3:B3");
+
+    const titleCell = resumen.getCell("A2");
+    titleCell.value = `PLAN DE PRUEBAS`;
+    titleCell.font = { bold: true, size: 20, color: { argb: COLORS.primary } };
+
+    const subtitleCell = resumen.getCell("A3");
+    subtitleCell.value = planName;
+    subtitleCell.font = { size: 14, color: { argb: COLORS.accent }, italic: true };
+
+    resumen.addRow([]);
+    resumen.addRow(["📅 Fecha de generación", new Date().toLocaleDateString()]);
+    resumen.addRow(["🧠 Generado por", "QAssistant (IA + Expertise QA - 👩‍💻 Paola Lozada)"]);
+    resumen.addRow(["💬 Descripción", testPlan.description || ""]);
+    resumen.addRow(["🌐 Fuente", testPlan.source || "No especificada"]);
+    resumen.addRow(["🎯 Objetivos", "✔ " + testPlan.objectives.join("\n✔ ")]);
+    resumen.addRow(["📋 Áreas incluidas","📌 " + testPlan.scope.included.join("\n📌 ")]);
+    resumen.addRow(["🚫 Áreas excluidas", "⬅ " + testPlan.scope.excluded.join("\n⬅ ")]);
+    resumen.addRow([]);
+
+    applyAlternateRows(resumen);
+
+
+
+
+    // 🟠 HOJA: Riesgos
+    const risksSheet = wb.addWorksheet("⚠️ Riesgos", {
+        properties: { tabColor: { argb: COLORS.primary } },
+    });
+    risksSheet.columns = [
+        { header: "#", key: "idx", width: 6 },
+        { header: "Riesgo", key: "description", width: 60 },
+        { header: "Impacto", key: "impact", width: 14 },
+        { header: "Probabilidad", key: "probability", width: 14 },
+        { header: "Mitigación", key: "mitigation", width: 60 },
+    ];
+    risksSheet.getRow(1).eachCell((cell) => applyHeaderGradient(cell));
+    risksSheet.views = [{ state: "frozen", ySplit: 1 }];
+
+    testPlan.risks.forEach((r, i) => {
+        risksSheet.addRow({ idx: i + 1, ...r });
+    });
+    applyAlternateRows(risksSheet);
+
+    // 🔵 HOJA: Casos de prueba
+    const tcSheet = wb.addWorksheet("🧪 Casos de Prueba", {
+        properties: { tabColor: { argb: COLORS.primary } },
+    });
+    tcSheet.columns = [
+        { header: "TC #", key: "tc", width: 8 },
+        { header: "Título", key: "title", width: 40 },
+        { header: "Prioridad", key: "priority", width: 12 },
+        { header: "Tipo", key: "type", width: 18 },
+        { header: "Automatizable", key: "automatable", width: 17 },
+        { header: "Precondiciones", key: "preconditions", width: 40 },
+        { header: "Pasos", key: "steps", width: 80 },
+        { header: "Resultado esperado", key: "expected", width: 60 },
+    ];
+    tcSheet.getRow(1).eachCell((cell) => applyHeaderGradient(cell));
+    tcSheet.views = [{ state: "frozen", ySplit: 1 }];
+
+    testPlan.testCases.forEach((tc, i) => {
+        tcSheet.addRow({
+            tc: `TC-${i + 1}`,
+            title: tc.title,
+            priority: tc.priority,
+            type: tc.type,
+            automatable: tc.automatable ? "Sí" : "No",
+            preconditions: "✔ " + tc.preconditions.join("\n✔ "),
+            steps: "✔ " + tc.steps.join("\n✔ "),
+            expected: tc.expectedResult,
+        });
+    });
+
+    applyAlternateRows(tcSheet);    
+    risksSheet.getRow(1).height = 17;
+
+    // 🟢 HOJA: Estimación de tiempos
+    const timeSheet = wb.addWorksheet("⏱️ Estimación", {
+        properties: { tabColor: { argb: COLORS.primary } },
+    });
+    timeSheet.columns = [
+        { header: "Fase", key: "name", width: 30 },
+        { header: "Duración (días)", key: "duration", width: 18 },
+        { header: "Justificación", key: "justification", width: 60 },
+    ];
+    timeSheet.getRow(1).eachCell((cell) => applyHeaderGradient(cell));
+    timeSheet.views = [{ state: "frozen", ySplit: 1 }];
+    testPlan.timeEstimation.phases.forEach((p) => timeSheet.addRow(p));
+    timeSheet.addRow([]);
+    const row_total = timeSheet.addRow(["Tiempo total estimado", testPlan.timeEstimation.totalDays]);
+    const cell_total = row_total.getCell(1);
+    cell_total.font = { bold: true, size: 14, color: { argb: "667eea" } }; 
+    const cell_2_total = row_total.getCell(2);
+    cell_2_total.font = { bold: true, size: 14, color: { argb: "667eea" } };     
+
+    timeSheet.addRow([]);
+    timeSheet.addRow([]);
+    const row_fac = timeSheet.addRow(["Factores considerados", "", "✔ " + testPlan.timeEstimation.factors.join("\n✔ ")]);
+    const cell_fac = row_fac.getCell(1);
+    cell_fac.font = { bold: true, size: 14, color: { argb: "667eea" } }; 
+    
+
+    applyAlternateRows(timeSheet);
+    timeSheet.getRow(1).height = 17;
+    
+
+    // 🧠 HOJA: Estrategia
+    const strat = wb.addWorksheet("⚙️ Estrategia", {
+        properties: { tabColor: { argb: COLORS.primary } },
+    });
+    strat.columns = [
+        { header: "Sección", key: "section", width: 30 },
+        { header: "Detalle", key: "detail", width: 100 },
+    ];
+    strat.getRow(1).eachCell((cell) => applyHeaderGradient(cell));
+    strat.views = [{ state: "frozen", ySplit: 1 }];
+    strat.addRow(["Enfoque general", testPlan.strategy.approach]);
+    strat.addRow([
+        "Técnicas",
+        "🧩 " + testPlan.strategy.techniques.map((t) => `${t.name}: ${t.description}`).join("\n🧩 "),
+    ]);
+    strat.addRow(["Criterios de entrada", "🔺 " + testPlan.strategy.entryCriteria.join("\n🔺 ")]);
+    strat.addRow(["Criterios de salida", "🔻 " + testPlan.strategy.exitCriteria.join("\n🔻 ")]);
+    applyAlternateRows(strat);
+    strat.getRow(1).height = 17;
+
+    // 🧩 HOJA: Entorno & Herramientas
+    const env = wb.addWorksheet("💻 Entorno & Herramientas", {
+        properties: { tabColor: { argb: COLORS.primary } },
+    });
+    env.columns = [
+        { header: "Tipo", key: "type", width: 18 },
+        { header: "Nombre / Fase", key: "name", width: 30 },
+        { header: "Propósito / Config", key: "purpose", width: 60 },
+    ];
+    env.getRow(1).eachCell((cell) => applyHeaderGradient(cell));
+    env.views = [{ state: "frozen", ySplit: 1 }];
+    testPlan.environment.environments.forEach((e) =>
+        env.addRow({ type: "Entorno", name: e.name, purpose: `${e.purpose} — ${e.configuration}` })
+    );
+    testPlan.environment.tools.forEach((t) =>
+        env.addRow({ type: "Herramienta", name: t.name, purpose: t.purpose })
+    );
+    env.addRow([]);
+    
+    const row_env = env.addRow(["Datos de prueba", "", "✔ " + testPlan.environment.testData.join("\n✔ ")]);
+    const cell_env = row_env.getCell(1);
+    cell_env.font = { bold: true, size: 14, color: { argb: "667eea" } }; 
+    cell_env.alignment = { horizontal: "center", vertical: "middle" };
+
+    applyAlternateRows(env);
+    risksSheet.getRow(1).height = 17;
+
+    // ✨ Ajustes finales: bordes, alineación y altura dinámica mejorada
+    wb.eachSheet((sheet) => {
+        sheet.eachRow((row) => {
+            if (row.number === 1) return;
+            let maxLines = 1;
+            row.eachCell((cell) => {
+                cell.border = BORDER_STYLE;
+                cell.alignment = { wrapText: true, vertical: "top" };
+
+                const value = cell.value ? cell.value.toString() : "";
+                const lines = value.split("\n").length;
+                const extra = Math.ceil(value.length / 60); // detecta texto largo sin saltos
+                const total = Math.max(lines, extra);
+                if (total > maxLines) maxLines = total;
+            });
+
+            // Altura más cómoda y proporcional
+            row.height = Math.min(350, 22 + maxLines * 22);
+        });
+    });
+
+
+
+
+    const buffer = await wb.xlsx.writeBuffer();
+    return Buffer.from(buffer);
+}

@@ -44,6 +44,7 @@
     "cmdk": "1.0.4",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "8.5.1",
+    "exceljs": "^4.4.0",
     "framer-motion": "^12.10.0",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
@@ -66,6 +67,7 @@
   },
   "devDependencies": {
     "@types/node": "^22",
+    "@types/nodemailer": "^7.0.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "postcss": "^8",

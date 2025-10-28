@@ -1,8 +1,11 @@
+/* 🌐 Importa Tailwind y define la estructura base */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* 🎨 PALETA DE COLORES Y VARIABLES DEL TEMA */
 :root {
+  /* Colores personalizados */
   --primaryColor: #5A1A2D;
   --secondColor: #aaabac;
   --thirdColor: #20b2aa;
@@ -10,67 +13,53 @@
   --fifthColor: #ffffff;
   --sixthColor: #8c8b8b;
 
+  /* Variables Tailwind Base */
   --background: 0 0% 100%;
   --foreground: 0 0% 0%;
-
   --card: 0 0% 100%;
   --card-foreground: 0 0% 0%;
-
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 0%;
-
   --primary: 320 30% 36%;
   --primary-foreground: 0 0% 100%;
-
   --secondary: 0 0% 68%;
   --secondary-foreground: 0 0% 100%;
-
   --muted: 210 20% 96%;
   --muted-foreground: 0 0% 55%;
-
   --accent: 174 70% 41%;
   --accent-foreground: 0 0% 100%;
-
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-
   --border: 0 0% 68%;
   --input: 0 0% 68%;
   --ring: 320 30% 36%;
-
   --radius: 0.5rem;
 }
 
+/* 🌙 MODO OSCURO */
 .dark {
   --background: 0 0% 0%;
   --foreground: 0 0% 100%;
-
   --card: 0 0% 12%;
   --card-foreground: 0 0% 100%;
-
   --popover: 0 0% 12%;
   --popover-foreground: 0 0% 100%;
-
   --primary: 320 30% 36%;
   --primary-foreground: 0 0% 100%;
-
   --secondary: 0 0% 17%;
   --secondary-foreground: 0 0% 100%;
-
   --muted: 0 0% 17%;
   --muted-foreground: 0 0% 67%;
-
   --accent: 174 70% 41%;
   --accent-foreground: 0 0% 100%;
-
   --destructive: 0 62% 30%;
   --destructive-foreground: 0 0% 100%;
-
   --border: 0 0% 15%;
   --input: 0 0% 15%;
   --ring: 320 30% 36%;
 }
 
+/* 🧱 ESTILOS BASE */
 @layer base {
   * {
     @apply border-border;
@@ -84,74 +73,26 @@
     background-position: top center;
     background-attachment: fixed;
   }
-
 }
 
-/* Clases de utilidad personalizadas para los colores específicos */
+/* ⚙️ UTILIDADES PERSONALIZADAS */
 @layer utilities {
-  .bg-primary-custom {
-    background-color: var(--primaryColor);
-  }
+  .bg-primary-custom { background-color: var(--primaryColor); }
+  .bg-six-custom { background-color: var(--sixthColor); }
+  .bg-accent-custom { background-color: var(--thirdColor); }
 
-  .bg-six-custom {
-    background-color: var(--sixthColor);
-  }
+  .text-primary-custom { color: var(--primaryColor); }
+  .text-six-custom { color: var(--sixthColor); }
+  .text-accent-custom { color: var(--thirdColor); }
 
-  .text-primary-custom {
-    color: var(--primaryColor);
-  }
-  .text-six-custom {
-    color: var(--sixthColor);
-  }
-
-  .bg-accent-custom {
-    background-color: var(--thirdColor);
-  }
-
-  .text-accent-custom {
-    color: var(--thirdColor);
-  }
-
-  .border-primary-custom {
-    border-color: var(--primaryColor);
-  }
-
-  .border-accent-custom {
-    border-color: var(--thirdColor);
-  }
-
-  .bg-primary-custom_drk {
-    background-color: var(--primaryColor);
-  }
-
-  .text-primary-custom_drk {
-    color: var(--secondColor);
-  }
-
-  .bg-accent-custom_drk {
-    background-color: var(--thirdColor);
-  }
-
-  .text-accent-custom_drk {
-    color: var(--thirdColor);
-  }
-
-  .border-primary-custom_drk {
-    border-color: var(--primaryColor);
-  }
-
-  .border-accent-custom_drk {
-    border-color: var(--thirdColor);
-  }
-  .border-second_custome {
-    border-color: var(--secondColor);
-  }
+  .border-primary-custom { border-color: var(--primaryColor); }
+  .border-accent-custom { border-color: var(--thirdColor); }
+  .border-second-custom { border-color: var(--secondColor); }
 }
 
-/* Estilos personalizados para componentes específicos */
+/* 🧩 COMPONENTES */
 @layer components {
-
-  /* Estilos para las pestañas */
+  /* Pestañas */
   .tabs-list {
     @apply flex p-1 bg-secondary rounded-md;
   }
@@ -168,7 +109,7 @@
     @apply text-foreground hover:bg-muted;
   }
 
-  /* Estilos para modales */
+  /* Modales */
   .dialog-overlay {
     @apply bg-black/50 backdrop-blur-sm;
   }
@@ -177,4 +118,3 @@
     @apply bg-background border border-border shadow-lg;
   }
 }
-

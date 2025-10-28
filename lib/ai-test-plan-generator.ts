@@ -21,6 +21,10 @@ function createPrompt(input: TestPlanInput): string {
       `DESCRIPCIÓN DETALLADA:\n${input.description}`
   }
 
+  console.log("tipos", input.testTypes.length > 0 ? input.testTypes.join(", ") : "Pruebas básicas")
+  console.log("auto", input.automationAllowed, input.automationAllowed ? "Sí" : "No")
+  console.log("rendmiento", input.performanceTestingAllowed, input.performanceTestingAllowed ? "Incluidas" : "No incluidas")
+
   return `
 Actúa como un experto certificado en pruebas de software de nivel avanzado ISTQB (International Software Testing Qualifications Board) con más de 10 años de experiencia en la industria. Tu tarea es generar un plan de pruebas exhaustivo, detallado y profesional siguiendo las mejores prácticas y estándares de ISTQB.
 
@@ -28,72 +32,84 @@ DESCRIPCIÓN DEL SISTEMA:
 ${enrichedDescription}
 
 DETALLES ADICIONALES:
-- Tamaño del equipo de pruebas: ${input.teamSize} probadores
-- Tipos de prueba requeridos: ${input.testTypes.length > 0 ? input.testTypes.join(", ") : "No especificados"}
+
+- Tipos de prueba requeridos: ${input.testTypes.length > 0 ? input.testTypes.join(", ") : "Pruebas básicas"}
 - Automatización permitida: ${input.automationAllowed ? "Sí" : "No"}
 - Pruebas de rendimiento: ${input.performanceTestingAllowed ? "Incluidas" : "No incluidas"}
 
 REQUISITOS ESPECÍFICOS Y OBLIGATORIOS:
 
 1. OBJETIVOS (mínimo 7):
+   - Los objetivos deben estar directamente relacionados con el tipo de aplicación y sus características específicas: ${enrichedDescription}.
    - Genera al menos 7 objetivos de prueba claros, específicos, medibles y alineados con los estándares ISTQB.
    - Cada objetivo debe ser concreto y verificable.
-   - Los objetivos deben estar directamente relacionados con el tipo de aplicación y sus características específicas.
 
 2. ALCANCE (mínimo 8 incluidos, 5 excluidos):
+
+   - El alcance debe ser específico para el tipo de aplicación descrita: ${enrichedDescription}.
    - Define un alcance detallado con al menos 8 áreas incluidas y 5 áreas excluidas.
    - Para cada área, proporciona una breve justificación de su inclusión o exclusión.
-   - El alcance debe ser específico para el tipo de aplicación descrita.
 
 3. RIESGOS (EXACTAMENTE 20 o más):
+   - Los riesgos deben ser específicos para el tipo de aplicación y características descritas: ${enrichedDescription}, 
+   los tipos de pruebas requeridos ${input.testTypes.length > 0 ? input.testTypes.join(", ") : "Pruebas básicas"} 
+   y tener en cuenta que ${input.automationAllowed ? "Sí" : "No"} se solicitan pruebas automatizadas y 
+   que las pruebas de rendieminto deben ser ${input.performanceTestingAllowed ? "Incluidas" : "No incluidas"}.
    - DEBES identificar EXACTAMENTE 20 RIESGOS O MÁS siguiendo el enfoque de gestión de riesgos de ISTQB.
    - Cada riesgo debe incluir: descripción detallada, impacto (Alto/Medio/Bajo), probabilidad (Alta/Media/Baja) y estrategia de mitigación específica.
    - Los riesgos deben cubrir aspectos técnicos, de negocio, de proyecto y de producto.
-   - Los riesgos deben ser específicos para el tipo de aplicación y características descritas.
 
 4. CASOS DE PRUEBA (EXACTAMENTE 20 o más):
-   - DEBES desarrollar EXACTAMENTE 10 CASOS DE PRUEBA O MÁS que cubran diferentes niveles y tipos de prueba.
+   - Los casos de prueba deben estar directamente relacionados con las funcionalidades y características específicas de la aplicación descrita:  ${enrichedDescription}
+   - DEBES desarrollar EXACTAMENTE 20 CASOS DE PRUEBA O MÁS que cubran diferentes niveles y tipos de prueba de acuerdo con los tipos de pruebas requeridos ${input.testTypes.length > 0 ? input.testTypes.join(", ") : "Pruebas básicas"} 
+   y tener en cuenta que ${input.automationAllowed ? "Sí" : "No"} se solicitan pruebas automatizadas y 
+   que las pruebas de rendieminto deben ser ${input.performanceTestingAllowed ? "Incluidas" : "No incluidas"}.
    - Cada caso de prueba debe incluir: título descriptivo, prioridad (Alta/Media/Baja), precondiciones (al menos 2), pasos detallados (al menos 3), resultado esperado específico, tipo de prueba y si es automatizable.
-   - Los casos deben cubrir pruebas funcionales, no funcionales, estructurales y de cambios.
-   - Los casos de prueba deben estar directamente relacionados con las funcionalidades y características específicas de la aplicación descrita.
+   - Los casos deben cubrir pruebas funcionales, no funcionales, estructurales y de cambios, de acuerdo con los tipos de pruebas requeridos.
 
-5. ESTIMACIÓN DE TIEMPOS (detallada y justificada teniendo en cuenta el tamaño del equipo: ${input.teamSize}):
+5. ESTIMACIÓN DE TIEMPOS (detallada y justificada teniendo en cuenta la complejidad del proyecto):
 
-- Proporciona una estimación de tiempos realista con al menos 8 fases diferentes.
-- Considera que el esfuerzo total requerido en cada fase debe dividirse entre los probadores disponibles (${input.teamSize} recursos), especialmente si las tareas son paralelizables.
-- Aclara en la justificación si la fase es:
-   a) completamente paralelizable (las tareas se pueden dividir entre probadores y realizarse al mismo tiempo),
-   b) parcialmente paralelizable (algunas tareas pueden hacerse en paralelo y otras no), o
-   c) no paralelizable (requiere ejecución secuencial).
-   d) no es necesario inlcuir cifras en la justificación solo se puede decir algo como por ejemplo: "	
-La ejecución de pruebas es completamente paralelizable, permitiendo que todos los probadores ejecuten casos de prueba simultáneamente."
-- La duración estimada de cada fase debe reducirse de forma proporcional si hay más probadores, **siempre que las tareas no dependan de otras**.
-- Para la ejecución de casos de prueba, considera que estos se pueden distribuir equitativamente entre los ${input.teamSize} probadores, reduciendo el tiempo total respecto a un equipo más pequeño.
-- No aumentes la duración por tener más recursos. Más recursos permiten reducir la duración si el esfuerzo es fijo.
-- Para cada fase, incluye: nombre, duración estimada en días, número de probadores asignados y una justificación detallada basada en metodologías de estimación reconocidas (como PERT, juicio experto, o puntos de función).
-- Incluye al menos 8 factores que influyen en la estimación (como: tamaño del equipo, complejidad de las funcionalidades, automatización, cobertura requerida, tipos de prueba, disponibilidad de entornos, volumen de datos, y herramientas utilizadas).
-IIMPORTANTE: Mantén el esfuerzo total constante para todos los tamaños de equipo. No aumentes la carga de trabajo ni las tareas por tener más probadores.
-Para fases paralelizables, usa la siguiente lógica de estimación:
-DURACIÓN (días) = CEIL(ESFUERZO_TOTAL / NÚMERO_DE_PROBADORES)
-Ejemplo: Si una fase implica 40 tareas paralelizables y hay 4 probadores, la duración debe ser 10 días. Si hay 20 probadores, debe ser 2 días.
-Solo en fases no paralelizables se permite mantener la duración constante. Si no usas este criterio, la respuesta será inválida.
-IMPORTANTE (crítico): Para estimar la duración de cada fase, especialmente en aquellas completamente paralelizables como la ejecución de pruebas, DEBES calcular primero el esfuerzo total (por ejemplo, cantidad de pruebas, tareas o actividades estimadas).
-Luego, divide ese esfuerzo entre el número de probadores disponibles (${input.teamSize}) para estimar la duración en días.
-Ejemplo: si hay 100 casos de prueba a ejecutar, y se asignan 30 probadores, la duración debería ser de aproximadamente 3 a 4 días, no 10.
-Si no haces este cálculo basado en esfuerzo dividido entre recursos, la duración estimada será incorrecta.
+- Proporciona una estimación de tiempos realista para al menos 8 fases necesarias para el proyecto descrito: ${enrichedDescription}.
+- Considera los tipos de pruebas requeridas: ${input.testTypes.length > 0 ? input.testTypes.join(", ") : "Pruebas básicas"}.
+- Automatización: ${input.automationAllowed ? "Sí" : "No"}. Pruebas de rendimiento: ${input.performanceTestingAllowed ? "Incluidas" : "No incluidas"}.
+
+- Justifica la duración explicando:
+   - Las tareas que se realizan.
+   - La metodología usada (ej. PERT, juicio experto, puntos de función).
+- NO incluyas cifras de tareas si no han sido dadas explícitamente.
+
+**Formato esperado en cada fase:**
+- Nombre de la fase
+- Duración estimada en días
+  En la justificación, **describe las tareas a realizar**.
+
+
+**Importante: Incluye al final una lista de al menos 8 factores que influyen en la estimación, como:**
+- Complejidad de funcionalidades
+- Automatización
+- Tipos de prueba requeridos
+- Volumen de datos
+- Herramientas utilizadas
+- Disponibilidad del entorno
+- Cobertura requerida
+
 
 
 6. ESTRATEGIA DE PRUEBA (completa y detallada):
+   - La estrategia debe ser apropiada para el tipo específico de aplicación descrita: ${enrichedDescription} y los tipos de pruebas requeridos ${input.testTypes.length > 0 ? input.testTypes.join(", ") : "Pruebas básicas"} 
+   y tener en cuenta que ${input.automationAllowed ? "Sí" : "No"} se solicitan pruebas automatizadas y 
+   que las pruebas de rendieminto deben ser ${input.performanceTestingAllowed ? "Incluidas" : "No incluidas"}.
    - Elabora una estrategia de prueba completa con un enfoque general de al menos 300 caracteres.
    - Incluye al menos 8 técnicas de diseño de pruebas diferentes con descripciones detalladas y ejemplos de aplicación.
    - Define al menos 6 criterios de entrada y 6 criterios de salida específicos y medibles.
-   - La estrategia debe ser apropiada para el tipo específico de aplicación descrita.
 
 7. ENTORNO DE PRUEBA (específico y justificado):
+   - Los entornos y herramientas deben ser apropiados para el tipo de aplicación descrita: ${enrichedDescription} y los tipos de pruebas requeridos ${input.testTypes.length > 0 ? input.testTypes.join(", ") : "Pruebas básicas"} 
+   y tener en cuenta que ${input.automationAllowed ? "Sí" : "No"} se solicitan pruebas automatizadas y 
+   que las pruebas de rendieminto deben ser ${input.performanceTestingAllowed ? "Incluidas" : "No incluidas"}.
    - Define al menos 4 entornos de prueba diferentes con propósito y configuración detallados.
    - Especifica al menos 8 conjuntos de datos de prueba representativos.
    - Recomienda al menos 6 herramientas con justificación específica para cada una.
-   - Los entornos y herramientas deben ser apropiados para el tipo de aplicación descrita.
 
 FORMATO DE RESPUESTA:
 Responde SOLO con el JSON del plan de pruebas, sin comentarios ni explicaciones adicionales, siguiendo exactamente esta estructura:
@@ -185,6 +201,8 @@ export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan
     console.log("Generando plan de pruebas con IA usando modelo:", DEFAULT_MODEL)
 
     const prompt = createPrompt(input)
+    console.log("input: ", input)
+    console.log("prompt: ", prompt)
 
 
     const response = await openai.chat.completions.create({

@@ -2,36 +2,107 @@
 
 /* src/App.css */
 ::selection {
-  background-color: var(--primaryColor);
-  
-  color: var(--fifthColor);
-  /* Texto blanco al seleccionar */
+  background-color: var(--text-quarter);
+  color: black;
 }
 
 ::-moz-selection {
-  background-color: var(--primaryColor);
-   color: var(--fifthColor);
+  background-color: var(--text-quarter);
+  color: var(--text-secondary);
 }
 
-.tittle_app{
-  width: 70%;
+.hero-section {
+  text-align: center;
+  padding: 6rem 1rem 4rem;
+  background: radial-gradient(ellipse at top, rgba(90, 60, 150, 0.25), transparent 60%);
 }
-.logo_tittle {
-  display: flex;
-}h
 
-.logo_pl {
-  width: 30%;
+.hero-content h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.hero-content p {
+  color: #cfcfe0;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  font-size: 1.1rem;
+}
+
+.hero-button {
+  background: linear-gradient(90deg, #6a5acd, #00e0ff);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+}
+
+.hero-button .arrow {
+  font-size: 1.2rem;
+  animation: bounce 1.2s infinite;
+}
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/****formulario*********/
+#qa-form-section {
+  margin-bottom: 25vh;
 }
 
 .footer-distributed {
-  /*background-color: var(--fourthColor);*/
-  margin-top: 50px;
+  margin-top: 150px;
   box-sizing: border-box;
   width: 100%;
   text-align: left;
   font: bold 16px sans-serif;
   padding: 55px 50px;
+}
+
+.footer-distributed::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.8), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.footer-distributed::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.8), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 3s ease-in-out infinite;
 }
 
 .footer-distributed .footer-left,
@@ -40,6 +111,7 @@
   display: inline-block;
   vertical-align: top;
 }
+
 
 /* Footer left */
 
@@ -50,20 +122,19 @@
 /* The company logo */
 
 .footer-distributed h3 {
-  color: var(--secondColor);
+  color: var(--text-secondary);
   font: normal 36px 'Shadow';
   font-family: "Comic Sans MS", "Comic Sans", sans-serif;
   margin: 0;
 }
 
 .footer-distributed h3 span {
-  color: var(--thirdColor);
+  color: var(--text-quarter);
 }
 
 /* Footer links */
 
 .footer-distributed .footer-links {
-  /*color: var(--fifthColor);*/
   margin: 20px 0 12px;
   padding: 0;
 }
@@ -73,7 +144,7 @@
   line-height: 1.8;
   font-weight: 400;
   text-decoration: underline;
-  color: inherit;
+  color: var(--text-secondary);
 }
 
 /* Footer Center */
@@ -84,7 +155,7 @@
 
 .footer-distributed .footer-center i {
   background-color: transparents;
-  color: var(--thirdColor);
+  color: var(--text-quarter);
   font-size: 25px;
   width: 38px;
   height: 38px;
@@ -97,10 +168,10 @@
 
 .footer-distributed .footer-center p {
   display: inline-block;
-  /*color: var(--fifthColor);*/
   font-weight: 400;
   vertical-align: middle;
   margin: 0;
+  color: var(--text-secondary);
 }
 
 .footer-distributed .footer-links a:before {
@@ -108,7 +179,6 @@
   font-weight: 300;
   font-size: 20px;
   left: 0;
-  /*color: var(--fifthColor);*/
   display: inline-block;
   padding: 5px;
 }
@@ -125,15 +195,15 @@
 
 .footer-distributed .footer-company-about {
   line-height: 20px;
-  /*color: var(--fifthColor);*/
   font-size: 13px;
   font-weight: normal;
   margin: 0;
+  color: var(--text-secondary);
 }
 
 .footer-distributed .footer-company-about span {
   display: block;
-  color: var(--thirdColor);
+  color: var(--text-quarter);
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 20px;
@@ -151,28 +221,28 @@
   background-color: transparent;
   border-radius: 2px;
   font-size: 20px;
-  /*color: var(--secondColor);*/
   text-align: center;
   line-height: 35px;
   margin-right: 3px;
   margin-bottom: 5px;
+  color: var(--text-secondary);
 }
 
 .footer-distributed h3:hover {
-  color: var(--thirdColor);
+  color: var(--text-quarter);
 }
 
 .footer-distributed h3 span:hover {
-  color: var(--secondColor);
+  color: var(--text-secondary);
 }
 
 .footer-distributed .footer-links:hover {
-  color: var(--thirdColor);
+  color: var(--text-quarter);
 
 }
 
 .footer-distributed a:hover {
-  color: var(--thirdColor);
+  color: var(--text-quarter);
 }
 
 
@@ -189,6 +259,15 @@
     width: 100%;
     margin-bottom: 40px;
     text-align: center;
+  }
+
+  .footer-distributed .footer-left {
+    display: flex;
+    width: 100%;
+    margin-bottom: 40px;
+    text-align: center;
+    align-items: center;
+    flex-direction: column;
   }
 
   .footer-distributed .footer-center i {
