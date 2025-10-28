@@ -788,12 +788,12 @@ export default function Home() {
     try {
       const result = await sendEmail({
         to: emailTo,
-        from: "dev@paolozada.com", // Remitente fijo
+        from: "qassistant@send.paolozada.com", // Remitente fijo
         subject:
           emailSubject || `Plan de Pruebas: ${description.substring(0, 50)}${description.length > 50 ? "..." : ""}`,
         planName: emailSubject || `Plan de Pruebas`,
         testPlan: testPlan,
-        format: emailFormat, // Añadimos el formato seleccionado
+        format: emailFormat,
       })
 
       if (result.success) {

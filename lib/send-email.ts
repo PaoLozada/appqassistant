@@ -4,6 +4,9 @@ import nodemailer from "nodemailer"
 import type { TestPlan } from "./types"
 import { generateTestPlanHTML } from "./html-generator"
 import { generateTestPlanExcel } from "./generateExcel"
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 interface EmailParams {
@@ -17,18 +20,6 @@ interface EmailParams {
 
 export async function sendEmail(params: EmailParams): Promise<{ success: boolean; message: string }> {
   try {
-    // Configurar el transporte de correo con las variables de entorno
-    const transporter = nodemailer.createTransport({
-      host: (process.env.SMTP_HOST as string) || "",
-      port: 465,
-      secure: true,
-      auth: {
-        user: (process.env.SMTP_USER as string) || "",
-        pass: (process.env.SMTP_PASSWORD as string) || "",
-      },
-    })
-
-
 
     // Crear un mensaje personalizado para el cuerpo del correo
     const emailBody = `
@@ -172,26 +163,45 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
       }
     }
 
-    // 1. Enviar el correo al destinatario con el adjunto
-    const info = await transporter.sendMail({
-      from: params.from,
+
+    // 🚀 Enviar el correo usando la API HTTPS de Resend
+    const { data, error } = await resend.emails.send({
+      from: params.from || "QAssistant <qassistant@send.paolozada.com>",
       to: params.to,
       subject: params.subject,
       html: emailBody,
-      attachments: attachments,
-    })
+      attachments,
+    });
+
+    if (error) {
+      console.error("❌ Error al enviar el correo:", error);
+      return { success: false, message: error.message };
+    }
+
 
     // 2. Enviar correo de confirmación al remitente predeterminado
-    const remitentePredeterminado = "dev@paolozada.com"
-    await transporter.sendMail({
-      from: remitentePredeterminado,
-      to: remitentePredeterminado,
+    const remitentePredeterminado = "qassistant@send.paolozada.com"
+
+    const { data: confirmData, error: confirmError } = await resend.emails.send({
+      from: `QAssistant <${remitentePredeterminado}>`,
+      to: "dev@paolozada.com",
       subject: `Confirmación: Plan de Pruebas enviado a ${params.to}`,
       html: confirmationEmailBody,
-      attachments: attachments, // Adjuntar también el plan de pruebas
+      attachments,
     })
-    console.log("Correo enviado:", info.messageId)
-    return { success: true, message: "Correo enviado correctamente" }
+
+
+    if (confirmError) {
+      console.error("Error enviando correo de confirmación:", confirmError)
+    } else {
+      console.log("Correo de confirmación enviado correctamente:", confirmData?.id)
+    }
+
+
+
+
+    console.log("✅ Correo enviado correctamente:", data);
+    return { success: true, message: "Correo enviado correctamente" };
   } catch (error) {
     console.error("Error al enviar el correo:", error)
     return {
