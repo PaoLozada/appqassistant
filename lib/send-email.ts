@@ -146,7 +146,8 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
       const htmlContent = generateTestPlanHTML(params.testPlan, params.planName);
       attachments.push({
         filename: `${params.planName.replace(/\s+/g, "_")}_test_plan.html`,
-        content: htmlContent,
+        content: Buffer.from(htmlContent, "utf-8").toString("base64"), // 👈 convertir a base64
+        encoding: "base64",
         contentType: "text/html",
       });
     } else {
@@ -162,6 +163,7 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
         console.error("⚠️ Error generando Excel:", err);
       }
     }
+
 
 
     // 🚀 Enviar el correo usando la API HTTPS de Resend
