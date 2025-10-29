@@ -245,6 +245,34 @@
   color: var(--text-quarter);
 }
 
+/* 🚨 Input con error */
+.input-error {
+  border: 1px solid #ff6b6b !important;
+  box-shadow: 0 0 8px rgba(255, 107, 107, 0.6);
+  animation: pulseError 1s infinite alternate;
+}
+
+/* ✨ Animación suave */
+@keyframes pulseError {
+  from {
+    box-shadow: 0 0 6px rgba(255, 107, 107, 0.3);
+  }
+  to {
+    box-shadow: 0 0 12px rgba(255, 107, 107, 0.7);
+  }
+}
+
+/* 👻 Aparición del texto de error */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 
 @media (max-width: 880px) {

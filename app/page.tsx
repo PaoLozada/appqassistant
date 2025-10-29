@@ -812,6 +812,14 @@ export default function Home() {
     }
   }
 
+  // 💡 Función para validar formato de correo electrónico
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+
+
   // Función handleEditEnvironment
   const handleEditEnvironment = (index: number, field: string, value: string) => {
     if (!testPlan) return
@@ -1613,8 +1621,8 @@ export default function Home() {
                 <div className=" w-40 h-40 footer-logo">
                   <img src="img/logo_app_2.png" alt="" />
                 </div>
-                
-                  <span>QAssistant</span>
+
+                <span>QAssistant</span>
                 <p className="footer-text">
                   Tu asistente inteligente para crear planes de prueba profesionales en minutos.
                   Combinamos inteligencia artificial y experiencia QA para ayudarte a optimizar tu trabajo con precisión y estilo.
@@ -3379,8 +3387,6 @@ export default function Home() {
                   <div className="flex-1 max-w-md">
                     <h3 className="text-lg font-bold mb-4 text-white">Enviar Plan por Email</h3>
 
-
-
                     <div style={{ display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap", margin: "10px" }}>
                       <button
                         type="button"
@@ -3421,11 +3427,27 @@ export default function Home() {
                     <div className="space-y-3">
                       <input
                         type="email"
-                        className="futuristic-input"
+                        className={`futuristic-input ${emailTo && !isValidEmail(emailTo) ? "input-error" : ""}`}
                         placeholder="Correo electrónico"
                         value={emailTo}
                         onChange={(e) => setEmailTo(e.target.value)}
                       />
+
+                      {/* 🔴 Mensaje de error elegante */}
+                      {emailTo && !isValidEmail(emailTo) && (
+                        <p
+                          style={{
+                            color: "#ff6b6b",
+                            fontSize: "0.9rem",
+                            marginTop: "4px",
+                            transition: "0.3s ease",
+                            animation: "fadeIn 0.4s ease",
+                          }}
+                        >
+                          ⚠️ Por favor, ingresa un correo electrónico válido.
+                        </p>
+                      )}
+
                       <input
                         type="text"
                         className="futuristic-input"
@@ -3433,11 +3455,14 @@ export default function Home() {
                         value={emailSubject}
                         onChange={(e) => setEmailSubject(e.target.value)}
                       />
+
                       <button
-                        className={`btn-3d btn-3d-primary w-full ${isSending || !emailTo ? "opacity-50 cursor-not-allowed" : "glow-on-hover"
+                        className={`btn-3d btn-3d-primary w-full ${isSending || !isValidEmail(emailTo)
+                          ? "opacity-50 cursor-not-allowed"
+                          : "glow-on-hover"
                           }`}
                         onClick={handleSendEmail}
-                        disabled={isSending || !emailTo}
+                        disabled={isSending || !isValidEmail(emailTo)}
                       >
                         {isSending ? (
                           <>
@@ -3452,6 +3477,7 @@ export default function Home() {
                         )}
                       </button>
                     </div>
+
                   </div>
                 </div>
               </div>
@@ -3501,7 +3527,7 @@ export default function Home() {
           <div className="footer-right">
             <p className="footer-company-about">
               <span>Acerca de</span>Este sitio web, es realizado por una persona apasionada por los desafíos y siempre
-               en búsqueda de nuevas oportunidades para aprender y crecer.
+              en búsqueda de nuevas oportunidades para aprender y crecer.
             </p>
 
             <div className="footer-icons">
