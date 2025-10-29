@@ -25,7 +25,7 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
     const emailBody = `
     <div style="font-family: 'Segoe UI', Roboto, Arial, sans-serif; max-width: 650px; margin: 0 auto; color: #ffffff; background-color: #1a1a2e; padding: 40px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
       <a href="https://paolozada.com" target="_blank" style="display:inline-block; margin-bottom: 15px;">
-        <img src="https://paolozada.com/info/wp-content/uploads/2025/10/cropped-pl_android-chrome-512x512-1.png" alt="Icono de la app" width="70" height="70" style="vertical-align: middle;">
+        <img src="https://paolozada.com/info/wp-content/uploads/2025/10/logo_app_2.png" alt="Icono de la app" width="70" height="70" style="vertical-align: middle;">
       </a>
       <h1 style="font-size: 26px; font-weight: 700; margin: 10px 0; color: #ffffff;">🚀 ¡Tu Plan de Pruebas está listo!</h1>
       <p style="font-size: 16px; color: #d3d4e4; margin-bottom: 20px; line-height: 1.6;">
@@ -83,7 +83,7 @@ export async function sendEmail(params: EmailParams): Promise<{ success: boolean
     const confirmationEmailBody = `
       <div style="font-family:'Segoe UI', Roboto, Arial, sans-serif; max-width:650px; margin:0 auto; color:#ffffff; background-color:#1a1a2e; padding:40px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); text-align:center;">
         <a href="https://paolozada.com" target="_blank" style="display:inline-block; margin-bottom:15px;">
-          <img src="https://paolozada.com/info/wp-content/uploads/2025/10/cropped-pl_android-chrome-512x512-1.png" alt="Icono de la app" width="70" height="70" style="vertical-align: middle;">
+          <img src="https://paolozada.com/info/wp-content/uploads/2025/10/logo_app_2.png" alt="Icono de la app" width="70" height="70" style="vertical-align: middle;">
         </a>
         <h1 style="font-size:26px; font-weight:700; margin:10px 0; color:#ffffff;">✅ Confirmación de Envío</h1>
         <p style="font-size:16px; color:#d3d4e4; margin-bottom:20px; line-height:1.6;">

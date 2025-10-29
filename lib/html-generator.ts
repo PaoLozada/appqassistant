@@ -234,7 +234,7 @@ export function generateTestPlanHTML(testPlan: TestPlan, planName: string): stri
   <div style="display:flex;">
       <div style="width: 30%; align-items: end; display:flex;">
         <a href="https://paolozada.com" target="_blank">
-          <img src="https://paolozada.com/info/wp-content/uploads/2025/10/cropped-pl_android-chrome-512x512-1.png" alt="Icono de la app" style="width: 30%; height: auto;"/>
+          <img src="https://paolozada.com/info/wp-content/uploads/2025/10/logo_app_2.png" alt="Icono de la app" style="width: 30%; height: auto;"/>
         </a>
       </div>
       <div style="width: 70%; display:flex; align-items: center;  padding-left: 20px;">
