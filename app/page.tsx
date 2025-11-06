@@ -779,7 +779,7 @@ export default function Home() {
       },
     })
   }
-
+  
   const handleSendEmail = async () => {
     if (!testPlan || !emailTo) return
 

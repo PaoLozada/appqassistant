@@ -101,20 +101,28 @@ function createPrompt(input: TestPlanInput): string {
 
 
         6. ESTRATEGIA DE PRUEBA (completa y detallada):
-          - La estrategia debe ser apropiada para el tipo específico de aplicación descrita: ${enrichedDescription} y los tipos de pruebas requeridos son ${tipos_pruebas} 
+          - La estrategia debe ser apropiada para el tipo específico de aplicación descrita: ${enrichedDescription}, los tipos de pruebas requeridos son ${tipos_pruebas} 
           y tener en cuenta que ${aut_pruebas} se solicitan pruebas automatizadas y 
           que las pruebas de rendieminto deben ser ${rend_pruebas}.
           - Elabora una estrategia de prueba completa con un enfoque general de al menos 300 caracteres.
           - Incluye al menos 8 técnicas de diseño de pruebas diferentes con descripciones detalladas y ejemplos de aplicación.
           - Define al menos 6 criterios de entrada y 6 criterios de salida específicos y medibles.
 
-        7. ENTORNO DE PRUEBA (específico y justificado):
-          - Los entornos y herramientas deben ser apropiados para el tipo de aplicación descrita: ${enrichedDescription} y los tipos de pruebas requeridos son ${tipos_pruebas} 
-          y tener en cuenta que ${aut_pruebas} se solicitan pruebas automatizadas y 
-          que las pruebas de rendieminto deben ser ${rend_pruebas}.
-          - Define al menos 4 entornos de prueba diferentes con propósito y configuración detallados.
-          - Especifica al menos 8 conjuntos de datos de prueba representativos.
-          - Recomienda al menos 6 herramientas con justificación específica para cada una.
+        7. **ENTORNO DE PRUEBA (específico, justificado y contextual)**  
+        - Los entornos deben estar alineados con el tipo de aplicación (${input.applicationType}) y subtipo (${input.applicationSubtype}), así como con los tipos de pruebas requeridos (${tipos_pruebas}).  
+        - Considera que ${aut_pruebas} se deben considerar pruebas automatizadas y si las pruebas de rendimiento deben ser ${rend_pruebas}.  
+        - Define **al menos 4 entornos de prueba distintos**, indicando su propósito, configuración técnica y relación con las pruebas planificadas (por ejemplo: integración, staging, preproducción, etc.).  
+        - Especifica **8 conjuntos de datos de prueba representativos**, variados y coherentes con la naturaleza del sistema (por ejemplo, datos válidos, inválidos, extremos, de volumen, de usuario, transaccionales, etc.).  
+        - Recomienda **6 herramientas diferentes**, justificando **por qué son apropiadas para este tipo de aplicación**.  
+          Evita mencionar herramientas genéricas si no son relevantes.  
+          En su lugar, adapta las recomendaciones  con el tipo de aplicación (${input.applicationType}) y subtipo (${input.applicationSubtype}), así como con los tipos de pruebas requeridos (${tipos_pruebas}).  
+        - Considera que ${aut_pruebas} se deben considerar pruebas automatizadas y si las pruebas de rendimiento deben ser ${rend_pruebas}.:  
+          - Para el tipo de aplicación *API*, prioriza herramientas de pruebas de endpoints, monitoreo y documentación y herramientas de pruebas de servicios y validación de contratos (como Postman, Newman, SoapUI, RestAssured, Karate DSL), o las que consideres que más se ajustan y sean mas relevantes y eficientes según lo solicitado.  
+          - Para el tipo de aplicación *Web o Móvil*, prioriza frameworks de automatización y análisis visual y herramientas orientadas a automatización funcional, BDD o frameworks de pruebas (por ejemplo, frameworks basados en Cucumber, Serenity BDD, Playwright o Appium), o las que consideres que más se ajustan y sean mas relevantes y eficientes según lo solicitado.    
+          - Para el tipo de aplicación *aplicaciones de escritorio o SaaS*, considera herramientas de gestión, control de versiones, empaquetado o despliegue y herramientas para automatización de GUI o integración continua (como TestComplete, Ranorex o Robot Framework), o las que consideres que más se ajustan y sean mas relevantes y eficientes según lo solicitado.  
+          - Para el subtipo de aplicación *juegos o aplicaciones con procesamiento intensivo*, considera herramientas de rendimiento, GPU profiling o simuladores de entorno, o las que consideres que más se ajustan y sean mas relevantes y eficientes según lo solicitado.  
+          - Si la aplicación incluye procesamiento intensivo o datos masivos, sugiere herramientas de carga, monitoreo y profiling (como Locust, Gatling o BlazeMeter), o las que consideres que más se ajustan y sean mas relevantes y eficientes según lo solicitado.  
+          - Las herramientas deben variar según el contexto y **no deben repetirse innecesariamente** entre planes diferentes. Cada recomendación debe incluir su propósito y beneficio técnico y siempre considera que ${aut_pruebas} se deben considerar pruebas automatizadas y si las pruebas de rendimiento deben ser ${rend_pruebas}.
 
         FORMATO DE RESPUESTA:
         Responde SOLO con el JSON del plan de pruebas, sin comentarios ni explicaciones adicionales, siguiendo exactamente esta estructura:

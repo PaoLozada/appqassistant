@@ -2,6 +2,7 @@
 
 import nodemailer from "nodemailer"
 import type { TestPlan } from "./types"
+import type { TestPlanInput } from "./types"
 import { generateTestPlanHTML } from "./html-generator"
 import { generateTestPlanExcel } from "./generateExcel"
 import { Resend } from "resend";
