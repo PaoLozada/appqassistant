@@ -224,10 +224,10 @@ export default function Home() {
         applicationFeatures: selectedFeatures,
       }
 
-      console.log("Generando plan con input:", input)
+      //console.log("Generando plan con input:", input)
 
       try {
-        console.log("Intentando generar plan con OpenAI desde la API interna...")
+        //console.log("Intentando generar plan con OpenAI desde la API interna...")
         const response = await fetch("/api/generate-ai-plan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -239,7 +239,7 @@ export default function Home() {
         }
 
         const data = await response.json()
-        console.log("Plan generado:", data)
+        //console.log("Plan generado:", data)
         setTestPlan(data)
       } catch (error) {
         console.error("❌ Error al generar plan con IA:", error)

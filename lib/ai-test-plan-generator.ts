@@ -215,7 +215,7 @@ export async function generateAITestPlan(input: TestPlanInput): Promise<TestPlan
 
     const prompt = createPrompt(input)
     console.log("input: ", input)
-    console.log("prompt: ", prompt)
+    //console.log("prompt: ", prompt)
 
 
     const response = await openai.chat.completions.create({
