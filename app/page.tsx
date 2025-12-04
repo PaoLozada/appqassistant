@@ -779,7 +779,7 @@ export default function Home() {
       },
     })
   }
-  
+
   const handleSendEmail = async () => {
     if (!testPlan || !emailTo) return
 
@@ -1413,12 +1413,19 @@ export default function Home() {
                       <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-secondary)" }}>
                         Descripción del Sistema <span style={{ color: "#f857a6" }}>*</span>
                       </label>
+                      <label className="block text-xs" style={{ color: "#e4cdd9ff", textAlign: "right", fontStyle: "italic" }}>
+                        No ingreses credenciales, contraseñas ni datos sensibles.
+                      </label>
                       <textarea
                         className="futuristic-input futuristic-textarea"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Describe el sistema o aplicación para el que necesitas un plan de pruebas..."
+                        placeholder="Describe el sistema o aplicación para el que necesitas un plan de pruebas."
+                        maxLength={2000}
                       />
+                      <p className="text-xs mt-1" style={{ color: "var(--text-secondary)", textAlign: "right", }}>
+                        {description.length} / 2000 caracteres
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1440,7 +1447,6 @@ export default function Home() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {[
                           "Funcional",
-                          "Rendimiento",
                           "Seguridad",
                           "Usabilidad",
                           "Accesibilidad",
@@ -1519,8 +1525,14 @@ export default function Home() {
                           <i className="bi bi-magic"></i>
                           Generar Plan de Pruebas
                         </>
+
                       )}
                     </button>
+                    {(!isGenerating && !description) && (
+                      <p className="text-center mt-2 text-sm font-semibold" style={{ color: '#f857a6' }}>
+                        ⚠️ La descripción del sistema es obligatoria para iniciar.
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1528,11 +1540,11 @@ export default function Home() {
             {/* Sección de estadísticas */}
             <div className="stats-section fade-in-up" style={{ animationDelay: "0.2s" }}>
               <div className="stat-card">
-                <span className="stat-number">1K+</span>
+                <span className="stat-number">🚀+</span>
                 <span className="stat-label">Planes Generados</span>
               </div>
               <div className="stat-card">
-                <span className="stat-number">98%</span>
+                <span className="stat-number">⬆%</span>
                 <span className="stat-label">Satisfacción</span>
               </div>
               <div className="stat-card">
@@ -3513,7 +3525,7 @@ export default function Home() {
 
             <div>
               <i className="bi bi-telephone-fill"></i>
-              <p>+571 3118534588</p>
+              <p>+57 3118534588</p>
             </div>
 
             <div>
@@ -3546,6 +3558,7 @@ export default function Home() {
         <div className="text-center p-3" style={{ backgroundColor: "rgba(0, 0, 0, 0.1)", fontSize: "11px" }}>
           Copyright © 2025 | Creado con 💜 por
           <a className="text-white" href="https://paolozada.com"> Paola Lozada</a>
+          <a className="text-white" href="https://paolozada.com/info/privacy-policy/" target="_blank"> | Política de Privacidad ✍</a>
         </div>
 
       </div>
