@@ -249,8 +249,18 @@ export default function Home() {
         setTestPlan(fallbackPlan)
       }
 
-      // Asunto predeterminado para el email
-      setEmailSubject(`Plan de Pruebas: ${description.substring(0, 50)}${description.length > 50 ? "..." : ""}`)
+      const sanitizeSubject = (text: string): string =>
+        text
+          .replace(/[\r\n]+/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+      const defaultSubject = sanitizeSubject(
+        `Plan de Pruebas: ${description.substring(0, 50)}${description.length > 50 ? "..." : ""
+        }`
+      )
+
+      setEmailSubject(defaultSubject)
+
     } catch (error) {
       console.error("⚠️ Error general en la generación:", error)
       alert("Ocurrió un error inesperado. Por favor, intenta de nuevo.")
@@ -785,12 +795,25 @@ export default function Home() {
 
     setIsSending(true)
 
+    const sanitizeSubject = (text: string): string =>
+      text
+        .replace(/[\r\n]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+
+
+    const rawSubject =
+      emailSubject ||
+      `Plan de Pruebas: ${description.substring(0, 50)}${description.length > 50 ? "..." : ""
+      }`
+
+    const subject = sanitizeSubject(rawSubject)
+
     try {
       const result = await sendEmail({
         to: emailTo,
         from: "qassistant@send.paolozada.com", // Remitente fijo
-        subject:
-          emailSubject || `Plan de Pruebas: ${description.substring(0, 50)}${description.length > 50 ? "..." : ""}`,
+        subject,
         planName: emailSubject || `Plan de Pruebas`,
         testPlan: testPlan,
         format: emailFormat,
